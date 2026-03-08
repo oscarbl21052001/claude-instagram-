@@ -1,0 +1,18 @@
+# claude-ig — Python Dependencies
+# Bounded version pinning with security-conscious minimums
+# Last updated: March 2026
+
+# Core dependencies (required for API-driven analysis)
+requests>=2.31.0,<3.0.0         # HTTP client for Instagram Graph API
+
+# Optional but recommended
+apify-client>=1.6.0,<2.0.0     # Apify scraper (fallback when Graph API unavailable)
+python-dotenv>=1.0.0,<2.0.0    # .env file loading
+
+# ─────────────────────────────────────────────────────────────────────
+# OPTIONAL — Advanced features. Scripts work WITHOUT these but gain
+# capabilities when present. Install individually as needed:
+#
+#   pip install textstat              # Readability scoring for caption analysis
+#   pip install beautifulsoup4        # HTML parsing for competitor page analysis
+# ─────────────────────────────────────────────────────────────────────

@@ -259,32 +259,56 @@ For `/ig audit`, all 6 agents spawn in parallel, results aggregate into unified 
 
 ## Instagram API Integration
 
-### Graph API (Direct)
+### Graph API Authentication
 
-For accounts with API access configured, use the Instagram Graph API:
+Instagram data is accessed via the **Facebook Graph API** at `https://graph.facebook.com/v21.0`.
+Do NOT use `graph.instagram.com` (that endpoint rejects Page Tokens).
 
-```
-Base URL: https://graph.instagram.com/v21.0/
-Auth: access_token parameter (Long-Lived User Token)
-Rate Limit: 200 calls/hour per user token
+**Two-Token System:**
+- **User Token** (`INSTAGRAM_ACCESS_TOKEN`): For ads, user-level queries
+- **Page Token** (`META_PAGE_TOKEN`): Required for all Instagram content endpoints (media, insights, stories)
 
-Endpoints:
-  GET /{user-id}?fields=id,username,media_count,followers_count,follows_count
-  GET /{user-id}/media?fields=id,caption,media_type,timestamp,like_count,comments_count&limit=50
-  GET /{media-id}/insights?metric=reach,saved,shares,likes,comments,total_interactions,ig_reels_avg_watch_time
-  GET /{user-id}/insights?metric=reach,follower_count,total_interactions&period=days_28
-```
-
-Note: `plays` and `impressions` are NOT supported in current API version.
-
-### Token Management
-
-Store tokens in environment variables, never in reference files:
+If `META_PAGE_TOKEN` is stale or missing, derive a fresh one:
 ```bash
-# In .env or shell profile
-export INSTAGRAM_ACCESS_TOKEN="your-token-here"
-export INSTAGRAM_USER_ID="your-user-id"
+source ~/Desktop/.env
+PT=$(curl -s "https://graph.facebook.com/v21.0/$META_PAGE_ID?fields=access_token&access_token=$INSTAGRAM_ACCESS_TOKEN" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 ```
+
+**Environment variables** (load with `source ~/Desktop/.env`):
+- `INSTAGRAM_ACCESS_TOKEN`: Long-Lived User Token
+- `META_PAGE_TOKEN`: Page Token (required for content endpoints)
+- `INSTAGRAM_BUSINESS_ACCOUNT_ID`: IG Business Account ID
+- `META_PAGE_ID`: Facebook Page ID (for token derivation)
+- `META_AD_ACCOUNT_ID`: Ad Account ID (for ads endpoints)
+
+### Endpoints
+
+```
+Base URL: https://graph.facebook.com/v21.0
+Auth: Page Token for content, User Token for ads
+Rate Limit: 200 calls/hour per token
+
+Content endpoints (Page Token):
+  GET /{ig-id}?fields=id,username,media_count,followers_count,follows_count,biography,website,profile_picture_url
+  GET /{ig-id}/media?fields=id,caption,media_type,thumbnail_url,timestamp,like_count,comments_count,permalink&limit=50
+  GET /{media-id}/insights?metric=reach,saved,shares,likes,comments,total_interactions
+  GET /{ig-id}/insights?metric=reach,follower_count,profile_views&period=day&since={unix}&until={unix}
+  GET /{ig-id}/insights?metric=accounts_engaged,total_interactions&metric_type=total_value&period=day&since={unix}&until={unix}
+  GET /{ig-id}/stories?fields=id,media_type,timestamp
+```
+
+**IMPORTANT:** Do NOT request `impressions` or `plays` (deprecated for Reels in v22+).
+`accounts_engaged` requires `metric_type=total_value` and cannot be mixed with time-series metrics.
+
+### Script Usage
+
+The `scripts/analyze_post.py` script handles token management automatically:
+```bash
+source ~/Desktop/.env
+python3 scripts/analyze_post.py --user-id $INSTAGRAM_BUSINESS_ACCOUNT_ID --token $INSTAGRAM_ACCESS_TOKEN --page-token $META_PAGE_TOKEN --page-id $META_PAGE_ID
+```
+If `--page-token` is omitted, the script derives one from `--token` + `--page-id`.
 
 ### Graceful Degradation
 

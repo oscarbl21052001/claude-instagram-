@@ -63,7 +63,7 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-GRAPH_API_BASE = "https://graph.instagram.com/v21.0"
+GRAPH_API_BASE = "https://graph.facebook.com/v21.0"
 
 # Metrics requested from the insights endpoint (plays/impressions NOT supported)
 MEDIA_INSIGHTS_METRICS = [
@@ -1365,6 +1365,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Instagram Graph API access token (env: INSTAGRAM_ACCESS_TOKEN)",
     )
     source.add_argument(
+        "--page-token",
+        help="Meta Page Token for Instagram content endpoints (env: META_PAGE_TOKEN). "
+             "If not provided, derived automatically from --token + --page-id.",
+    )
+    source.add_argument(
+        "--page-id",
+        help="Facebook Page ID for Page Token derivation (env: META_PAGE_ID)",
+    )
+    source.add_argument(
         "--username",
         help="Instagram username for Apify fallback",
     )
@@ -1428,7 +1437,45 @@ def resolve_credentials(args: argparse.Namespace) -> argparse.Namespace:
         )
     if not args.apify_token:
         args.apify_token = os.environ.get("APIFY_TOKEN", "")
+    if not getattr(args, "page_token", None):
+        args.page_token = os.environ.get("META_PAGE_TOKEN", "")
+    if not getattr(args, "page_id", None):
+        args.page_id = os.environ.get("META_PAGE_ID", "")
     return args
+
+
+def derive_page_token(user_token: str, page_id: str) -> str:
+    """Derive a Page Token from User Token + Page ID via Graph API."""
+    if not user_token or not page_id:
+        return ""
+    url = f"{GRAPH_API_BASE}/{page_id}?fields=access_token&access_token={user_token}"
+    try:
+        data = _api_get(url)
+        token = data.get("access_token", "")
+        if token:
+            _log(f"Derived fresh Page Token from Page ID {page_id}")
+        return token
+    except RuntimeError as exc:
+        _log(f"Warning: Could not derive Page Token: {exc}")
+        return ""
+
+
+def get_content_token(args: argparse.Namespace) -> str:
+    """Get the correct token for Instagram content endpoints (Page Token preferred).
+
+    Instagram content endpoints (media, insights, stories) require a Page Token.
+    The User Token (INSTAGRAM_ACCESS_TOKEN) alone will fail with '(#200) Provide valid app ID'.
+
+    Priority: 1) explicit --page-token  2) derive from --token + --page-id  3) fall back to --token
+    """
+    if args.page_token:
+        return args.page_token
+    if args.token and args.page_id:
+        derived = derive_page_token(args.token, args.page_id)
+        if derived:
+            return derived
+    _log("Warning: No Page Token available. Using User Token (may fail for content endpoints).")
+    return args.token
 
 
 def main() -> int:
@@ -1450,14 +1497,16 @@ def main() -> int:
             data_source = "file"
 
         elif args.post_id and args.token:
-            # Single post via Graph API
-            account, posts = fetch_single_post_graph_api(args.post_id, args.token)
+            # Single post via Graph API (needs Page Token for content endpoints)
+            content_token = get_content_token(args)
+            account, posts = fetch_single_post_graph_api(args.post_id, content_token)
             data_source = "graph_api"
 
         elif args.user_id and args.token:
-            # Graph API
+            # Graph API (needs Page Token for content endpoints)
+            content_token = get_content_token(args)
             account, posts = fetch_posts_graph_api(
-                args.user_id, args.token, args.limit, args.days,
+                args.user_id, content_token, args.limit, args.days,
             )
             data_source = "graph_api"
 

@@ -19,13 +19,13 @@ Works with any Instagram account and niche. Automatic niche detection adapts hoo
 **One-command install (Unix/macOS):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/NicoJunk/claude-ig/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nicojunk/claude-ig/main/install.sh | bash
 ```
 
 **Or clone and install manually:**
 
 ```bash
-git clone https://github.com/NicoJunk/claude-ig.git
+git clone https://github.com/nicojunk/claude-ig.git
 cd claude-ig
 chmod +x install.sh && ./install.sh
 ```
@@ -234,4 +234,4 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
-Built by [NicoJunk](https://github.com/NicoJunk) with Claude Code.
+Built by [NicoJunk](https://github.com/nicojunk) with Claude Code.

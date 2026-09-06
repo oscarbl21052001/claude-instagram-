@@ -11,13 +11,13 @@
 ### From GitHub
 
 ```bash
-curl -sL https://raw.githubusercontent.com/NicoJunk/claude-ig/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/nicojunk/claude-ig/main/install.sh | bash
 ```
 
 ### From Local Clone
 
 ```bash
-git clone https://github.com/NicoJunk/claude-ig.git
+git clone https://github.com/nicojunk/claude-ig.git
 cd claude-ig
 bash install.sh
 ```

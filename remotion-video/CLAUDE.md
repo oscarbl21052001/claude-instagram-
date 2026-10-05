@@ -9,8 +9,8 @@ Nunca guardar ni repetir tokens de GitHub en archivos o mensajes.
   etiquetas naranjas, subtítulos por palabras con la palabra clave resaltada y tarjetas con iconos que
   aparecen. Se usa **solo el estilo**, nunca su contenido.
 - El primer video de prueba (selfie sobre propiedades en el extranjero) **no se reutiliza en ningún sitio**:
-  ni contenido, ni subtítulos, ni estilos de aquella composición (`src/Reel/`: playa dibujada, Matrix,
-  subtítulos amarillos). Para videos nuevos se empieza de cero con `src/kit/`.
+  ni contenido, ni subtítulos, ni estilos de aquella composición (playa dibujada, Matrix, subtítulos amarillos),
+  que ya se retiró del repo. Para videos nuevos se empieza de cero con `src/kit/`.
 - Fondos hechos con código se notan: si hace falta un fondo realista, proponer una imagen o clip real/IA
   y pedir permiso antes de generar nada (Higgsfield consume créditos).
 - Antes de entregar, mirar varios fotogramas por escena y decir qué no convence.
@@ -20,7 +20,9 @@ Nunca guardar ni repetir tokens de GitHub en archivos o mensajes.
    Máx. 100 MB por archivo en GitHub; mejor 1080p/30 fps. Un adjunto de chat debe pesar < 25 MB.
 2. `git fetch origin mi-video` y traer el archivo. `ffprobe` para duración, resolución, rotación y audio.
 3. Copia de trabajo 1080x1920 a 30 fps en H.264 (los móviles graban HEVC 4K con rotación):
-   `tools/make_subject.py` hace copia + recorte del sujeto (MODNet) en `public/subject/*.webp`.
+   Recorte del sujeto por fotograma con MODNet (`Xenova/modnet`, `onnx/model.onnx`, entrada 480x864,
+   suavizado temporal, exportar RGBA .webp a 1080x1920). El script que lo hacía se retiró del repo pero está
+   en el historial: `git show 744b5dc:remotion-video/tools/make_subject.py`.
 4. Transcribir con `faster-whisper` (modelo `small`, `language="es"`, `word_timestamps=True`).
    El audio no se "oye": solo se lee la transcripción, que puede fallar con nombres propios.
 5. Componer en Remotion con los componentes de `src/kit/`. Orden de capas con sujeto recortado:

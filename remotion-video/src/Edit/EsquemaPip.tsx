@@ -37,6 +37,7 @@ const PIP = { x: 100, y: 925, w: 880, h: 560, r: 46 };
 const PIP_ZOOM = 0.85; // escala del video dentro del PIP
 const HEAD_DROP = 255; // el centro de la vista queda tantos px (del video) por debajo de la coronilla
 const CAPTION_Y = 1565;
+const SHOW_CAPTIONS = false; // subtítulos por palabras (desactivados a petición de la persona usuaria)
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const inOut = Easing.bezier(0.65, 0, 0.35, 1);
@@ -349,7 +350,7 @@ export const EsquemaPip: React.FC = () => {
           </div>
         </div>
       </div>
-      <Captions words={WORDS} />
+      {SHOW_CAPTIONS && <Captions words={WORDS} />}
     </AbsoluteFill>
   );
 };

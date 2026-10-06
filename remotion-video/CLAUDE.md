@@ -19,10 +19,12 @@ Nunca guardar ni repetir tokens de GitHub en archivos o mensajes.
 1. La persona sube el video a la rama `mi-video` (carpeta `remotion-video/public/`) y avisa del nombre.
    Máx. 100 MB por archivo en GitHub; mejor 1080p/30 fps. Un adjunto de chat debe pesar < 25 MB.
 2. `git fetch origin mi-video` y traer el archivo. `ffprobe` para duración, resolución, rotación y audio.
-3. Copia de trabajo 1080x1920 a 30 fps en H.264 (los móviles graban HEVC 4K con rotación):
-   Recorte del sujeto por fotograma con MODNet (`Xenova/modnet`, `onnx/model.onnx`, entrada 480x864,
-   suavizado temporal, exportar RGBA .webp a 1080x1920). El script que lo hacía se retiró del repo pero está
-   en el historial: `git show 744b5dc:remotion-video/tools/make_subject.py`.
+3. Copia de trabajo 1080x1920 a 30 fps en H.264 (los móviles graban HEVC 4K): 
+   `ffmpeg -i entrada.mov -vf "scale=1080:1920,fps=30" -c:v libx264 -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k video_1080.mp4`.
+   Recorte del sujeto: extraer fotogramas JPG (`f_NNNN.jpg`, NNNN = nº de fotograma) y ejecutar
+   `python tools/recorte/recorte.py <fotogramas> public/recorte <seguimiento.json>` (MODNet en CPU, ~0,6 s por
+   fotograma; deja RGBA .webp y la posición de la cabeza). `public/recorte/` está en .gitignore (74 MB por 873
+   fotogramas): hay que regenerarlo en cada máquina. Dependencias: onnxruntime pillow numpy scipy huggingface_hub.
 4. Transcribir con `faster-whisper` (modelo `small`, `language="es"`, `word_timestamps=True`).
    El audio no se "oye": solo se lee la transcripción, que puede fallar con nombres propios.
 5. Componer en Remotion con los componentes de `src/kit/`. Orden de capas con sujeto recortado:
@@ -69,3 +71,17 @@ composiciones `UnidadFlotante` (`src/Unidad/`, recibe una configuración por uni
 - Renders de ejemplo guardados en `renders/`. EEVEE no funciona sin GPU: Cycles en CPU.
 - Los planos de catálogo son imágenes, no vectores: el modelo es aproximado. Pedir DWG/DXF/PDF vectorial si existe.
 - Avisar siempre de los derechos del plano y del catálogo si el video es para clientes o redes.
+
+## Edición "esquema + PIP" (composición `EsquemaPip`, `src/Edit/`)
+Video hablado (Reel 1080x1920) → esquema animado en la mitad superior y la persona recortada en un PIP en la mitad
+inferior, con paso suave entre pantalla completa y PIP. Paleta de la persona usuaria: `#C7AE6A #000000 #d5c28f
+#b99a45 #1a1a1a #e3d6b4` (constantes `P` en `EsquemaPip.tsx`; el kit violeta no se usa aquí).
+- Datos por video: `src/Edit/words.ts` (palabras con tiempos de Whisper, corregidas por la persona),
+  `STEPS` (texto y segundo en que aparece cada tarjeta, `**negrita**` = palabra clave dorada) y tiempos
+  `T_IN/T_IN_END/T_OUT/T_OUT_END/SCHEMA_EXIT`. `src/Edit/head.ts` lo genera `tools/recorte/recorte.py`.
+- El PIP sigue la cabeza con una "cámara virtual" suavizada. Capas del PIP: degradado → video (se desvanece) →
+  recorte encima, así la persona no parpadea al cambiar el fondo.
+- Antes de montar, enseñar a la persona el esquema propuesto y las palabras de la transcripción dudosas
+  (Whisper falla con "en pozo", "cuotas", "amortizar", "apalancamiento"): no poner en pantalla texto sin confirmar.
+- Render: unos 10 min en la nube para 35 s (`--gl=swangle`). Los subtítulos usan contorno negro para leerse sobre
+  la camisa blanca. La zona segura de Reels es aproximada (subtítulos a y=1565).

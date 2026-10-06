@@ -60,3 +60,12 @@ Escala: los px de diseño web (base 390) se multiplican por `UI_SCALE` ≈ 2,77 
 - Otros estilos con potencial para video: Glassmorphism, Bento Grids, Aurora UI, Kinetic Typography,
   Liquid Glass, Kinetic Brutalism.
 - Antes de ejecutar código de repos de terceros, revisarlo. Las skills corren con permisos amplios.
+
+## Unidades 3D: plano → unidad flotante y recorrido
+Proceso completo, entradas que pedir, comprobaciones y trampas: **`.claude/skills/unidad-flotante/SKILL.md`**
+(leerlo antes de empezar cualquier video de este tipo). Código en `tools/unidad/` (Blender sin interfaz con `bpy`),
+composiciones `UnidadFlotante` (`src/Unidad/`, recibe una configuración por unidad) y `TourApto` (`src/Tour/`).
+- La unidad de referencia es `tipo101` (`tools/unidad/specs/tipo101.py`). Una unidad nueva = una especificación nueva.
+- Renders de ejemplo guardados en `renders/`. EEVEE no funciona sin GPU: Cycles en CPU.
+- Los planos de catálogo son imágenes, no vectores: el modelo es aproximado. Pedir DWG/DXF/PDF vectorial si existe.
+- Avisar siempre de los derechos del plano y del catálogo si el video es para clientes o redes.

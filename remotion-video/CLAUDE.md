@@ -76,3 +76,13 @@ Composición `TourApto` (`src/Tour/`), video de fondo `public/tour/walk.mp4`, sc
   vidrio (cuña negra). Mantener la cámara a >0,7 m de postes/muebles altos y fuera de volúmenes.
 - Los renders de Cycles salen sobreexpuestos con luz cálida: usar AgX y revisar exposición.
 - Textos del video en español; el catálogo origen está en portugués. Incluir aviso "recreación 3D ilustrativa".
+
+## Unidad flotante (composición `UnidadFlotante`)
+La unidad 3D flota en el centro, gira sobre sí misma y al final se inclina hacia adelante: el techo se levanta y se
+ve la distribución, con etiquetas de cada ambiente ancladas en 3D (`src/Unidad/`).
+- Modelo: `public/models/unidad_tipo101.glb` (2 MB), exportado con `tools/apto/export_unit.py` (bpy). El techo es un
+  objeto aparte llamado `TECHO`. glTF no exporta materiales procedurales: hay que fijar colores planos antes de exportar.
+- three.js en Remotion: render con `--gl=swangle` (sin GPU) y navegador `headless_shell`; ~3 s por fotograma
+  a 1080x1920 con sombras. Las animaciones deben depender solo de `useCurrentFrame()`.
+- Las etiquetas se proyectan con una `PerspectiveCamera` idéntica a la de la escena (misma transformación).
+- Exportar plantas/hojas sueltas dio objetos flotando fuera del modelo: se eliminaron del export.

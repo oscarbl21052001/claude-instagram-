@@ -2,6 +2,7 @@ import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
 import { KitDemo } from "./KitDemo/KitDemo";
 import { TOUR_DURATION, TOUR_FPS, TourApto } from "./Tour/TourApto";
+import { UNIDAD_DURATION, UNIDAD_FPS, UnidadFlotante } from "./Unidad/UnidadFlotante";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -20,6 +21,14 @@ export const RemotionRoot: React.FC = () => {
         component={TourApto}
         durationInFrames={TOUR_DURATION}
         fps={TOUR_FPS}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="UnidadFlotante"
+        component={UnidadFlotante}
+        durationInFrames={UNIDAD_DURATION}
+        fps={UNIDAD_FPS}
         width={1080}
         height={1920}
       />

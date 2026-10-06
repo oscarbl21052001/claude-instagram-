@@ -10,27 +10,28 @@ import { Background, colors, fonts, GlassCard, Headline, motion, safe, Tag, useK
 export const UNIDAD_FPS = 30;
 export const UNIDAD_DURATION = 270;
 
-const W = 1080, H = 1920;
-const FOV = 22, CAM_D = 66;
-const PX = 56.5, X0 = 16, Y0 = 559;                        // escala del plano (px → m)
-const plan = (px: number, py: number) => new THREE.Vector3((px - X0) / PX, 0.05, -((Y0 - py) / PX));
-const CENTER = new THREE.Vector3(11.5 / 2, 1.4, -7.5 / 2 - 0.3);
+export type UnitConfig = {
+  id: string;
+  glb: string; // ruta dentro de public/
+  center: [number, number, number]; // centro del modelo en ejes de three.js
+  size: [number, number, number];
+  rooms: { name: string; area: string; position: [number, number, number] }[];
+  title: { tag: string; lines: [string, string] };
+  footnote: string;
+  camDistance?: number; // por defecto, proporcional al lado mayor de la unidad
+};
 
-const ROOMS = [
-  { name: "Salón y cocina", area: "23,37 m²", at: plan(520, 330) },
-  { name: "Balcón", area: "6,44 m²", at: plan(524, 510) },
-  { name: "Suite B", area: "12,45 m²", at: plan(285, 470) },
-  { name: "Suite A", area: "14,22 m²", at: plan(105, 425) },
-];
+const W = 1080, H = 1920;
+const FOV = 22;
 
 const ease = Easing.bezier(...motion.expoOut);
 const inOut = Easing.inOut(Easing.cubic);
 
-const useModel = () => {
+const useModel = (glb: string) => {
   const [model, setModel] = useState<THREE.Group | null>(null);
   const [handle] = useState(() => delayRender("Cargando modelo 3D"));
   useEffect(() => {
-    new GLTFLoader().load(staticFile("models/unidad_tipo101.glb"), (g) => {
+    new GLTFLoader().load(staticFile(glb), (g) => {
       g.scene.traverse((o) => {
         const m = o as THREE.Mesh;
         if (m.isMesh) {
@@ -43,15 +44,18 @@ const useModel = () => {
       setModel(g.scene);
       continueRender(handle);
     });
-  }, [handle]);
+  }, [handle, glb]);
   return model;
 };
 
-export const UnidadFlotante: React.FC = () => {
+export const UnidadFlotante: React.FC<{ config: UnitConfig }> = ({ config }) => {
   useKitFonts();
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
-  const model = useModel();
+  const model = useModel(config.glb);
+  const CENTER = useMemo(() => new THREE.Vector3(...config.center), [config.center]);
+  const CAM_D = config.camDistance ?? 5.6 * Math.max(config.size[0], config.size[2]);
+  const ROOMS = useMemo(() => config.rooms.map((r) => ({ ...r, at: new THREE.Vector3(...r.position) })), [config.rooms]);
 
   // --- línea de tiempo ---
   const enter = spring({ frame, fps, config: motion.spring, durationInFrames: 40 });
@@ -88,7 +92,7 @@ export const UnidadFlotante: React.FC = () => {
       const p = r.at.clone().sub(CENTER).applyMatrix4(m).project(cam);
       return { ...r, x: ((p.x + 1) / 2) * W, y: ((1 - p.y) / 2) * H };
     });
-  }, [camY, floatY, pitch, yaw, scale]);
+  }, [camY, floatY, pitch, yaw, scale, CAM_D, CENTER, ROOMS]);
 
   const labelOpacity = interpolate(frame, [222, 246], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const glow = interpolate(frame, [150, 232], [0.55, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -112,9 +116,9 @@ export const UnidadFlotante: React.FC = () => {
 
       {/* título */}
       <div style={{ position: "absolute", left: safe.side, top: safe.top - 40, opacity: interpolate(frame, [4, 24], [0, 1], { extrapolateRight: "clamp" }) }}>
-        <Tag text="Unidad tipo" delay={4} />
+        <Tag text={config.title.tag} delay={4} />
         <div style={{ marginTop: 26 }}>
-          <Headline lines={["80 M²", "2 SUITES"]} delay={10} gradientLine={1} size={150} />
+          <Headline lines={config.title.lines} delay={10} gradientLine={1} size={150} />
         </div>
       </div>
 
@@ -129,7 +133,7 @@ export const UnidadFlotante: React.FC = () => {
       ))}
 
       <div style={{ position: "absolute", left: safe.side, right: safe.side, top: 1560, textAlign: "center", fontFamily: fonts.body, fontWeight: 500, fontSize: 26, color: "rgba(255,255,255,0.7)", opacity: labelOpacity }}>
-        Recreación 3D ilustrativa. Medidas aproximadas.
+        {config.footnote}
       </div>
     </AbsoluteFill>
   );

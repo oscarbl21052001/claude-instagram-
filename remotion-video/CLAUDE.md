@@ -61,28 +61,11 @@ Escala: los px de diseño web (base 390) se multiplican por `UI_SCALE` ≈ 2,77 
   Liquid Glass, Kinetic Brutalism.
 - Antes de ejecutar código de repos de terceros, revisarlo. Las skills corren con permisos amplios.
 
-## Recorrido 3D de un apartamento (Blender sin interfaz + Remotion)
-Composición `TourApto` (`src/Tour/`), video de fondo `public/tour/walk.mp4`, scripts en `tools/apto/`
-(contienen rutas absolutas de la sesión: ajustar antes de reutilizarlos).
-- **Blender sin interfaz:** `pip install bpy==4.5.14` (Python 3.11). **EEVEE no funciona sin GPU**: usar Cycles en CPU
-  (~30 s por fotograma a 576x1024, 16 muestras + denoise OpenImageDenoise, 4 núcleos).
-- **Del plano al modelo:** los planos del catálogo son imágenes, no vectores. Se detectaron los muros negros
-  (líneas largas y finas) y se revisaron a mano; escala calibrada con las superficies indicadas (~56,5 px/m).
-  Comprobar siempre con una vista cenital superpuesta al plano. Si hay DWG/DXF/PDF vectorial, usarlo.
-- **Recorrido:** 12 fps renderizados + intermedios reales donde la cámara gira rápido (>3°/fotograma); en el resto,
-  mezcla de dos vecinos. `ffmpeg minterpolate` deforma la imagen en los giros: no usarlo. Revisar fotogramas negros
-  con `signalstats` (YAVG<25).
-- **Errores de ruta ya cometidos:** cámara dentro de un mueble alto (todo negro) y pegada a un poste del marco de
-  vidrio (cuña negra). Mantener la cámara a >0,7 m de postes/muebles altos y fuera de volúmenes.
-- Los renders de Cycles salen sobreexpuestos con luz cálida: usar AgX y revisar exposición.
-- Textos del video en español; el catálogo origen está en portugués. Incluir aviso "recreación 3D ilustrativa".
-
-## Unidad flotante (composición `UnidadFlotante`)
-La unidad 3D flota en el centro, gira sobre sí misma y al final se inclina hacia adelante: el techo se levanta y se
-ve la distribución, con etiquetas de cada ambiente ancladas en 3D (`src/Unidad/`).
-- Modelo: `public/models/unidad_tipo101.glb` (2 MB), exportado con `tools/apto/export_unit.py` (bpy). El techo es un
-  objeto aparte llamado `TECHO`. glTF no exporta materiales procedurales: hay que fijar colores planos antes de exportar.
-- three.js en Remotion: render con `--gl=swangle` (sin GPU) y navegador `headless_shell`; ~3 s por fotograma
-  a 1080x1920 con sombras. Las animaciones deben depender solo de `useCurrentFrame()`.
-- Las etiquetas se proyectan con una `PerspectiveCamera` idéntica a la de la escena (misma transformación).
-- Exportar plantas/hojas sueltas dio objetos flotando fuera del modelo: se eliminaron del export.
+## Unidades 3D: plano → unidad flotante y recorrido
+Proceso completo, entradas que pedir, comprobaciones y trampas: **`.claude/skills/unidad-flotante/SKILL.md`**
+(leerlo antes de empezar cualquier video de este tipo). Código en `tools/unidad/` (Blender sin interfaz con `bpy`),
+composiciones `UnidadFlotante` (`src/Unidad/`, recibe una configuración por unidad) y `TourApto` (`src/Tour/`).
+- La unidad de referencia es `tipo101` (`tools/unidad/specs/tipo101.py`). Una unidad nueva = una especificación nueva.
+- Renders de ejemplo guardados en `renders/`. EEVEE no funciona sin GPU: Cycles en CPU.
+- Los planos de catálogo son imágenes, no vectores: el modelo es aproximado. Pedir DWG/DXF/PDF vectorial si existe.
+- Avisar siempre de los derechos del plano y del catálogo si el video es para clientes o redes.

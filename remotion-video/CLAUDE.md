@@ -60,3 +60,19 @@ Escala: los px de diseño web (base 390) se multiplican por `UI_SCALE` ≈ 2,77 
 - Otros estilos con potencial para video: Glassmorphism, Bento Grids, Aurora UI, Kinetic Typography,
   Liquid Glass, Kinetic Brutalism.
 - Antes de ejecutar código de repos de terceros, revisarlo. Las skills corren con permisos amplios.
+
+## Recorrido 3D de un apartamento (Blender sin interfaz + Remotion)
+Composición `TourApto` (`src/Tour/`), video de fondo `public/tour/walk.mp4`, scripts en `tools/apto/`
+(contienen rutas absolutas de la sesión: ajustar antes de reutilizarlos).
+- **Blender sin interfaz:** `pip install bpy==4.5.14` (Python 3.11). **EEVEE no funciona sin GPU**: usar Cycles en CPU
+  (~30 s por fotograma a 576x1024, 16 muestras + denoise OpenImageDenoise, 4 núcleos).
+- **Del plano al modelo:** los planos del catálogo son imágenes, no vectores. Se detectaron los muros negros
+  (líneas largas y finas) y se revisaron a mano; escala calibrada con las superficies indicadas (~56,5 px/m).
+  Comprobar siempre con una vista cenital superpuesta al plano. Si hay DWG/DXF/PDF vectorial, usarlo.
+- **Recorrido:** 12 fps renderizados + intermedios reales donde la cámara gira rápido (>3°/fotograma); en el resto,
+  mezcla de dos vecinos. `ffmpeg minterpolate` deforma la imagen en los giros: no usarlo. Revisar fotogramas negros
+  con `signalstats` (YAVG<25).
+- **Errores de ruta ya cometidos:** cámara dentro de un mueble alto (todo negro) y pegada a un poste del marco de
+  vidrio (cuña negra). Mantener la cámara a >0,7 m de postes/muebles altos y fuera de volúmenes.
+- Los renders de Cycles salen sobreexpuestos con luz cálida: usar AgX y revisar exposición.
+- Textos del video en español; el catálogo origen está en portugués. Incluir aviso "recreación 3D ilustrativa".

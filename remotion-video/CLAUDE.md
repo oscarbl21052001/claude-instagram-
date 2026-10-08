@@ -85,3 +85,33 @@ inferior, con paso suave entre pantalla completa y PIP. Paleta de la persona usu
   (Whisper falla con "en pozo", "cuotas", "amortizar", "apalancamiento"): no poner en pantalla texto sin confirmar.
 - Render: unos 10 min en la nube para 35 s (`--gl=swangle`). Los subtítulos usan contorno negro para leerse sobre
   la camisa blanca. La zona segura de Reels es aproximada (subtítulos a y=1565).
+
+## Calle pintada + texto pegado al suelo en video de dron (`CalleDorada`, `src/Calle/`, `tools/calle/`)
+Plano de dron girando: se pinta de mostaza dorado (`#E2A826`) la calle principal y se escribe un texto tumbado en
+el suelo que sigue el giro de cámara. Probado con un clip de 2 s (62 fotogramas); no sé cómo se comporta con clips largos.
+1. Fotogramas 1080x1920 (`f_NNNN.jpg`, desde 0) → `tools/calle/segmentar_calle.py` (SegFormer-B5 ADE20K, clase "road",
+   ~30 s por fotograma en CPU) → `road_NNNN.npy`.
+2. `tools/calle/seguir.py <fotogramas> <road> todo` → `G_todo.npy` (homografías acumuladas SIFT+RANSAC; en un giro
+   puro valen para cualquier plano). Para comprobar: IoU entre la máscara del fotograma 0 llevada al k y la real.
+3. `tools/calle/procesar.py` → `public/calle/p_NNNN.webp` (dorado con la luz de la imagen) y `src/Calle/datos.ts`
+   (matriz `matrix3d` del texto por fotograma). Solo se pinta la calle conectada con la del primer y último fotograma
+   (descarta solares y aparcamientos que el modelo también llama "road"). `tools/calle/texto.py` recalcula solo el texto
+   (variable `QUAD` = esquinas del tramo de calle en el fotograma 0).
+4. El texto se recorta con la silueta de la calle y se revela en el sentido de lectura. Trampa: con `clipPath`, un
+   texto más ancho que su textura (1800 px) se corta por el extremo; usar fuente ≤ 420 px.
+Limitaciones: en el clip 1008, al final del giro la máscara pinta también el solar de obra junto a la calle; el audio de
+los clips de prueba era silencio (-91 dB).
+
+### Versión con bordes rectos (clip RAIL, composición `CalleRail`) (pedida por la persona tras ver la versión irregular)
+Pintar el borde de la máscara del modelo deja los lados irregulares (invade aceras y solares). Ahora la calle es un
+**polígono de lados rectos** que se define a mano sobre el fotograma de referencia (con cuadrícula para leer
+coordenadas) y se lleva a cada fotograma con la homografía del giro; el modelo solo se usa para recortar obstáculos
+(árboles, coches, camiones) dentro del polígono y nunca define el borde. Un lado puede tener un escalón si la calle
+realmente cambia de borde (solar en el clip RAIL). Preferir polígonos algo más estrechos que la calle antes que pasarse.
+1. Igual que arriba, con `tools/calle/segmentar_calle.py <fotogramas> <salida> 8` (solo 1 de cada 8 fotogramas: dan
+   `road_` y `occ_`; ~30 s por fotograma) y `seguir.py` (`G_todo.npy`).
+2. `tools/calle/config/rail.json`: `tramos` (polígono, fotograma de referencia, rango de fotogramas) y `quad` del texto.
+   `python tools/calle/pintar_recta.py <fotogramas> <road> <G_todo.npy> <config.json> public/calle_rail src/Calle/datosRail.ts`.
+3. `src/Calle/CalleDorada.tsx` (`CalleEscena`, recibe una `CalleConfig`) y `src/Calle/CalleRail.tsx` con los tiempos.
+`G` solo es fiable mientras el plano no gira más de unos 70-80°: más allá las homografías divergen, por eso la calle
+del inicio se limita a los fotogramas 0-72 y la del final se ancla al último fotograma (82-98).

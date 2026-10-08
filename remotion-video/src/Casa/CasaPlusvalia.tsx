@@ -1,11 +1,8 @@
 import { Audio } from "@remotion/media";
 import { ThreeCanvas } from "@remotion/three";
-import { useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useState } from "react";
-import { AbsoluteFill, continueRender, delayRender, Easing, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { useMemo } from "react";
+import { AbsoluteFill, Easing, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import * as THREE from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { useEnter, useKitFonts } from "../kit";
 
 // Reel esquemático sincronizado con el audio "AUDIO.mp4" (11,6 s):
@@ -40,8 +37,6 @@ const P = {
   sheen: "#F3EBB6",
   shade: "#8f7138",
   green: "#22c55e",
-  bg: "#F4F0E8", // blanco roto
-  bgDeep: "#E8E1D2",
 };
 const METAL = `linear-gradient(135deg, ${P.shade} 0%, ${P.gold} 28%, ${P.sheen} 50%, ${P.gold} 72%, ${P.shade} 100%)`;
 
@@ -83,15 +78,15 @@ const Fondo: React.FC = () => {
         width: size,
         height: size,
         borderRadius: "50%",
-        background: `radial-gradient(circle, rgba(226,190,100,${alpha}) 0%, transparent 66%)`,
+        background: `radial-gradient(circle, ${P.goldDeep}${alpha} 0%, transparent 66%)`,
       }}
     />
   );
   return (
-    <AbsoluteFill style={{ background: `linear-gradient(180deg, #F8F5EE 0%, ${P.bg} 55%, ${P.bgDeep} 100%)` }}>
-      {blob(220, 420, 1200, "0.16", 11, 0)}
-      {blob(880, 1350, 1100, "0.12", 9, 2)}
-      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 48%, transparent 45%, rgba(120,98,52,0.16) 100%)" }} />
+    <AbsoluteFill style={{ background: `linear-gradient(180deg, ${P.ink} 0%, ${P.black} 100%)` }}>
+      {blob(220, 420, 1200, "30", 11, 0)}
+      {blob(880, 1350, 1100, "26", 9, 2)}
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.62) 100%)" }} />
     </AbsoluteFill>
   );
 };
@@ -118,9 +113,9 @@ const Tarjeta: React.FC<{ i: number; merge: number }> = ({ i, merge }) => {
         display: "flex",
         alignItems: "center",
         padding: "0 44px",
-        background: "linear-gradient(180deg, rgba(70,58,32,0.96) 0%, rgba(26,26,26,0.97) 78%)",
+        background: "linear-gradient(180deg, rgba(199,174,106,0.18) 0%, rgba(26,26,26,0.92) 72%)",
         border: `1.5px solid rgba(199,174,106,${0.45 + 0.4 * glow})`,
-        boxShadow: `0 20px 46px rgba(70,50,15,0.30), 0 0 ${30 + 90 * glow}px rgba(226,168,38,${0.12 + 0.5 * glow})`,
+        boxShadow: `0 24px 60px rgba(0,0,0,0.55), 0 0 ${30 + 90 * glow}px rgba(226,190,100,${0.1 + 0.4 * glow})`,
         backdropFilter: "blur(18px)",
         opacity: interpolate(enter, [0, 0.5], [0, 1], { extrapolateRight: "clamp" }) * (1 - smooth(0.82, 1, merge)),
         transform: `translateY(${(1 - Math.min(enter, 1)) * -50}px) scale(${scale * (0.94 + 0.06 * Math.min(enter, 1))})`,
@@ -176,7 +171,7 @@ const Cuerpo: React.FC<{ merge: number }> = ({ merge }) => {
           width: 1040,
           height: 660,
           borderRadius: "50%",
-          background: `radial-gradient(ellipse, rgba(236,176,40,${0.55 * intensity}) 0%, rgba(226,190,100,${0.28 * intensity}) 38%, transparent 70%)`,
+          background: `radial-gradient(ellipse, rgba(243,235,182,${0.55 * intensity}) 0%, rgba(199,174,106,${0.25 * intensity}) 35%, transparent 70%)`,
           opacity,
           transform: `scale(${scale})`,
         }}
@@ -192,7 +187,7 @@ const Cuerpo: React.FC<{ merge: number }> = ({ merge }) => {
           padding: 7,
           borderRadius: 58,
           background: METAL,
-          boxShadow: `0 0 ${60 + 110 * intensity}px rgba(226,168,38,${0.4 + 0.5 * Math.min(intensity, 1.4)}), 0 24px 50px rgba(70,50,15,0.25)`,
+          boxShadow: `0 0 ${70 + 120 * intensity}px rgba(226,190,100,${0.35 + 0.45 * Math.min(intensity, 1.4)})`,
           opacity,
           transform: `scale(${scale})`,
         }}
@@ -228,66 +223,33 @@ const Destello: React.FC = () => {
   const t = useCurrentFrame() / CASA_FPS;
   const k = interpolate(t, [T.morph - 0.1, T.morph + 0.12, T.morph + 0.7], [0, 1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   if (k <= 0.001) return null;
-  const e = smooth(T.morph, T.morph + 0.6, t);
-  const size = 300 + 800 * e;
-  const ring = 240 + 1100 * e;
+  const size = 300 + 900 * smooth(T.morph, T.morph + 0.6, t);
   return (
-    <>
-      <div
-        style={{
-          position: "absolute",
-          left: HOUSE_SCREEN_X - size / 2,
-          top: HOUSE_SCREEN_Y - size / 2,
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,232,150,0.95) 0%, rgba(236,176,40,0.5) 34%, transparent 68%)",
-          opacity: k,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: HOUSE_SCREEN_X - ring / 2,
-          top: HOUSE_SCREEN_Y - ring / 2,
-          width: ring,
-          height: ring,
-          borderRadius: "50%",
-          border: "7px solid rgba(226,168,38,0.85)",
-          boxSizing: "border-box",
-          opacity: k * 0.8,
-        }}
-      />
-    </>
+    <div
+      style={{
+        position: "absolute",
+        left: HOUSE_SCREEN_X - size / 2,
+        top: HOUSE_SCREEN_Y - size / 2,
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,247,215,0.95) 0%, rgba(226,190,100,0.45) 35%, transparent 68%)",
+        opacity: k,
+        mixBlendMode: "screen",
+      }}
+    />
   );
 };
 
 // ---------- 3D ----------
+const mat = (color: string, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) => (
+  <meshStandardMaterial color={color} roughness={0.42} metalness={0.15} {...extra} />
+);
+
 const useSpr = (startSec: number, damping = 11, stiffness = 120, mass = 0.6) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return spring({ frame: frame - startSec * fps, fps, config: { damping, stiffness, mass } });
-};
-
-// Geometrías suaves (esquinas redondeadas): mismo lenguaje de "icono 3D" que el emoji
-const useRBox = (w: number, h: number, d: number, r: number) => useMemo(() => new RoundedBoxGeometry(w, h, d, 5, r), [w, h, d, r]);
-
-const Entorno: React.FC = () => {
-  const { gl, scene } = useThree();
-  const [handle] = useState(() => delayRender("Entorno 3D"));
-  useLayoutEffect(() => {
-    const pm = new THREE.PMREMGenerator(gl);
-    const tex = pm.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environment = tex;
-    scene.environmentIntensity = 0.85;
-    pm.dispose();
-    continueRender(handle);
-    return () => {
-      scene.environment = null;
-      tex.dispose();
-    };
-  }, [gl, scene, handle]);
-  return null;
 };
 
 const Casa: React.FC = () => {
@@ -297,95 +259,83 @@ const Casa: React.FC = () => {
   const base = s(0), walls = s(0.07), roof = useSpr(T.morph + 0.12 + 0.17), details = s(0.26), chim = s(0.32);
   const roofGeo = useMemo(() => {
     const sh = new THREE.Shape();
-    sh.moveTo(-1.7, 0);
-    sh.lineTo(1.7, 0);
-    sh.lineTo(0, 1.1);
+    sh.moveTo(-1.62, 0);
+    sh.lineTo(1.62, 0);
+    sh.lineTo(0, 1.05);
     sh.closePath();
-    const g = new THREE.ExtrudeGeometry(sh, { depth: 2.05, bevelEnabled: true, bevelSize: 0.12, bevelThickness: 0.12, bevelSegments: 8, curveSegments: 16 });
-    g.translate(0, 0, -1.025);
+    const g = new THREE.ExtrudeGeometry(sh, { depth: 2.2, bevelEnabled: true, bevelSize: 0.04, bevelThickness: 0.04, bevelSegments: 2 });
+    g.translate(0, 0, -1.1);
     return g;
   }, []);
-  const gWalls = useRBox(2.5, 1.55, 1.9, 0.16);
-  const gDoor = useRBox(0.5, 1.0, 0.1, 0.04);
-  const gDoorFrame = useRBox(0.64, 1.1, 0.07, 0.05);
-  const gWinFrame = useRBox(0.86, 0.76, 0.07, 0.06);
-  const gGlass = useRBox(0.68, 0.58, 0.08, 0.05);
-  const gBar = useRBox(0.05, 0.6, 0.04, 0.015);
-  const gBarH = useRBox(0.7, 0.05, 0.04, 0.015);
-  const gChim = useRBox(0.34, 0.8, 0.34, 0.06);
-  const gCap = useRBox(0.44, 0.09, 0.44, 0.04);
   const bob = Math.sin(t * 1.6) * 0.05;
-  const ivory = { color: "#FBF7EC", roughness: 0.55, metalness: 0, clearcoat: 0.35, clearcoatRoughness: 0.35 };
-  const gold = { color: "#D2B56B", roughness: 0.28, metalness: 0.9, clearcoat: 0.25 };
-  const charcoal = { color: "#262626", roughness: 0.4, metalness: 0.25, clearcoat: 0.5 };
-  const glass = { color: "#24364a", roughness: 0.08, metalness: 0.25, clearcoat: 1, emissive: "#ffcf7a", emissiveIntensity: 0.32 };
-  const Ventana: React.FC = () => (
-    <group>
-      <mesh geometry={gWinFrame} position={[0, 0, 0]}>
-        <meshPhysicalMaterial {...gold} />
-      </mesh>
-      <mesh geometry={gGlass} position={[0, 0, 0.03]}>
-        <meshPhysicalMaterial {...glass} />
-      </mesh>
-      <mesh geometry={gBar} position={[0, 0, 0.075]}>
-        <meshPhysicalMaterial {...gold} />
-      </mesh>
-      <mesh geometry={gBarH} position={[0, 0, 0.075]}>
-        <meshPhysicalMaterial {...gold} />
-      </mesh>
-    </group>
-  );
   return (
     <group position={[HOUSE_X, HOUSE_Y + bob, 0]} scale={HOUSE_SCALE} rotation={[0.2, 0.55 + Math.sin(t * 0.7) * 0.1, 0]}>
-      {/* plataforma redonda con aro dorado */}
+      {/* base */}
       <group scale={base}>
-        <mesh position={[0, 0.08, 0]}>
-          <cylinderGeometry args={[2.15, 2.2, 0.16, 72]} />
-          <meshPhysicalMaterial {...charcoal} />
+        <mesh position={[0, 0.06, 0]}>
+          <boxGeometry args={[3.3, 0.12, 2.6]} />
+          {mat(P.ink)}
         </mesh>
-        <mesh position={[0, 0.165, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[2.12, 0.035, 16, 96]} />
-          <meshPhysicalMaterial {...gold} />
+        <mesh position={[0, 0.125, 0]}>
+          <boxGeometry args={[3.34, 0.02, 2.64]} />
+          {mat(P.gold, { emissive: P.goldDeep, emissiveIntensity: 0.35 })}
         </mesh>
       </group>
       {/* muros */}
-      <group scale={walls} position={[0, 0.16 + 0.775, 0]}>
-        <mesh geometry={gWalls}>
-          <meshPhysicalMaterial {...ivory} />
+      <group scale={walls} position={[0, 0.87, 0]}>
+        <mesh>
+          <boxGeometry args={[2.6, 1.5, 1.9]} />
+          {mat(P.cream, { emissive: P.goldDeep, emissiveIntensity: 0.1 })}
         </mesh>
       </group>
-      {/* tejado dorado */}
-      <group position={[0, 1.71 + (1 - Math.min(roof, 1.2)) * 2.2, 0]} scale={Math.max(0.0001, Math.min(roof * 1.0, 1.15))}>
-        <mesh geometry={roofGeo}>
-          <meshPhysicalMaterial {...gold} />
-        </mesh>
+      {/* tejado */}
+      <group position={[0, 1.62 + (1 - Math.min(roof, 1.2)) * 2.2, 0]} scale={Math.max(0.0001, Math.min(roof * 1.0, 1.15))}>
+        <mesh geometry={roofGeo}>{mat(P.goldDeep, { roughness: 0.38, emissive: P.shade, emissiveIntensity: 0.25 })}</mesh>
       </group>
       {/* puerta y ventanas */}
       <group scale={details}>
-        <mesh geometry={gDoorFrame} position={[0.55, 0.16 + 0.55, 0.95]}>
-          <meshPhysicalMaterial {...gold} />
+        <mesh position={[0.55, 0.62, 0.965]}>
+          <boxGeometry args={[0.58, 1.0, 0.04]} />
+          {mat(P.gold, { emissive: P.goldDeep, emissiveIntensity: 0.3 })}
         </mesh>
-        <mesh geometry={gDoor} position={[0.55, 0.16 + 0.5, 0.985]}>
-          <meshPhysicalMaterial {...charcoal} />
+        <mesh position={[0.55, 0.57, 0.99]}>
+          <boxGeometry args={[0.46, 0.9, 0.05]} />
+          {mat(P.ink)}
         </mesh>
-        <mesh position={[0.69, 0.16 + 0.48, 1.04]}>
-          <sphereGeometry args={[0.04, 16, 16]} />
-          <meshPhysicalMaterial {...gold} />
+        <mesh position={[0.68, 0.55, 1.03]}>
+          <sphereGeometry args={[0.035, 12, 12]} />
+          {mat(P.sheen, { emissive: P.sheen, emissiveIntensity: 0.6 })}
         </mesh>
-        <group position={[-0.62, 1.0, 0.95]}>
-          <Ventana />
-        </group>
-        <group position={[1.25, 1.0, 0.1]} rotation={[0, Math.PI / 2, 0]}>
-          <Ventana />
-        </group>
+        <mesh position={[-0.65, 0.95, 0.955]}>
+          <boxGeometry args={[0.74, 0.66, 0.04]} />
+          {mat(P.gold, { emissive: P.goldDeep, emissiveIntensity: 0.3 })}
+        </mesh>
+        <mesh position={[-0.65, 0.95, 0.985]}>
+          <boxGeometry args={[0.6, 0.52, 0.05]} />
+          <meshStandardMaterial color="#ffe3a0" emissive="#ffd277" emissiveIntensity={1.4} />
+        </mesh>
+        <mesh position={[-0.65, 0.95, 1.015]}>
+          <boxGeometry args={[0.04, 0.52, 0.03]} />
+          {mat(P.ink)}
+        </mesh>
+        <mesh position={[-0.65, 0.95, 1.015]}>
+          <boxGeometry args={[0.6, 0.04, 0.03]} />
+          {mat(P.ink)}
+        </mesh>
+        <mesh position={[1.32, 0.95, 0.15]}>
+          <boxGeometry args={[0.05, 0.52, 0.6]} />
+          <meshStandardMaterial color="#ffe3a0" emissive="#ffd277" emissiveIntensity={1.2} />
+        </mesh>
+        <mesh position={[1.31, 0.95, 0.15]}>
+          <boxGeometry args={[0.04, 0.62, 0.7]} />
+          {mat(P.gold, { emissive: P.goldDeep, emissiveIntensity: 0.3 })}
+        </mesh>
       </group>
       {/* chimenea */}
-      <group scale={chim} position={[0.85, 2.28, -0.35]}>
-        <mesh geometry={gChim}>
-          <meshPhysicalMaterial {...ivory} />
-        </mesh>
-        <mesh geometry={gCap} position={[0, 0.44, 0]}>
-          <meshPhysicalMaterial {...gold} />
+      <group scale={chim} position={[0.85, 2.15, -0.3]}>
+        <mesh>
+          <boxGeometry args={[0.3, 0.7, 0.3]} />
+          {mat(P.gold, { emissive: P.goldDeep, emissiveIntensity: 0.25 })}
         </mesh>
       </group>
     </group>
@@ -413,7 +363,7 @@ const Halo: React.FC<{ rgb: string; size: number; opacity: number }> = ({ rgb, s
   const tex = useHalo(rgb);
   return (
     <sprite scale={[size, size, 1]}>
-      <spriteMaterial map={tex} transparent opacity={opacity} depthWrite={false} blending={THREE.NormalBlending} />
+      <spriteMaterial map={tex} transparent opacity={opacity} depthWrite={false} blending={THREE.AdditiveBlending} />
     </sprite>
   );
 };
@@ -430,7 +380,7 @@ const useSalida = (start: number, slot: THREE.Vector3) => {
   return { p, pos, alive, tt: t - start };
 };
 
-const Chispas: React.FC<{ start: number; at: THREE.Vector3; rgb?: string }> = ({ start, at, rgb = "199,160,60" }) => {
+const Chispas: React.FC<{ start: number; at: THREE.Vector3; rgb?: string }> = ({ start, at, rgb = "243,235,182" }) => {
   const t = useCurrentFrame() / CASA_FPS - start;
   if (t < 0 || t > 0.8) return null;
   const k = t / 0.8;
@@ -462,7 +412,7 @@ const Emoji: React.FC = () => {
     <>
       <Chispas start={T.emoji} at={FROM} />
       <group position={[pos.x, pos.y + bob, pos.z]} rotation={[0, spin + Math.sin(t * 1.4) * 0.18, Math.sin(t * 1.7) * 0.06]} scale={Math.max(0.0001, p)}>
-        <Halo rgb="236,190,70" size={3.2} opacity={0.38 * clamp01(tt * 2)} />
+        <Halo rgb="243,215,120" size={3.4} opacity={0.5 * clamp01(tt * 2)} />
         <mesh>
           <sphereGeometry args={[0.62, 48, 48]} />
           <meshStandardMaterial color="#EDC454" roughness={0.3} metalness={0.1} emissive="#b99a45" emissiveIntensity={0.35} />
@@ -564,9 +514,9 @@ const Billete: React.FC = () => {
   const spin = (1 - Math.min(p, 1)) * Math.PI * 2;
   return (
     <>
-      <Chispas start={T.bill} at={FROM} rgb="199,150,40" />
+      <Chispas start={T.bill} at={FROM} rgb="226,190,100" />
       <group position={[pos.x, pos.y + bob, pos.z]} rotation={[0.15 + Math.sin(t * 1.2) * 0.1, spin - 0.25 + Math.sin(t * 1.1) * 0.2, 0.12 + Math.sin(t * 1.5) * 0.05]} scale={Math.max(0.0001, p)}>
-        <Halo rgb="226,168,38" size={3.0} opacity={0.3 * clamp01(tt * 2)} />
+        <Halo rgb="226,190,100" size={3.2} opacity={0.4 * clamp01(tt * 2)} />
         <mesh geometry={geo}>
           <meshStandardMaterial map={tex} side={THREE.DoubleSide} roughness={0.55} metalness={0.05} />
         </mesh>
@@ -600,9 +550,9 @@ const Flecha: React.FC = () => {
   const k = Math.max(0.0001, Math.min(p, 1.2)) * (1 + 0.16 * beat);
   return (
     <>
-      <Chispas start={T.arrow} at={SLOT.arrow} rgb="60,190,110" />
+      <Chispas start={T.arrow} at={SLOT.arrow} rgb="134,239,172" />
       <group position={[SLOT.arrow.x, SLOT.arrow.y + Math.sin(t * 1.9) * 0.06, SLOT.arrow.z]} rotation={[0.1, -0.35 + Math.sin(t * 1.2) * 0.08, 0]} scale={0.62 * k}>
-        <Halo rgb="34,197,94" size={3.0 + 0.9 * beat} opacity={0.32 + 0.3 * beat} />
+        <Halo rgb="34,197,94" size={3.4 + 1.0 * beat} opacity={0.55 + 0.35 * beat} />
         <mesh geometry={geo}>
           <meshStandardMaterial color={P.green} roughness={0.28} metalness={0.1} emissive="#16a34a" emissiveIntensity={0.55 + 0.7 * beat} />
         </mesh>
@@ -618,10 +568,10 @@ const Escena3D: React.FC = () => {
   const cam = CAM_Z - 0.6 * (t / 11.6);
   return (
     <ThreeCanvas width={width} height={height} camera={{ position: [0, 0, cam], fov: FOV, near: 0.1, far: 200 }}>
-      <Entorno />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 10]} intensity={2.2} color="#fff3d8" />
-      <directionalLight position={[-6, 4, -4]} intensity={0.9} color="#e8d6a0" />
+      <ambientLight intensity={1.1} />
+      <directionalLight position={[5, 8, 10]} intensity={2.4} color="#fff1d0" />
+      <directionalLight position={[-6, 4, -4]} intensity={1.1} color="#C7AE6A" />
+      <pointLight position={[0, 1.5, 6]} intensity={14} color="#ffd98a" distance={22} />
       <Casa />
       <Emoji />
       <Billete />
@@ -638,7 +588,7 @@ export const CasaPlusvalia: React.FC = () => {
   // sombra de contacto bajo la casa
   const sombra = smooth(T.morph + 0.15, T.morph + 0.7, t);
   return (
-    <AbsoluteFill style={{ background: P.bg }}>
+    <AbsoluteFill style={{ background: P.black }}>
       <Audio src={staticFile("audio/casa_plusvalia.m4a")} />
       <Fondo />
       <div
@@ -649,7 +599,7 @@ export const CasaPlusvalia: React.FC = () => {
           width: 760,
           height: 150,
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(90,66,24,0.34) 0%, rgba(90,66,24,0) 70%)",
+          background: "radial-gradient(ellipse, rgba(199,174,106,0.28) 0%, rgba(0,0,0,0.0) 70%)",
           opacity: sombra,
         }}
       />

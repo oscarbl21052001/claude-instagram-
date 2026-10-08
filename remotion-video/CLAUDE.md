@@ -151,3 +151,14 @@ Es simple, contactarnos." Voz de 0 a 4,84 s; "contactarnos" 4,36–4,84 s. Quié
   usuaria pidió "bastante más pequeño"; ahora 104 px con grosor 38 px, a y=1470, flecha a y=1625.
 - Se oscurece un poco la parte baja del vídeo para que el texto se lea. Remotion baja el audio mono 3 dB: corregido con ffmpeg.
 - La copia de trabajo es `public/entrada/contactar_1080.mp4` (4K/60 fps pasado a 1080x1920/30 fps).
+
+## Esquema profesional sin dibujos (`EsquemaPlusvalia`, `src/Casa/EsquemaPlusvalia.tsx`)
+Versión 2 del Reel del audio `AUDIO.mp4` (11,6 s), pedida como "cambio drástico": nada de casa, emoji ni flecha; solo tarjetas, líneas,
+números y un gráfico, sobre fondo claro (blanco roto `#FBF9F4`→`#F5F1E8`). La versión 3D sigue en `CasaPlusvalia` (`renders/casa_plusvalia.mp4`).
+- Estructura (sale de la frase, con el criterio de Claude, a petición de la persona usuaria): los tres pilares → contador **3/3
+  alineados** → tarjeta oscura "Un producto pensado para" → Disfrutar · Rentabilizar · Grandes ganancias (con la plusvalía del inmueble).
+- **Sin cifras inventadas:** el único dato numérico (3/3) sale del discurso. El gráfico de plusvalía es una línea ascendente sin
+  números y lleva la nota "Gráfico ilustrativo, sin datos reales". Si hay datos reales (rentabilidad, % de plusvalía…), pedirlos.
+- Tiempos (`T`): pilares 0,12/0,20/0,28 s (se escriben), alineados 2,0/2,5/3,0 s, producto 3,64, Disfrutar 5,04, Rentabilizar 6,32,
+  Grandes ganancias 7,24, plusvalía 9,1 (chip y gráfico que se dibuja). Mismo audio `public/audio/casa_plusvalia.m4a`; mismo ajuste de +3 dB.
+- Contenido en y=250–1520 para respetar la zona inferior de Reels (aproximada). El nombre de las tres tarjetas lo dio la persona usuaria.

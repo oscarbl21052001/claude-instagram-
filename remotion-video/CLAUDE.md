@@ -115,3 +115,18 @@ realmente cambia de borde (solar en el clip RAIL). Preferir polígonos algo más
 3. `src/Calle/CalleDorada.tsx` (`CalleEscena`, recibe una `CalleConfig`) y `src/Calle/CalleRail.tsx` con los tiempos.
 `G` solo es fiable mientras el plano no gira más de unos 70-80°: más allá las homografías divergen, por eso la calle
 del inicio se limita a los fotogramas 0-72 y la del final se ancla al último fotograma (82-98).
+
+## Reel esquemático sincronizado con audio, con 3D (`CasaPlusvalia`, `src/Casa/`)
+Audio de 11,6 s (`public/audio/casa_plusvalia.m4a`, sacado de `AUDIO.mp4`; la imagen del vídeo original se descartó).
+Tarjetas que se escriben → se funden en un cuerpo brillante → casa 3D → emoji con gafas, billete y flecha verde que palpita.
+- Los tiempos (`T` en `CasaPlusvalia.tsx`) salen de la transcripción por palabras (`faster-whisper`, modelo `medium`; el
+  `small` confundió "plusvalía" con "pluralidad") y del nivel de voz (`silencedetect`: la voz empieza en ~0,55 s y acaba en ~10,1 s).
+- Todo el 3D son formas básicas de three.js (sin modelos descargados): casa con tejado extruido, emoji con esferas y
+  toro, billete con textura de canvas, flecha extruida con halo y latido. Paleta negro y dorado; verde solo en flecha y billete.
+- Capas: fondo → `ThreeCanvas` → tarjetas/cuerpo (2D) → destello (blend `screen`). Un `CanvasTexture` necesita `document`:
+  funciona en el render de Remotion.
+- Trampa: Remotion renderiza el audio mono **3 dB más bajo** (ley de panoramización). Comprobado por correlación con el
+  original (desfase 0 ms). Se corrige después con
+  `ffmpeg -i out.mp4 -c:v copy -af "volume=3dB,alimiter=limit=0.97:level=disabled" -c:a aac -b:a 160k final.mp4`.
+- Margen lateral: los objetos 3D a menos de ~100 px del borde se ven cortados por el Reel; mirar fotogramas antes de renderizar.
+- Render: ~3 min para 11,6 s con `--gl=swangle`.

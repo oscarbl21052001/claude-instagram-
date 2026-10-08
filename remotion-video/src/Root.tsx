@@ -1,5 +1,6 @@
 import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
+import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
 import { EDIT_DURATION, EDIT_FPS, EsquemaPip } from "./Edit/EsquemaPip";
 import { KitDemo } from "./KitDemo/KitDemo";
 import { TOUR_DURATION, TOUR_FPS, TourApto } from "./Tour/TourApto";
@@ -23,6 +24,14 @@ export const RemotionRoot: React.FC = () => {
         component={EsquemaPip}
         durationInFrames={EDIT_DURATION}
         fps={EDIT_FPS}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="CalleDorada"
+        component={CalleDorada}
+        durationInFrames={CALLE_DURATION}
+        fps={CALLE_FPS}
         width={1080}
         height={1920}
       />

@@ -99,5 +99,19 @@ el suelo que sigue el giro de cámara. Probado con un clip de 2 s (62 fotogramas
    (variable `QUAD` = esquinas del tramo de calle en el fotograma 0).
 4. El texto se recorta con la silueta de la calle y se revela en el sentido de lectura. Trampa: con `clipPath`, un
    texto más ancho que su textura (1800 px) se corta por el extremo; usar fuente ≤ 420 px.
-Limitaciones: al final del giro la máscara pinta también el solar de obra junto a la calle; el audio del clip de prueba
-era silencio (-91 dB).
+Limitaciones: en el clip 1008, al final del giro la máscara pinta también el solar de obra junto a la calle; el audio de
+los clips de prueba era silencio (-91 dB).
+
+### Versión con bordes rectos (clip RAIL, composición `CalleRail`) (pedida por la persona tras ver la versión irregular)
+Pintar el borde de la máscara del modelo deja los lados irregulares (invade aceras y solares). Ahora la calle es un
+**polígono de lados rectos** que se define a mano sobre el fotograma de referencia (con cuadrícula para leer
+coordenadas) y se lleva a cada fotograma con la homografía del giro; el modelo solo se usa para recortar obstáculos
+(árboles, coches, camiones) dentro del polígono y nunca define el borde. Un lado puede tener un escalón si la calle
+realmente cambia de borde (solar en el clip RAIL). Preferir polígonos algo más estrechos que la calle antes que pasarse.
+1. Igual que arriba, con `tools/calle/segmentar_calle.py <fotogramas> <salida> 8` (solo 1 de cada 8 fotogramas: dan
+   `road_` y `occ_`; ~30 s por fotograma) y `seguir.py` (`G_todo.npy`).
+2. `tools/calle/config/rail.json`: `tramos` (polígono, fotograma de referencia, rango de fotogramas) y `quad` del texto.
+   `python tools/calle/pintar_recta.py <fotogramas> <road> <G_todo.npy> <config.json> public/calle_rail src/Calle/datosRail.ts`.
+3. `src/Calle/CalleDorada.tsx` (`CalleEscena`, recibe una `CalleConfig`) y `src/Calle/CalleRail.tsx` con los tiempos.
+`G` solo es fiable mientras el plano no gira más de unos 70-80°: más allá las homografías divergen, por eso la calle
+del inicio se limita a los fotogramas 0-72 y la del final se ancla al último fotograma (82-98).

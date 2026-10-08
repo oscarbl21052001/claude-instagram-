@@ -16,8 +16,8 @@ export const CASA_DURATION = 348; // 11,6 s
 
 // Tiempos (s) tomados de la transcripción por palabras (faster-whisper "medium") y del nivel de voz
 const T = {
-  card: [0.1, 0.42, 0.74], // las tarjetas se escriben en la primera frase
-  mergeFrom: 1.2, // "cuando estas tres cosas"
+  card: [0.0, 0.08, 0.16], // las tres tarjetas aparecen casi a la vez para poder leerlas
+  mergeFrom: 1.7, // "estas tres cosas"
   mergeTo: 3.3, // "alineadas"
   glowFrom: 2.3,
   morph: 3.64, // "tenés un producto pensado"
@@ -55,7 +55,7 @@ const HOUSE_SCREEN_X = 540 + HOUSE_X * PXU;
 const SLOT = {
   emoji: new THREE.Vector3(-1.85, 1.95, 0.5),
   bill: new THREE.Vector3(1.85, 2.3, 0.4),
-  arrow: new THREE.Vector3(2.05, -0.45, 0.7),
+  arrow: new THREE.Vector3(2.2, -0.55, 0.7),
 };
 const FROM = new THREE.Vector3(HOUSE_X, 0.95, 0.3); // de aquí salen: la parte alta de la casa
 
@@ -96,7 +96,7 @@ const Tarjeta: React.FC<{ i: number; merge: number }> = ({ i, merge }) => {
   const frame = useCurrentFrame();
   const enter = useEnter(Math.round(T.card[i] * CASA_FPS));
   const text = CARDS[i];
-  const typed = Math.max(0, Math.floor(((frame - T.card[i] * CASA_FPS - 6) / CASA_FPS) * 52));
+  const typed = Math.max(0, Math.floor(((frame - T.card[i] * CASA_FPS - 4) / CASA_FPS) * 90));
   const y = CARD.ys[i] + (CARD.cy - CARD.ys[i]) * merge;
   const scale = 1 - 0.16 * merge;
   const glow = smooth(0.2, 1, merge);
@@ -551,8 +551,8 @@ const Flecha: React.FC = () => {
   return (
     <>
       <Chispas start={T.arrow} at={SLOT.arrow} rgb="134,239,172" />
-      <group position={[SLOT.arrow.x, SLOT.arrow.y + Math.sin(t * 1.9) * 0.06, SLOT.arrow.z]} rotation={[0.1, -0.35 + Math.sin(t * 1.2) * 0.08, 0]} scale={0.8 * k}>
-        <Halo rgb="34,197,94" size={4.2 + 1.2 * beat} opacity={0.55 + 0.35 * beat} />
+      <group position={[SLOT.arrow.x, SLOT.arrow.y + Math.sin(t * 1.9) * 0.06, SLOT.arrow.z]} rotation={[0.1, -0.35 + Math.sin(t * 1.2) * 0.08, 0]} scale={0.62 * k}>
+        <Halo rgb="34,197,94" size={3.4 + 1.0 * beat} opacity={0.55 + 0.35 * beat} />
         <mesh geometry={geo}>
           <meshStandardMaterial color={P.green} roughness={0.28} metalness={0.1} emissive="#16a34a" emissiveIntensity={0.55 + 0.7 * beat} />
         </mesh>

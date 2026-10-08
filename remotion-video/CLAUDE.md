@@ -130,3 +130,12 @@ Tarjetas que se escriben → se funden en un cuerpo brillante → casa 3D → em
   `ffmpeg -i out.mp4 -c:v copy -af "volume=3dB,alimiter=limit=0.97:level=disabled" -c:a aac -b:a 160k final.mp4`.
 - Margen lateral: los objetos 3D a menos de ~100 px del borde se ven cortados por el Reel; mirar fotogramas antes de renderizar.
 - Render: ~3 min para 11,6 s con `--gl=swangle`.
+
+## Clip "AÑADIR" con tres puntos difuminados (`TresCosas`, `src/Intriga/`)
+Clip de 3,5 s ("Es simple, analizo tres cosas a la hora de invertir."): cuando dice "analizo tres cosas" aparecen en el cielo
+tres tarjetas numeradas (1., 2., 3.) con el texto desenfocado (intriga). Tiempos de la transcripción por palabras:
+analizo 1,14 s · tres 1,62 s · cosas 1,94 s; las tarjetas entran en 1,2 / 1,55 / 1,9 s. El texto oculto es el de las tres
+tarjetas de `CasaPlusvalia` (Localización estratégica, Constructora de renombre, Amenities premium).
+- Un desenfoque de 11 px sobre letra de 46 px todavía se puede leer; con 20 px y letra de 36 px queda ilegible y cabe en la tarjeta.
+- El nombre original del archivo lleva la Ñ en forma descompuesta (N + tilde): en la terminal usar un comodín (`A*ADIR.mov`).
+  La copia de trabajo en 1080x1920 es `public/entrada/anadir_1080.mp4`. Audio estéreo: Remotion lo conserva sin bajar nivel.

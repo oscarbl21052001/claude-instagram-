@@ -1,5 +1,6 @@
 import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
+import { INTRIGA_DURATION, INTRIGA_FPS, TresCosas } from "./Intriga/TresCosas";
 import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
 import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
@@ -50,6 +51,14 @@ export const RemotionRoot: React.FC = () => {
         component={CasaPlusvalia}
         durationInFrames={CASA_DURATION}
         fps={CASA_FPS}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="TresCosas"
+        component={TresCosas}
+        durationInFrames={INTRIGA_DURATION}
+        fps={INTRIGA_FPS}
         width={1080}
         height={1920}
       />

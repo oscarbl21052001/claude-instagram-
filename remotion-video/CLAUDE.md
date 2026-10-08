@@ -139,3 +139,15 @@ tarjetas de `CasaPlusvalia` (Localización estratégica, Constructora de renombr
 - Un desenfoque de 11 px sobre letra de 46 px todavía se puede leer; con 20 px y letra de 36 px queda ilegible y cabe en la tarjeta.
 - El nombre original del archivo lleva la Ñ en forma descompuesta (N + tilde): en la terminal usar un comodín (`A*ADIR.mov`).
   La copia de trabajo en 1080x1920 es `public/entrada/anadir_1080.mp4`. Audio estéreo: Remotion lo conserva sin bajar nivel.
+
+## Clip "CONTACTAR" con texto en relieve y flecha (`Contactanos`, `src/Contactar/`)
+Clip de 5,7 s con dos personas (4K, 60 fps, mono): "Bueno, bueno, ¿y cómo hacen los clientes para invertir en proyectos así?
+Es simple, contactarnos." Voz de 0 a 4,84 s; "contactarnos" 4,36–4,84 s. Quién dice cada frase no se sabe por la transcripción.
+- "CONTÁCTANOS" con volumen real **sin three.js**: pila de 26 capas del mismo texto con `translateZ` y color de mostaza
+  (#E2A826) a oscuro, cara delantera en blanco cálido, `transform-style: preserve-3d` y un giro suave. Trampas: `filter` u
+  `opacity` sobre el elemento 3D lo aplanan (poner la opacidad en un contenedor exterior; el brillo, en un div aparte).
+- Flecha mostaza hacia abajo con la misma técnica (capas con `clip-path`), con latido de dos pulsos y balanceo.
+- Entra en 4,2 s (texto) y 4,5 s (flecha), a la vez que se dice "contactarnos". A 188 px el texto era invasivo: la persona
+  usuaria pidió "bastante más pequeño"; ahora 104 px con grosor 38 px, a y=1470, flecha a y=1625.
+- Se oscurece un poco la parte baja del vídeo para que el texto se lea. Remotion baja el audio mono 3 dB: corregido con ffmpeg.
+- La copia de trabajo es `public/entrada/contactar_1080.mp4` (4K/60 fps pasado a 1080x1920/30 fps).

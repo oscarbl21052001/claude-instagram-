@@ -192,3 +192,17 @@ ninguno de los renders del repo (no coincide con `calle_rail.mp4`), así que **n
    los fotogramas 79–97; los demás se copian (re-codificados a crf 12). El texto pintado no lleva desenfoque de movimiento aunque el fondo sí.
 - Texto nuevo: líneas "UBICACIÓN" / "ESTRATÉGICA" a la misma fuente y tamaño; "ESTRATÉGICA" es ~5 % más larga que la línea más larga original. Sin kerning (PIL).
 - Requiere `fonttools brotli` para convertir `public/fonts/BebasNeue-Regular.woff2` a `/tmp/bebas.ttf`, y OpenCV (venv `tripo`).
+
+## Clip "AMENITIES": texto nuevo, tarjetas y nitidez (`Amenities`, `src/Amenities/`, `tools/amenities/`, `renders/amenities_premium.mp4`)
+`AMENITIES.mov` (1,47 s, HEVC 1440x2544, 30 fps, audio estéreo AAC): terraza → 3 recuadros apilados (piscina exterior, piscina interior, ducha con jardín)
+con el texto fino "2 PISCINAS" ya grabado en el vídeo. Pedido: texto "AMENITIES PREMIUM" (Bebas Neue crema `#FFF8E7`, igual que el texto de la calle)
+en el mismo sitio, recuadros convertidos en tarjetas oscuras con borde dorado, imagen más nítida, mismo formato (1440x2544) y misma duración.
+- La persona escribió "AMENITIS": se corrigió a "AMENITIES" (lo confirmó). El material de origen es blando (parece 540p ampliado): se mejora la nitidez,
+  pero no se inventa detalle.
+- `tools/amenities/quitar_texto.py`: borra "2 PISCINAS" (máscara = top-hat de trazos claros por fotograma + intersección estable, `cv2.inpaint` + suavizado).
+  Quedan restos muy suaves bajo el texto nuevo. Luego `ffmpeg … -vf "hqdn3d=2:2:5:5,unsharp=lx=5:ly=5:la=1.0:cx=5:cy=5:ca=0.4,unsharp=lx=11:ly=11:la=0.7"`
+  → `public/entrada/amenities_clean.mp4` (límite de `unsharp`: lx/2+ly/2 ≤ 25). Nitidez (var. Laplaciano) 25 → ~200.
+- Composición: fondo = terraza congelada en el fotograma 7, desenfocada y oscurecida al entrar las tarjetas; 3 tarjetas (x 60, 1320x760, separación 40) que
+  recortan la zona de cada recuadro original (recuadros reales: x≈50–1392; bordes inferiores con degradado, por eso `cy` se subió unos px) y mantienen congelado el
+  primer fotograma completo mientras entran (fotogramas 7/9/11). Sombra oscura abajo en la tarjeta 3 para leer el texto.
+- Audio original copiado (`public/audio/amenities.m4a`); verificado desfase 0 ms, correlación 1,0 y mismo nivel (−19,7 dB): estéreo, Remotion no lo baja.

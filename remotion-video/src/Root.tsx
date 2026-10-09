@@ -3,6 +3,7 @@ import { MyComposition } from "./Composition";
 import { CONTACTAR_DURATION, CONTACTAR_FPS, Contactanos } from "./Contactar/Contactanos";
 import { INTRIGA_DURATION, INTRIGA_FPS, TresCosas } from "./Intriga/TresCosas";
 import { IDEAS_DURATION, IDEAS_FPS, VideoIdeas } from "./Ideas/VideoIdeas";
+import { AMEN_DURATION, AMEN_FPS, AMEN_H, AMEN_W, Amenities } from "./Amenities/Amenities";
 import { ESQ_DURATION, ESQ_FPS, EsquemaPlusvalia } from "./Casa/EsquemaPlusvalia";
 import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
@@ -88,6 +89,14 @@ export const RemotionRoot: React.FC = () => {
         fps={IDEAS_FPS}
         width={1080}
         height={1920}
+      />
+      <Composition
+        id="Amenities"
+        component={Amenities}
+        durationInFrames={AMEN_DURATION}
+        fps={AMEN_FPS}
+        width={AMEN_W}
+        height={AMEN_H}
       />
       <Composition
         id="TourApto"

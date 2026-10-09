@@ -2,6 +2,7 @@ import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
 import { CONTACTAR_DURATION, CONTACTAR_FPS, Contactanos } from "./Contactar/Contactanos";
 import { INTRIGA_DURATION, INTRIGA_FPS, TresCosas } from "./Intriga/TresCosas";
+import { IDEAS_DURATION, IDEAS_FPS, VideoIdeas } from "./Ideas/VideoIdeas";
 import { ESQ_DURATION, ESQ_FPS, EsquemaPlusvalia } from "./Casa/EsquemaPlusvalia";
 import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
@@ -77,6 +78,14 @@ export const RemotionRoot: React.FC = () => {
         component={EsquemaPlusvalia}
         durationInFrames={ESQ_DURATION}
         fps={ESQ_FPS}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="VideoIdeas"
+        component={VideoIdeas}
+        durationInFrames={IDEAS_DURATION}
+        fps={IDEAS_FPS}
         width={1080}
         height={1920}
       />

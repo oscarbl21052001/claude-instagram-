@@ -162,3 +162,18 @@ números y un gráfico, sobre fondo claro (blanco roto `#FBF9F4`→`#F5F1E8`). L
 - Tiempos (`T`): pilares 0,12/0,20/0,28 s (se escriben), alineados 2,0/2,5/3,0 s, producto 3,64, Disfrutar 5,04, Rentabilizar 6,32,
   Grandes ganancias 7,24, plusvalía 9,1 (chip y gráfico que se dibuja). Mismo audio `public/audio/casa_plusvalia.m4a`; mismo ajuste de +3 dB.
 - Contenido en y=250–1520 para respetar la zona inferior de Reels (aproximada). El nombre de las tres tarjetas lo dio la persona usuaria.
+
+## Clip "VIDEO IDEAS": estructura "no es X, es Y" con transición de zoom (`VideoIdeas`, `src/Ideas/`, `tools/sfx/`)
+Clip de 6,2 s ("Y recordá, no se trata de mirar solo el valor, es sobre saber cómo y cuándo ingresar.") con **un único corte duro a
+los 3,27 s** (ella junto al coche → dentro del coche) que cae en la pausa de la voz (3,05–3,70 s). Se añaden 1,2 s de fotograma
+congelado al final (7,4 s en total) para que se lea el cierre.
+- Estructura: etiqueta RECORDÁ → "NO SE TRATA DE MIRAR SOLO EL" (palabra a palabra) → **VALOR** (se tacha con una línea mostaza en
+  3,0 s) → etiqueta "ES SOBRE SABER" → **CÓMO + CUÁNDO = INGRESAR** (tarjeta final mostaza). Tarjetas oscuras con borde dorado, en el
+  tercio superior (y 230–600); letra de 27 px en etiquetas y 48–54 px en palabras (a petición de la persona: "no invasiva").
+- **Transición del corte** (aprobada por la persona **sin brillo dorado**): zoom acelerado hacia el coche (x1,365) con desenfoque
+  creciente en los ~0,27 s previos y salida desde ese mismo zoom, que se asienta en ~0,4 s. Se simula el desenfoque de zoom con
+  4 copias apiladas del vídeo (solo en esos fotogramas). Trampa: el desenfoque usa la copia 1440x2560 (`public/entrada/ideas_1440.mp4`)
+  para que el zoom no ablande la imagen. Cámara: empuje lento dentro de cada plano y "punch-in" del 4 % en valor/cómo/cuándo.
+- **Sonidos sintéticos** (sin archivos de terceros): `python tools/sfx/sfx_ideas.py public/audio/sfx_ideas.wav` (clics, whoosh,
+  golpe grave y acorde suave), a un pico de ~-16 dBFS frente a una voz de -27 dB de media. Verificado que la voz no cambia de nivel.
+- Este clip es estéreo, así que Remotion **no** baja el audio 3 dB (solo pasa con audio mono).

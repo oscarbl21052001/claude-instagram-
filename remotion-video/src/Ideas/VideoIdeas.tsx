@@ -31,6 +31,9 @@ const W = {
 const C = { ink: "#1a1a1a", gold: "#C7AE6A", goldDeep: "#b99a45", cream: "#e3d6b4", mustard: "#E2A826", shade: "#8f7138", sheen: "#F3EBB6" };
 const METAL = `linear-gradient(135deg, ${C.shade} 0%, ${C.gold} 28%, ${C.sheen} 50%, ${C.gold} 72%, ${C.shade} 100%)`;
 
+// Etiquetas que escriben la frase palabra a palabra (parecían subtítulos): desactivadas a petición de la persona usuaria.
+const ETIQUETAS = false;
+
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const easeOut = Easing.out(Easing.cubic);
 
@@ -241,11 +244,11 @@ export const VideoIdeas: React.FC = () => {
       )}
       <Audio src={staticFile("audio/sfx_ideas.wav")} />
       {/* parte 1: "no se trata de mirar solo el valor" */}
-      <Etiqueta words={["RECORDÁ"]} times={[W.recorda]} top={236} exit={{ from: 1.2, len: 0.2 }} />
-      <Etiqueta words={["NO", "SE", "TRATA", "DE", "MIRAR", "SOLO", "EL"]} times={W.vWords} top={236} exit={{ from: 3.1, len: 0.3 }} />
+      {ETIQUETAS && <Etiqueta words={["RECORDÁ"]} times={[W.recorda]} top={236} exit={{ from: 1.2, len: 0.2 }} />}
+      {ETIQUETAS && <Etiqueta words={["NO", "SE", "TRATA", "DE", "MIRAR", "SOLO", "EL"]} times={W.vWords} top={236} exit={{ from: 3.1, len: 0.3 }} />}
       <Valor />
       {/* parte 2: "es sobre saber cómo y cuándo ingresar" */}
-      <Etiqueta words={["ES", "SOBRE", "SABER"]} times={W.label2} top={236} />
+      {ETIQUETAS && <Etiqueta words={["ES", "SOBRE", "SABER"]} times={W.label2} top={236} />}
       <Palabra at={W.como} text="CÓMO" left={180} width={328} top={300} />
       <Signo at={W.plus} char="+" cy={359} />
       <Palabra at={W.cuando} text="CUÁNDO" left={572} width={328} top={300} />

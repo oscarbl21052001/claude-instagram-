@@ -61,15 +61,13 @@ def swipe(t0, amp=0.07):
 
 
 # --- EVENTOS (segundos, de la transcripción por palabras) ---
-tick(0.68, 1700)  # etiqueta RECORDÁ
-whoosh(1.28, 0.30, 700, 2200, 0.07, rise=False)  # entra la tarjeta VALOR
+# (sin sonidos para las etiquetas: ya no hay etiquetas, solo tarjetas)
 thud(2.80, 0.12)  # VALOR
 tick(2.80, 900, 0.08)
 swipe(2.95)  # línea que tacha VALOR
 whoosh(3.00, 0.27, 450, 4200, 0.16)  # zoom hacia delante
 thud(3.2667, 0.28)  # corte
 whoosh(3.28, 0.40, 3200, 600, 0.10, rise=False)  # el plano se asienta
-tick(3.80, 1600)  # etiqueta ES SOBRE SABER
 whoosh(4.48, 0.22, 800, 2400, 0.07, rise=False)
 tick(4.50, 1300, 0.10)  # CÓMO
 tick(5.15, 2000, 0.08)  # +

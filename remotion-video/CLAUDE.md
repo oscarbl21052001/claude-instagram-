@@ -167,7 +167,9 @@ números y un gráfico, sobre fondo claro (blanco roto `#FBF9F4`→`#F5F1E8`). L
 Clip de 6,2 s ("Y recordá, no se trata de mirar solo el valor, es sobre saber cómo y cuándo ingresar.") con **un único corte duro a
 los 3,27 s** (ella junto al coche → dentro del coche) que cae en la pausa de la voz (3,05–3,70 s). Se añaden 1,2 s de fotograma
 congelado al final (7,4 s en total) para que se lea el cierre.
-- Estructura: etiqueta RECORDÁ → "NO SE TRATA DE MIRAR SOLO EL" (palabra a palabra) → **VALOR** (se tacha con una línea mostaza en
+- **Sin etiquetas ni subtítulos** (pedido de la persona: "solamente las tarjetas"): `ETIQUETAS = false` en `VideoIdeas.tsx` desactiva las etiquetas
+  RECORDÁ / NO SE TRATA DE MIRAR SOLO EL / ES SOBRE SABER (el componente `Etiqueta` sigue en el código) y sus sonidos se quitaron de `sfx_ideas.py`.
+- Estructura (versión anterior con etiquetas: RECORDÁ → "NO SE TRATA DE MIRAR SOLO EL" palabra a palabra) → **VALOR** (se tacha con una línea mostaza en
   3,0 s) → etiqueta "ES SOBRE SABER" → **CÓMO + CUÁNDO = INGRESAR** (tarjeta final mostaza). Tarjetas oscuras con borde dorado, en el
   tercio superior (y 230–600); letra de 27 px en etiquetas y 48–54 px en palabras (a petición de la persona: "no invasiva").
 - **Transición del corte** (aprobada por la persona **sin brillo dorado**): zoom acelerado hacia el coche (x1,365) con desenfoque

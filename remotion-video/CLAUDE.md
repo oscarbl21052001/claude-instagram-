@@ -179,3 +179,16 @@ congelado al final (7,4 s en total) para que se lea el cierre.
 - **Sonidos sintéticos** (sin archivos de terceros): `python tools/sfx/sfx_ideas.py public/audio/sfx_ideas.wav` (clics, whoosh,
   golpe grave y acorde suave), a un pico de ~-16 dBFS frente a una voz de -27 dB de media. Verificado que la voz no cambia de nivel.
 - Este clip es estéreo, así que Remotion **no** baja el audio 3 dB (solo pasa con audio mono).
+
+## Clip "CAMBIO": cambiar el texto de la calle en un video ya montado (`tools/cambio/`, `renders/cambio_ubicacion.mp4`)
+`CAMBIO.mp4` (4,04 s, 1080x1920, 24 fps, sin audio): terraza → giro rápido → dron con la calle amarilla y el texto "300 METROS DEL MAR".
+La persona pidió cambiar **solo** el texto por "UBICACIÓN ESTRATÉGICA" con la misma letra, color y patrón de aparición. El clip de dron no sale de
+ninguno de los renders del repo (no coincide con `calle_rail.mp4`), así que **no se pudo re-renderizar con Remotion**: se editan los fotogramas.
+1. `ffmpeg -i CAMBIO.mp4 out/full/%03d.png` (097 fotogramas). Texto = píxeles casi blancos dentro de la calle amarilla (`common.py: masks`).
+2. `ajustar96.py`: homografía textura→fotograma en el último fotograma (esquinas de cada línea + plantilla Bebas Neue 420 px). `seguir.py`: ECC entre
+   fotogramas contiguos sobre el entorno de la calle (cc ≥ 0,97) propaga la homografía hacia atrás (79–97).
+3. `componer.py`: borra el texto viejo con `cv2.inpaint` (Telea), dibuja el nuevo (crema `#FFF8E7`, opacidad 0,96, sombra suave) recortado a la calle y al
+   **frente del barrido medido en el texto original** (`FRENTE`, px de textura: 79→451, 80→680, 81→1108, 82→1509, 83→1650, ≥84 completo). Solo se tocan
+   los fotogramas 79–97; los demás se copian (re-codificados a crf 12). El texto pintado no lleva desenfoque de movimiento aunque el fondo sí.
+- Texto nuevo: líneas "UBICACIÓN" / "ESTRATÉGICA" a la misma fuente y tamaño; "ESTRATÉGICA" es ~5 % más larga que la línea más larga original. Sin kerning (PIL).
+- Requiere `fonttools brotli` para convertir `public/fonts/BebasNeue-Regular.woff2` a `/tmp/bebas.ttf`, y OpenCV (venv `tripo`).

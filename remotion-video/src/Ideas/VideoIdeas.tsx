@@ -18,7 +18,7 @@ const END = IDEAS_DURATION / IDEAS_FPS;
 const W = {
   recorda: 0.68,
   vWords: [1.3, 1.48, 1.68, 1.86, 2.04, 2.44, 2.66], // no · se · trata · de · mirar · solo · el
-  valor: 2.8,
+  valor: 2.1,
   strike: 2.95,
   label2: [3.8, 3.92, 4.16], // es · sobre · saber
   como: 4.5,
@@ -153,7 +153,7 @@ const Valor: React.FC = () => {
     <div style={{ position: "absolute", left: 540 - 230, top: 300, width: 460, height: 124, display: "flex", alignItems: "center", justifyContent: "center", ...cardBase(enter), ...exitStyle(t, 3.1, 0.3), opacity: dim * clamp01(enter * 2) * (1 - clamp01((t - 3.1) / 0.3)) }}>
       <div style={{ position: "relative", fontFamily: "Inter", fontWeight: 800, fontSize: 56, letterSpacing: 8, color: C.cream, transform: `scale(${0.8 + 0.2 * Math.min(slam, 1.15)})` }}>
         VALOR
-        <div style={{ position: "absolute", left: -12, top: "52%", height: 6, width: `calc(${line * 100}% + 24px)`, background: C.mustard, borderRadius: 3 }} />
+        <div style={{ position: "absolute", left: -12, top: "52%", height: 6, width: line > 0 ? `calc(${line * 100}% + 24px)` : 0, background: C.mustard, borderRadius: 3 }} />
       </div>
     </div>
   );

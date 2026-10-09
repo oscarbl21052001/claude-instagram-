@@ -62,8 +62,8 @@ def swipe(t0, amp=0.07):
 
 # --- EVENTOS (segundos, de la transcripción por palabras) ---
 # (sin sonidos para las etiquetas: ya no hay etiquetas, solo tarjetas)
-thud(2.80, 0.12)  # VALOR
-tick(2.80, 900, 0.08)
+thud(2.10, 0.12)  # VALOR
+tick(2.10, 900, 0.08)
 swipe(2.95)  # línea que tacha VALOR
 whoosh(3.00, 0.27, 450, 4200, 0.16)  # zoom hacia delante
 thud(3.2667, 0.28)  # corte

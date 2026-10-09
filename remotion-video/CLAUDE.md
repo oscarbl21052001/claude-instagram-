@@ -213,14 +213,15 @@ con un corte a los 1,03 s (fotograma 31→32: oficina → hombre junto a la vent
 original ("Atualizações!", logos, interfaz) y poner "CONSTRUCTORAS DE RENOMBRE" (dos líneas, estilo de "AMENITIES PREMIUM", abajo).
 - Lo que había encima: borde discontinuo de la grabación y franjas diagonales amarillas en los lados, interfaz de la historia (progreso, avatar, nombre, iconos, barra "Responder…",
   "Detener grab…"), logo dorado grande arriba con contorno hexagonal tenue, "Atualizações!", logo inferior y, **dentro de la escena 1, el letrero real de la pared**
-  ("J.E VARGAS EMPREENDIMENTOS" en dorado y verde sobre el cristal).
+  ("J.E VARGAS EMPREENDIMENTOS" en dorado y verde sobre el cristal). **Ese letrero NO se borra** (la persona lo aclaró: es parte del video, no una marca de agua);
+  `MANTENER_LETRERO = True` en `limpiar.py`. Se borra todo lo demás (interfaz, logos superpuestos, "Atualizações!").
 - `tools/constructora/limpiar.py`: recorte `(80,150)-(1360,2400)` (quita borde, franjas, parte alta/baja de la interfaz) reescalado a 1440x2530 (zoom ×1,125); máscaras por color,
   top-hat y cajas; relleno con **LaMa** (`big-lama.pt` de `fashn-ai/LaMa` en Hugging Face, TorchScript, CPU, a media resolución: ~3 s por fotograma). Probados y descartados:
-  `cv2.inpaint` (Telea) sobre el letrero deja manchas; a resolución completa LaMa tardaba ~100 s por fotograma. La máscara se calcula por fotograma; el parpadeo del relleno es
+  `cv2.inpaint` (Telea) sobre el letrero deja manchas (el borrado del letrero se quedó como opción apagada); a resolución completa LaMa tardaba ~100 s por fotograma. La máscara se calcula por fotograma; el parpadeo del relleno es
   del mismo orden que el del original (dif. consecutiva 1,9 vs 1,8).
 - `tools/constructora/color.py`: el verde era una capa que sube hacia arriba, abajo y los lados (tinte medido +17/+14 arriba/abajo, +6 izq., +3 der. sobre el centro); se resta con un mapa
   exponencial, se desatura el verde-cian de baja saturación (se respeta la vegetación, que es viva) y se da algo de exposición/contraste. Luego `hqdn3d` + `unsharp` (como en AMENITIES) →
   `public/entrada/constructora_clean.mp4`.
 - Composición: vídeo con zoom 1,025 (quita los puntitos de las esquinas), velo oscuro suave abajo y el texto (Bebas Neue 112 px, crema `#FFF8E7`, sombra suave) que entra a 0,27 s.
-- Límites: queda algún resto muy tenue de los contornos del letrero/hexágono, la parte de la cabeza de la mujer cerca de la "S" del letrero se retocó, y todo lo rellenado es inventado por el modelo.
+- Límites: puede quedar algún resto muy tenue del contorno hexagonal del logo superior, y todo lo rellenado (logos, interfaz) es inventado por el modelo.
   Es contenido de un tercero: avisar de permisos de marca/personas antes de publicar.

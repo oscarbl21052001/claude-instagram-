@@ -2,6 +2,7 @@
 Entrada: out/cof/NNN.png (fotogramas originales 1440x2530). Salida: out/cok/NNN.png (1440x2530, ya recortado y reescalado)."""
 import cv2, numpy as np, sys, os
 CROP = (80, 150, 1360, 2400)          # x0, y0, x1, y1 -> 1280x2250 (misma proporción que 1440x2530)
+MANTENER_LETRERO = True                # el letrero de la pared ("J.E VARGAS" en el espejo/cristal) es parte de la escena: NO se borra
 ESCENA1 = range(1, 32)                 # fotogramas 1..31: oficina; 32..49: hombre junto a la ventana
 K = lambda n: cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (n, n))
 
@@ -30,7 +31,7 @@ def mascara(im, k):
     # 3) logo inferior: zona lisa y oscura, se rellena entera
     m |= box(h, w, 630, 2185, 810, 2400)
     # 4) letrero real de la pared (solo escena 1): letras doradas, contornos pardos y "EMPREENDIMENTOS" verde
-    if k in ESCENA1:
+    if k in ESCENA1 and not MANTENER_LETRERO:
         letras = ((Hh >= 12) & (Hh <= 34) & (S > 70) & (V > 70)).astype(np.uint8)
         letras = cv2.morphologyEx(letras, cv2.MORPH_CLOSE, K(5))
         contornos = ((Hh >= 4) & (Hh <= 30) & (S > 40) & (V > 35) & (V < 120)).astype(np.uint8)   # contornos pardos de las letras
@@ -79,7 +80,7 @@ def procesar(k):
     m = mascara(im, k)
     x0, y0, x1, y1 = CROP
     out = im
-    for z in ZONAS + ([ZONA_LETRERO] if k in ESCENA1 else []):
+    for z in ZONAS + ([ZONA_LETRERO] if (k in ESCENA1 and not MANTENER_LETRERO) else []):
         out = rellenar(out, m, z)
     out = cv2.resize(out[y0:y1, x0:x1], (1440, 2530), interpolation=cv2.INTER_LANCZOS4)
     return out, m

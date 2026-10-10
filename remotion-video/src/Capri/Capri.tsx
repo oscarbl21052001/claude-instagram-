@@ -149,7 +149,7 @@ const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start
   );
 };
 
-type Item = { start: number; label?: string; main: string; accent?: string; x: number; y: number; w: number; h: number; mainSize?: number };
+type Item = { start: number; label?: string; main: string; accent?: string; x: number; y: number; w: number; h: number; mainSize?: number; azul?: boolean };
 
 const Tarjeta: React.FC<{ it: Item; active: boolean; exitFrom: number; exitLen?: number }> = ({ it, active, exitFrom, exitLen = 12 }) => {
   const f = useCurrentFrame();
@@ -172,13 +172,13 @@ const Tarjeta: React.FC<{ it: Item; active: boolean; exitFrom: number; exitLen?:
         filter: out > 0 ? `blur(${out * 10}px)` : undefined,
       }}
     >
-      <Marco glow={active} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <Marco glow={active} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", ...(it.azul ? { background: `linear-gradient(180deg, #38577F 0%, #26405F 100%) padding-box, ${GOLD.border} border-box` } : {}) }}>
         {it.label && <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 26, letterSpacing: 5, color: GOLD.deep, marginBottom: 2 }}>{it.label}</div>}
-        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: it.mainSize ?? 48, letterSpacing: 2.5, color: GOLD.ink, whiteSpace: "nowrap" }}>
+        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: it.mainSize ?? 48, letterSpacing: 2.5, color: it.azul ? "#F4EAD3" : GOLD.ink, whiteSpace: "nowrap" }}>
           {it.accent ? (
             <>
               {a}
-              <span style={{ color: GOLD.mustard }}>{it.accent}</span>
+              <span style={{ color: it.azul ? "#F0C24E" : GOLD.mustard }}>{it.accent}</span>
               {b}
             </>
           ) : (
@@ -230,7 +230,7 @@ const Esquema2: React.FC = () => {
   const W = 480;
   const H = 134;
   const items: Item[] = [
-    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 200, w: W, h: 140, mainSize: 40 },
+    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 200, w: W, h: 140, mainSize: 40, azul: true },
     { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 356, w: W, h: H, mainSize: 42 },
     { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 506, w: W, h: H, mainSize: 42 },
     { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 656, w: W, h: H, mainSize: 42 },
@@ -262,23 +262,23 @@ const Esquema2: React.FC = () => {
   );
 };
 
-// Comentario de Instagram que sale del teléfono al pasar el dedo (0,30 s) y sube a la parte superior; se queda mientras ella lo lee (0,86–6,22 s)
+// Comentario de Instagram que sale del teléfono cuando el dedo se despega (0,54 s) y sube a la parte superior; se queda mientras ella lo lee (0,86–6,22 s)
 const PHONE = { x: 335, y: 1300 };
 const COM = { w: 1120, h: 386, left: -40, top: 200 };
 const Comentario: React.FC = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const start = T(0.3);
+  const start = T(0.54);
   const outStart = T(6.0);
   if (f < start - 4 || f > outStart + 12) return null;
-  const p = Math.min(spring({ frame: f - start, fps, config: { damping: 19, stiffness: 115 } }), 1);
+  const p = Math.min(spring({ frame: f - start, fps, config: { damping: 22, stiffness: 160 } }), 1);
   const out = easeOut(clamp01((f - outStart) / 10));
   const dx = PHONE.x - (COM.left + COM.w / 2);
   const dy = PHONE.y - (COM.top + COM.h / 2);
   const tx = Math.pow(1 - p, 1.35) * dx;
   const ty = (1 - p) * dy - out * 24;
   const sc = (0.1 + 0.9 * p) * (1 - 0.03 * out);
-  const glow = clamp01((f - (start - 3)) / 5) * (1 - clamp01((f - (start + 2)) / 14));
+  const glow = clamp01((f - (start - 1)) / 4) * (1 - clamp01((f - (start + 2)) / 14));
   return (
     <>
       <div style={{ position: "absolute", left: PHONE.x - 130, top: PHONE.y - 130, width: 260, height: 260, borderRadius: 130, background: "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 68%)", opacity: glow * 0.9, transform: `scale(${0.6 + 0.8 * clamp01((f - start) / 14)})` }} />

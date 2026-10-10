@@ -101,7 +101,7 @@ const Marco: React.FC<{ style?: React.CSSProperties; radius?: number; glow?: boo
 );
 
 // Tarjeta grande vacía (el contenido llegará después), con perspectiva 3D como las de la referencia
-const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start: number; end: number; rotY: number; rotZ: number; from: "left" | "right"; imagen?: string }> = ({ x, y, w, h, start, end, rotY, rotZ, from, imagen }) => {
+const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start: number; end: number; rotY: number; rotZ: number; from: "left" | "right"; imagen?: string; imagenes?: string[] }> = ({ x, y, w, h, start, end, rotY, rotZ, from, imagen, imagenes }) => {
   const f = useCurrentFrame();
   const p = useSpr(start, 18, 80);
   if (f < start || f > end + 14) return null;
@@ -126,6 +126,22 @@ const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start
                 transform: `scale(${1.02 + 0.06 * clamp01((f - start) / (end - start))})`,
               }}
             />
+          )}
+          {imagenes && (
+            // tres fotos 16:9 apiladas (sin recorte), con el mismo ancho y separación; entran una tras otra
+            <div style={{ position: "absolute", inset: 0, padding: 22, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              {imagenes.map((src, i) => {
+                const q = clamp01((f - (start + 20 + i * 24)) / 18);
+                const k = 1 - Math.pow(1 - q, 3);
+                return (
+                  <Img
+                    key={src}
+                    src={staticFile(src)}
+                    style={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: 26, opacity: k, transform: `translateY(${(1 - k) * 60}px) scale(${0.96 + 0.04 * k})`, boxShadow: "0 8px 22px rgba(70,44,18,0.35)" }}
+                  />
+                );
+              })}
+            </div>
           )}
         </Marco>
       </div>
@@ -271,7 +287,7 @@ export const CapriEdit: React.FC = () => {
       {/* tarjetas grandes vacías (detrás de ella): enteras en el plano y simétricas */}
       <TarjetaVacia x={40} y={150} w={470} h={930} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" imagen="entrada/capri_card.jpg" />
       <TarjetaVacia x={570} y={150} w={470} h={930} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={1} from="right" />
-      <TarjetaVacia x={560} y={200} w={480} h={740} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" />
+      <TarjetaVacia x={560} y={165} w={480} h={810} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" imagenes={["entrada/capri_int1.jpg", "entrada/capri_int2.jpg", "entrada/capri_int3.jpg"]} />
       {/* ELLA: siempre nítida (sin desenfoque en ningún momento); solo sigue el zoom del fondo */}
       {hasMatte && (
         <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: ORIGIN }}>

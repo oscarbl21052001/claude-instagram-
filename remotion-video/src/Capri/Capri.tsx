@@ -286,7 +286,7 @@ export const CapriEdit: React.FC = () => {
       </AbsoluteFill>
       {/* tarjetas grandes vacías (detrás de ella): enteras en el plano y simétricas */}
       <TarjetaVacia x={40} y={150} w={470} h={930} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" imagen="entrada/capri_card.jpg" />
-      <TarjetaVacia x={570} y={150} w={470} h={930} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={1} from="right" />
+      <TarjetaVacia x={570} y={150} w={470} h={930} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={1} from="right" imagen="entrada/capri_logo_card.jpg" />
       <TarjetaVacia x={560} y={165} w={480} h={810} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" imagenes={["entrada/capri_int1.jpg", "entrada/capri_int2.jpg", "entrada/capri_int3.jpg"]} />
       {/* ELLA: siempre nítida (sin desenfoque en ningún momento); solo sigue el zoom del fondo */}
       {hasMatte && (

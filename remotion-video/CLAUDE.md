@@ -296,3 +296,6 @@ La tarjeta de 16,4–20,7 s (ahora x 560, y 165, 480x810) lleva tres fotos 16:9 
 
 ### CAPRI v3.3: logo en la tarjeta grande de la derecha del inicio
 La tarjeta de 6,8–9,25 s lleva el logo CAPRI RESIDENCE (azul, `public/entrada/capri_logo_card.jpg`): logo al 90 % del ancho, completo, sobre el mismo azul extendido (fondo = imagen con las letras crema borradas y desenfocada, bordes difuminados para no ver costuras). Resolución del original: 1052x1122.
+
+### CAPRI v3.4: comentario de Instagram que sale del teléfono
+`public/entrada/COMENTARIO.png` (RGBA, 1836x633, usuario inventado `claudia_martinezz`). Aparece a 0,30 s (mientras pasa el dedo, ~0,1–0,5 s) desde la pantalla del teléfono (≈ x335,y1300) con resorte, arco suave, desenfoque de movimiento al arrancar y un brillo en el teléfono; queda arriba (ancho 1120 px, card ≈ 997 px, y≈266–520) hasta 6,0 s y se va antes del primer corte (6,28 s). Ella empieza a leer a 0,86 s y acaba a 6,22 s (Whisper: dice "emprendimiento" en vez de "me recomendás"). Sin marco extra: el PNG ya es la burbuja con sombra.

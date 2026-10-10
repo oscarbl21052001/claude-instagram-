@@ -262,6 +262,43 @@ const Esquema2: React.FC = () => {
   );
 };
 
+// Comentario de Instagram que sale del teléfono al pasar el dedo (0,30 s) y sube a la parte superior; se queda mientras ella lo lee (0,86–6,22 s)
+const PHONE = { x: 335, y: 1300 };
+const COM = { w: 1120, h: 386, left: -40, top: 200 };
+const Comentario: React.FC = () => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const start = T(0.3);
+  const outStart = T(6.0);
+  if (f < start - 4 || f > outStart + 12) return null;
+  const p = Math.min(spring({ frame: f - start, fps, config: { damping: 19, stiffness: 115 } }), 1);
+  const out = easeOut(clamp01((f - outStart) / 10));
+  const dx = PHONE.x - (COM.left + COM.w / 2);
+  const dy = PHONE.y - (COM.top + COM.h / 2);
+  const tx = Math.pow(1 - p, 1.35) * dx;
+  const ty = (1 - p) * dy - out * 24;
+  const sc = (0.1 + 0.9 * p) * (1 - 0.03 * out);
+  const glow = clamp01((f - (start - 3)) / 5) * (1 - clamp01((f - (start + 2)) / 14));
+  return (
+    <>
+      <div style={{ position: "absolute", left: PHONE.x - 130, top: PHONE.y - 130, width: 260, height: 260, borderRadius: 130, background: "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 68%)", opacity: glow * 0.9, transform: `scale(${0.6 + 0.8 * clamp01((f - start) / 14)})` }} />
+      <Img
+        src={staticFile("entrada/COMENTARIO.png")}
+        style={{
+          position: "absolute",
+          left: COM.left,
+          top: COM.top,
+          width: COM.w,
+          height: COM.h,
+          opacity: clamp01((f - start) / 5) * (1 - out),
+          transform: `translate(${tx}px, ${ty}px) scale(${sc})`,
+          filter: p < 0.98 ? `blur(${(1 - p) * 7}px)` : undefined,
+        }}
+      />
+    </>
+  );
+};
+
 // ---------- composición ----------
 export const CapriEdit: React.FC = () => {
   useKitFonts();
@@ -300,6 +337,7 @@ export const CapriEdit: React.FC = () => {
       )}
       <Esquema1 />
       <Esquema2 />
+      <Comentario />
     </AbsoluteFill>
   );
 };

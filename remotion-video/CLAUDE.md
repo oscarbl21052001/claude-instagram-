@@ -284,3 +284,9 @@ Cambios pedidos tras ver la v2: difuminar **solo de la mitad de la pantalla haci
 - Ella más abajo sin cambiar de tamaño: el encuadre ×1,16 se hace desde el punto (540,1200) en vez de abajo-centro (≈110 px más abajo, más aire arriba).
 - Simetría: tarjetas del inicio iguales y espejadas (x 40–510 / 570–1040, y 150, h 930, perspectiva ±9°); esquema 2 y tarjeta grande de la derecha con el mismo ancho (480), la misma altura (y 200–940) y márgenes iguales (40 px).
 - Entrega: `renders/capri_edit.mp4` (41 MB, calidad alta) y `renders/capri_edit_ligero.mp4` (16 MB, para enviar por chat: el límite es 30 MB). Audio igual al original (desfase 0 ms, corr. 0,9999, −26,4 dB).
+
+### CAPRI v3.1: imagen en la tarjeta grande de la izquierda
+La persona subió `remotion-video/public/entrada/CAPRI.jpeg` (render arquitectónico del edificio, 3327x4160, 4:5, sin texto) directamente a `main` ("Add files via upload"; lo llamó "imagen Neva" = nueva) y pidió ponerla en **una de las tarjetas
+grandes del inicio**: se eligió la **izquierda** (la primera en entrar, 6,45 s). `TarjetaVacia` acepta `imagen`; copia ligera `public/entrada/capri_card.jpg` (1200x1500). Como el render es 4:5 y la tarjeta casi 1:2 se recorta a lo alto (`objectFit: cover`) y se desplaza
+muy despacio de izquierda a derecha (`objectPosition` 22 %→62 %, zoom 1,02→1,08 durante los 2,8 s de la tarjeta) para que se vea todo el edificio. La tarjeta de la derecha sigue vacía a la espera de su contenido, igual que la grande de los 16,4–20,7 s.
+Se hizo `git merge origin/main` en la rama de trabajo para traer la imagen. Render y copia ligera (17 MB) en `renders/`.

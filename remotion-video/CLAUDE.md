@@ -302,3 +302,6 @@ La tarjeta de 6,8–9,25 s lleva el logo CAPRI RESIDENCE (azul, `public/entrada/
 
 ### CAPRI v3.5: comentario al despegar el dedo + tarjeta azul
 El dedo se despega del teléfono a ≈0,54 s: el comentario sale a 0,54 s (resorte damping 22 / stiffness 160, llega arriba ≈0,95 s; ella empieza a hablar a 0,86 s). La tarjeta "CAPRI RESIDENCE" (esquema 2) usa `azul: true` en `Item`: degradado #38577F→#26405F con el mismo marco dorado, texto crema y "CAPRI" en dorado claro; las otras cuatro siguen blancas.
+
+### CAPRI v3.6: subtítulos minimalistas estilo documental
+Solo desde 6,3 s (el comentario de 0,9–6,2 s no lleva). Texto aprobado por la persona (Whisper medium + revisión): 12 frases en `SUBS` de `Capri.tsx` (voseo rioplatense tal cual: "querés", "contactame"). Inter Medium 40 px, blanco, sombra suave, dos líneas máx. (maxWidth 500), centrado, anclado a 52 px del borde inferior sobre la mesa, línea fina blanca de 64 px encima y degradado negro suave (0→42 %) abajo para el contraste. Entrada/salida con desvanecimiento (5/6 fotogramas). La zona inferior se solapa con la interfaz de Reels (aproximada).

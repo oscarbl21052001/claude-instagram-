@@ -50,17 +50,22 @@ const camera = (f: number) => {
   return { scale: 1, blur: 0 };
 };
 
-// ---------- alineación de ella en el corte 2 (medida con el recorte; ver tools/capri/) ----------
-const ALIGN = { len: 16, s: 1, dx: 0, dy: 0, px: 540, py: 1700 };
-const personAlign = (f: number) => {
+// ---------- alineación de ella en el corte 2 (medida con el recorte: ancho de la cabeza 203→177 px, coronilla y 1022→1011, centro x 516→522) ----------
+// Mitad del ajuste en cada lado del corte: justo antes se encoge/desplaza un poco y justo después vuelve desde la posición intermedia.
+const ALIGN = { len: 16, sh: Math.sqrt(177 / 203), dx: 6, dy: -11, pre: { px: 516, py: 1022 }, post: { px: 522, py: 1011 } };
+const personAlign = (f: number): { transform: string; origin: string } | undefined => {
   if (f >= CUT2 - ALIGN.len && f < CUT2) {
     const q = easeIn(clamp01((f - (CUT2 - ALIGN.len)) / ALIGN.len));
-    return `translate(${q * ALIGN.dx}px, ${q * ALIGN.dy}px) scale(${1 + q * (ALIGN.s - 1)})`;
+    return { transform: `translate(${q * ALIGN.dx * 0.5}px, ${q * ALIGN.dy * 0.5}px) scale(${1 + q * (ALIGN.sh - 1)})`, origin: `${ALIGN.pre.px}px ${ALIGN.pre.py}px` };
+  }
+  if (f >= CUT2 && f < CUT2 + ALIGN.len) {
+    const q = 1 - easeOut(clamp01((f - CUT2) / ALIGN.len));
+    return { transform: `translate(${-q * ALIGN.dx * 0.5}px, ${-q * ALIGN.dy * 0.5}px) scale(${1 + q * (1 / ALIGN.sh - 1)})`, origin: `${ALIGN.post.px}px ${ALIGN.post.py}px` };
   }
   return undefined;
 };
 // fila (px) donde el recorte de ella termina contra la mesa, por escena: se funde con un degradado
-const BOTTOM = (f: number) => (f < CUT2 ? 1745 : 1745);
+const BOTTOM = (f: number) => (f < CUT2 ? 1680 : 1610); // por encima de la taza, que forma parte de la mesa y se difumina
 
 // ---------- piezas ----------
 const useSpr = (start: number, damping = 20, stiffness = 90) => {
@@ -125,8 +130,8 @@ const Tarjeta: React.FC<{ it: Item; active: boolean; exitFrom: number; exitLen?:
       }}
     >
       <Marco glow={active} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        {it.label && <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 22, letterSpacing: 6, color: GOLD.deep, marginBottom: 4 }}>{it.label}</div>}
-        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: it.mainSize ?? 44, letterSpacing: 2.5, color: GOLD.ink, whiteSpace: "nowrap" }}>
+        {it.label && <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 28, letterSpacing: 5, color: GOLD.deep, marginBottom: 2 }}>{it.label}</div>}
+        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: it.mainSize ?? 48, letterSpacing: 2.5, color: GOLD.ink, whiteSpace: "nowrap" }}>
           {it.accent ? (
             <>
               {a}
@@ -179,13 +184,14 @@ const ESQ2_OUT = T(20.7);
 const Esquema2: React.FC = () => {
   const f = useCurrentFrame();
   const X = 70;
-  const W = 560;
+  const W = 590;
+  const H = 126;
   const items: Item[] = [
-    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 250, w: W, h: 120, mainSize: 46 },
-    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 392, w: W, h: 112 },
-    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 522, w: W, h: 112 },
-    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 652, w: W, h: 112 },
-    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 782, w: W, h: 112 },
+    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 250, w: W, h: 128, mainSize: 50 },
+    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 396, w: W, h: H },
+    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 538, w: W, h: H },
+    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 680, w: W, h: H },
+    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 822, w: W, h: H },
   ];
   let act = 0;
   items.forEach((it, i) => {
@@ -222,6 +228,7 @@ export const CapriEdit: React.FC = () => {
   const hasMatte = f >= M_FIRST && f <= M_LAST;
   const n = String(Math.min(Math.max(f, M_FIRST), M_LAST)).padStart(4, "0");
   const b = BOTTOM(f);
+  const al = personAlign(f);
   const drift = 1 + 0.05 * clamp01((f - CUT1) / (CUT3 - CUT1)); // el fondo respira muy despacio
   return (
     <AbsoluteFill style={{ background: "#000" }}>
@@ -237,9 +244,9 @@ export const CapriEdit: React.FC = () => {
         {/* tarjetas de detrás de ella */}
         <TarjetaVacia x={-70} y={170} w={500} h={1190} start={T(7.0)} end={T(9.0)} rotY={14} rotZ={-1.5} from="left" />
         <TarjetaVacia x={650} y={250} w={480} h={1060} start={T(7.4)} end={T(9.0)} rotY={-26} rotZ={0} from="right" />
-        <TarjetaVacia x={640} y={250} w={480} h={1060} start={T(18.4)} end={T(20.7)} rotY={-22} rotZ={0} from="right" />
+        <TarjetaVacia x={710} y={250} w={440} h={1060} start={T(18.4)} end={T(20.7)} rotY={-22} rotZ={0} from="right" />
         {hasMatte && (
-          <AbsoluteFill style={{ transform: personAlign(f), transformOrigin: `${ALIGN.px}px ${ALIGN.py}px` }}>
+          <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
             <Img src={staticFile(`recorte_edit/m_${n}.webp`)} style={{ width: "100%", height: "100%", WebkitMaskImage: `linear-gradient(to bottom, #000 0px, #000 ${b - 130}px, transparent ${b}px)`, maskImage: `linear-gradient(to bottom, #000 0px, #000 ${b - 130}px, transparent ${b}px)` }} />
           </AbsoluteFill>
         )}

@@ -17,19 +17,11 @@ STOPS = [(0.0, (128, 94, 60)), (0.25, (178, 130, 84)), (0.5, (212, 168, 114)), (
 def camel(L):
     xs = [s[0] for s in STOPS]
     return np.dstack([np.interp(L, xs, [s[1][c] for s in STOPS]) for c in range(3)])
-def procesar(k, guardar_recorte=True):
+def procesar(k, guardar_recorte=False):
     im = cv2.imread(f"out/e_all/f_{k:04d}.jpg")
     h, w = im.shape[:2]
-    rgba = np.asarray(Image.open(f"public/recorte_edit/m_{k:04d}.webp").convert("RGBA")).copy()
-    a = rgba[..., 3].astype(np.float32) / 255
+    a = np.asarray(Image.open(f"public/recorte_hq/m_{k:04d}.webp").convert("RGBA"))[..., 3].astype(np.float32) / 255
     T = mesa(k)
-    a[T:, :] = 0
-    # borde suave contra la mesa (12 px)
-    y = np.arange(h)[:, None]
-    a *= np.clip((T - y) / 12.0, 0, 1)
-    rgba[..., 3] = (a * 255).astype(np.uint8)
-    if guardar_recorte:
-        Image.fromarray(rgba, "RGBA").save(f"public/recorte_edit/m_{k:04d}.webp", quality=90, method=4)
     P = cv2.dilate((a > 0.03).astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13))).astype(np.float32)
     if k >= CUT1:
         P[T:mesa_borde(k) + 1, :] = 1            # banda de la taza/mesa: se rellena con lo de alrededor

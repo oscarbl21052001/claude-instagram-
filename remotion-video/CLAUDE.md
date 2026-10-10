@@ -270,3 +270,17 @@ y "el recorte y el fondo lo más perfectos posible, aunque tardes más". Lo que 
   Esquemas movidos hacia arriba para no chocar con su cabeza más grande (esquema 1 y 230–730; esquema 2 x 64, y 200–812, tarjetas de 510 px).
 - Render: ~13 min (`--gl=swangle`, 1244 fotogramas a 50 fps, 40 MB). Audio igual al original (desfase 0 ms, corr. 0,9999).
 - Trampa: `pkill -f <patrón>` mata la propia shell si el patrón aparece en el comando; matar por PID (`ps aux | grep … | awk '{print $2}' | xargs kill`).
+
+### CAPRI v3 (arriba sin fondo, abajo fondo real, ella siempre nítida)
+Cambios pedidos tras ver la v2: difuminar **solo de la mitad de la pantalla hacia arriba** (para esquema y tarjetas grandes), **mantener el fondo y los colores originales abajo**, con un **degradado de desenfoque** entre las dos zonas; arriba
+"directamente no se vea el fondo" (degradado camel liso, sin panel ni logo); **ella nítida en todo momento**; transición profesional si el corte se nota más; bajar a la mujer **sin cambiar su tamaño**; composición **simétrica**.
+- Fondo (`tools/capri/fondo.py`, un JPG por fotograma, ahora 290–1075): nivel 0 = fotograma real **sin ella** (hueco rellenado con el entorno desenfocado; así el zoom/desenfoque de las transiciones no deja una copia borrosa de ella bajo su recorte); franja
+  `Y0=660…Y1=1230` (coordenadas del vídeo; con el encuadre ×1,16 y pivote (540,1200) cae hacia la mitad de la pantalla): desenfoque creciente hasta σ=18 + `limpio()` = **degradado camel liso** (#E2C498 arriba → #CEA676) con un poco de ruido anti-bandas;
+  mezcla `smoothstep(1,35·u)`. Escena 4 (≥1050): solo "sin ella", sin franja.
+- **Ella siempre nítida**: el zoom y el desenfoque de las transiciones actúan **solo en el fondo**; el recorte de ella solo sigue el zoom (sin desenfoque). Para eso hizo falta recortarla también en el arranque del plano final (fotogramas 1050–1075,
+  `recorte_hq.py 1050 1075` + `recorte_post.py 1050 1075`; `mesa(k)` devuelve 10⁵ para ese plano: no hay mesa). El fondo "sin ella" se usa hasta el fotograma 1075; luego, el vídeo real.
+- Cortes (todos con zoom + desenfoque solo del fondo): 6,28 s (×1,3, desenfoque 16, 6 fotogramas antes y 20 después), 12,70 s (×1,18, desenfoque 10: más suave) y 21,00 s (×1,3). Alineación de ella tras el corte (escala ≥1, sin bordes vacíos):
+  corte 1: mismo tamaño pero 64 px más abajo y 14 px a la izquierda → se compensa; corte 2: ancho de cabeza 209→182 → ×1,148 desde la cabeza. Se asienta en ~0,4 s.
+- Ella más abajo sin cambiar de tamaño: el encuadre ×1,16 se hace desde el punto (540,1200) en vez de abajo-centro (≈110 px más abajo, más aire arriba).
+- Simetría: tarjetas del inicio iguales y espejadas (x 40–510 / 570–1040, y 150, h 930, perspectiva ±9°); esquema 2 y tarjeta grande de la derecha con el mismo ancho (480), la misma altura (y 200–940) y márgenes iguales (40 px).
+- Entrega: `renders/capri_edit.mp4` (41 MB, calidad alta) y `renders/capri_edit_ligero.mp4` (16 MB, para enviar por chat: el límite es 30 MB). Audio igual al original (desfase 0 ms, corr. 0,9999, −26,4 dB).

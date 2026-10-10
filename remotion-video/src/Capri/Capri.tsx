@@ -249,7 +249,7 @@ export const CapriEdit: React.FC = () => {
         {hasMatte && (
           <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
             <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
-              <Img src={staticFile(`recorte_edit/m_${n}.webp`)} style={{ width: "100%", height: "100%" }} />
+              <Img src={staticFile(`recorte_hq/m_${n}.webp`)} style={{ width: "100%", height: "100%" }} />
             </AbsoluteFill>
           </AbsoluteFill>
         )}

@@ -7,3 +7,7 @@ dist
 out
 work/
 public/recorte/
+public/recorte_unidades/
+public/recorte_edit/
+public/edit_bg/
+public/recorte_hq/

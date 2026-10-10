@@ -225,3 +225,89 @@ original ("Atualizações!", logos, interfaz) y poner "CONSTRUCTORAS DE RENOMBRE
 - Composición: vídeo con zoom 1,025 (quita los puntitos de las esquinas), velo oscuro suave abajo y el texto (Bebas Neue 112 px, crema `#FFF8E7`, sombra suave) que entra a 0,27 s.
 - Límites: puede quedar algún resto muy tenue del contorno hexagonal del logo superior, y todo lo rellenado (logos, interfaz) es inventado por el modelo.
   Es contenido de un tercero: avisar de permisos de marca/personas antes de publicar.
+
+## Clip "UNIDADES": texto 3D protagonista que sale por detrás de la mujer (`Unidades`, `src/Unidades/`, `renders/unidades_vendidas.mp4`)
+`UNIDADES.mov` (2,67 s, HEVC 1440x2560, 30 fps, audio estéreo, plano fijo de un edificio con la presentadora abajo, sin texto ni interfaz). Transcripción (`faster-whisper` medium):
+"Llevamos más de 15 unidades comercializadas." (0–2,64 s; "más" 0,42 · "15" 0,78–1,0 · "unidades" 1,0–1,66 · "comercializadas" 1,66–2,64).
+Pedido: en ese momento aparece "**+15 UNIDADES VENDIDAS**" (texto elegido por la persona; "+MÁS DE" era redundante), en dos líneas ("+15" grande / "UNIDADES VENDIDAS"),
+mostaza con volumen, entrando desde abajo con desenfoque **por detrás de ella** hasta la zona alta. Sin añadir segundos: se adelantó la entrada (empieza a 0,1 s, legible desde ~0,7 s).
+- Recorte de la mujer: `python tools/recorte/recorte.py out/un_f public/recorte_unidades x.json` con fotogramas `f_NNNN.jpg` desde 0 (MODNet, ~80 s para 80 fotogramas a 1440x2560;
+  `public/recorte_unidades/` está en .gitignore). Capas: vídeo → velo oscuro superior → texto 3D → recorte encima. `public/entrada/unidades_1440.mp4` = copia H.264 con audio.
+- Texto: Bebas Neue 430 px ("+15") y 160 px; pila de 30 capas con `translateZ` (96 px de grosor), cara con degradado `#FFDD85→#F2BE45→#E2A826→#B98512`, laterales hacia `#4A3006`,
+  sombra grande detrás, brillo que barre la cara una vez, balanceo suave. Entrada: curva `bezier(0.3,0.05,0.2,1)` en 30 fotogramas, desenfoque 30→0 px, giro de 62° que se endereza. Bloque final centrado en y=640.
+  Con una curva más agresiva (expo-out) el texto subía demasiado deprisa y no se notaba que salía de detrás de ella.
+- Audio original (estéreo): desfase 0 ms, correlación 0,9998, mismo nivel (−26,3 dB). Trampa no ocurrida aquí: Remotion solo baja 3 dB el audio **mono**.
+
+## Edit "CAPRI" (EDIT_COMPLETO.mov): fondo difuminado, tarjetas detrás de ella y esquemas (`CapriEdit`, `src/Capri/`, `tools/capri/`, `renders/capri_edit.mp4`)
+`EDIT_COMPLETO.mov` (24,9 s, 1080x1920, HEVC 50 fps, audio estéreo; la persona lo subió comprimido con `avconvert` porque el original pesaba 114 MB > 100 MB de GitHub). Tres cortes duros: **6,28 s** (fotograma 314),
+**12,70 s** (635) y **21,00 s** (1050; cambia de sala). Transcripción (`faster-whisper` medium; "Residenz" = **Capri Residence**, confirmado): "Hoy este emprendimiento es uno de los mejores para poder ingresar con un monto mínimo
+y un gran financiamiento (ingresar 9,5 · monto mínimo 10,32–11,16 · gran financiamiento 11,68–12,68). Capri Residence (12,94) es uno de los emprendimientos más completos (14,5) con unidades de dos dormitorios (16,28),
+amenities premium (18,12) y una ubicación extraordinaria (19,36–20,94). Si querés más info… contactame."
+- Pedido: desde 6,28 s fondo difuminado con los colores del propio fondo (corte tapado), 7–8 s dos tarjetas vacías detrás de ella (referencia), esquema ~9–12,5 s, corte de 12,70 s mínimo, 13–21 s esquema arriba a la izquierda,
+  18–19 s tarjeta grande vacía a la derecha, 21 s transición y fondo real. **Estilo de tarjetas: fondo blanco con marco dorado** (decisión de la persona). El contenido de las tarjetas grandes llegará después.
+- Recorte de ella: `recorte.py` **por escena** (el suavizado temporal no debe cruzar los cortes): `out/e_s1` (290–313), `e_s2` (314–634), `e_s3` (635–1049) → `public/recorte_edit/` (gitignore; ~13 min para 760 fotogramas). Fotogramas
+  extraídos con `-start_number 0` (nombre = índice a 50 fps). La mesa y la taza se difuminan con el fondo: el recorte de ella se funde con un degradado hacia 1680 px (escena 2) / 1610 px (escena 3).
+- Fondo: `python tools/capri/plate.py 400 800 public/edit_plate/plate.jpg` (silueta rellena + desenfoque fuerte de un fotograma de cada escena, promediados + mezcla con un degradado azul profundo). Un solo fondo para las dos escenas.
+- Capas: vídeo (se desenfoca y se cubre con el fondo entre 5,88 y 6,28 s) → fondo → tarjetas de detrás → recorte de ella → esquemas delanteros. Cortes 1 y 3: zoom ×1,34 y desenfoque (como VideoIdeas, sin brillo).
+- **Corte de 12,70 s**: medido en el recorte (ancho de cabeza 203→177 px, coronilla 1022→1011, centro 516→522): mitad del ajuste de escala/posición justo antes y mitad justo después (16 fotogramas). Trampa: el ancho de hombros
+  daba 595→443 (0,745) porque cambia la pose de los brazos; el de la cabeza (0,87) es el fiable. Se reduce mucho pero no es invisible: cambia su pose.
+- Esquema 1 (9,3–12,42 s): "PARA INGRESAR" · "CON UN / MONTO MÍNIMO" · "+" · "Y UN / GRAN FINANCIAMIENTO". Esquema 2 (12,94–20,7 s, x 70, y 250–950): CAPRI RESIDENCE · UNO DE LOS MÁS COMPLETOS · UNIDADES DE 2 DORMITORIOS · AMENITIES PREMIUM ·
+  UBICACIÓN EXTRAORDINARIA, con hilo dorado que se dibuja y la tarjeta activa resaltada. Solo palabras de ella; sin cifras inventadas. Tarjeta grande vacía a la derecha desde 18,4 s.
+- Render: ~13 min para 1244 fotogramas a 50 fps (`--gl=swangle`). Audio estéreo del original verificado: desfase 0 ms, correlación 0,9999, nivel −26,4 dB.
+
+### CAPRI v2 (cambios pedidos tras ver la v1)
+La persona pidió: fondo difuminado **más claro y camel** (no oscuro ni tan fuerte) **con la mesa y sus elementos visibles**; tarjetas grandes que **quepan enteras en el plano y duren más**; ella **algo más grande**;
+y "el recorte y el fondo lo más perfectos posible, aunque tardes más". Lo que cambió:
+- **Recorte de alta calidad** (`tools/capri/recorte_hq.py` + `recorte_post.py`, ~35 min en total para 760 fotogramas): MODNet *crudo* (sin los rellenos de `recorte.py`, que cerraban huecos y dejaban parches de fondo) → trimap (suavizado ±1 fotograma sin
+  cruzar cortes) → **ViTMatte small** (`hustvl/vitmatte-small-distinctions-646`, ~3 s por recuadro de ella en CPU) → suavizado temporal solo donde el alfa es estable → **estimación del color de primer plano** (`pymatting.estimate_foreground_ml`, quita el
+  borde oscuro del fondo en el pelo) → corte contra la mesa con borde de 12 px → `public/recorte_hq/` (gitignore). Mucho mejor que MODNet solo en pelo y bordes. Pip: `transformers` 4.35 pide `tokenizers<0.15` (se fijó `tokenizers==0.14.1`, que
+  baja `huggingface-hub` a 0,17; `faster-whisper` sigue funcionando) y `pymatting`.
+- **Fondo** (`tools/capri/fondo.py`, un JPG por fotograma en `public/edit_bg/`, gitignore): fotograma real **sin ella** (desenfoque normalizado σ=18 donde los píxeles de ella no cuentan; σ=70 de reserva) → luminancia mapeada a una rampa **camel claro**
+  (`STOPS`) mezclada con algo de color real (más en zonas cálidas: mesa y paredes). La mesa, la taza y el móvil son parte del fondo: ella se corta en el borde superior de la taza (escena 2: y 1758, escena 3: y 1632; escena 1: 1678).
+- **Encuadre más cercano** ×1,16 (pivote abajo-centro) desde el primer corte, para que ella se vea mayor. Corte de 12,70 s: ahora solo **después** del corte, fondo y ella arrancan ampliados ×1,147 (=203/177 del ancho de cabeza) y se asientan en 0,5 s
+  (no hay bordes vacíos porque la escala siempre es ≥ 1).
+- **Tarjetas grandes**: las dos de 7–9 s ahora entran a 6,45 y 6,8 s y salen a 9,25 s (x 40–510 y 570–1040: enteras en el plano, ligera perspectiva); la grande de la derecha entra a 16,4 s (antes 18,4) y sale a 20,7 s (x 610–1040).
+  Esquemas movidos hacia arriba para no chocar con su cabeza más grande (esquema 1 y 230–730; esquema 2 x 64, y 200–812, tarjetas de 510 px).
+- Render: ~13 min (`--gl=swangle`, 1244 fotogramas a 50 fps, 40 MB). Audio igual al original (desfase 0 ms, corr. 0,9999).
+- Trampa: `pkill -f <patrón>` mata la propia shell si el patrón aparece en el comando; matar por PID (`ps aux | grep … | awk '{print $2}' | xargs kill`).
+
+### CAPRI v3 (arriba sin fondo, abajo fondo real, ella siempre nítida)
+Cambios pedidos tras ver la v2: difuminar **solo de la mitad de la pantalla hacia arriba** (para esquema y tarjetas grandes), **mantener el fondo y los colores originales abajo**, con un **degradado de desenfoque** entre las dos zonas; arriba
+"directamente no se vea el fondo" (degradado camel liso, sin panel ni logo); **ella nítida en todo momento**; transición profesional si el corte se nota más; bajar a la mujer **sin cambiar su tamaño**; composición **simétrica**.
+- Fondo (`tools/capri/fondo.py`, un JPG por fotograma, ahora 290–1075): nivel 0 = fotograma real **sin ella** (hueco rellenado con el entorno desenfocado; así el zoom/desenfoque de las transiciones no deja una copia borrosa de ella bajo su recorte); franja
+  `Y0=660…Y1=1230` (coordenadas del vídeo; con el encuadre ×1,16 y pivote (540,1200) cae hacia la mitad de la pantalla): desenfoque creciente hasta σ=18 + `limpio()` = **degradado camel liso** (#E2C498 arriba → #CEA676) con un poco de ruido anti-bandas;
+  mezcla `smoothstep(1,35·u)`. Escena 4 (≥1050): solo "sin ella", sin franja.
+- **Ella siempre nítida**: el zoom y el desenfoque de las transiciones actúan **solo en el fondo**; el recorte de ella solo sigue el zoom (sin desenfoque). Para eso hizo falta recortarla también en el arranque del plano final (fotogramas 1050–1075,
+  `recorte_hq.py 1050 1075` + `recorte_post.py 1050 1075`; `mesa(k)` devuelve 10⁵ para ese plano: no hay mesa). El fondo "sin ella" se usa hasta el fotograma 1075; luego, el vídeo real.
+- Cortes (todos con zoom + desenfoque solo del fondo): 6,28 s (×1,3, desenfoque 16, 6 fotogramas antes y 20 después), 12,70 s (×1,18, desenfoque 10: más suave) y 21,00 s (×1,3). Alineación de ella tras el corte (escala ≥1, sin bordes vacíos):
+  corte 1: mismo tamaño pero 64 px más abajo y 14 px a la izquierda → se compensa; corte 2: ancho de cabeza 209→182 → ×1,148 desde la cabeza. Se asienta en ~0,4 s.
+- Ella más abajo sin cambiar de tamaño: el encuadre ×1,16 se hace desde el punto (540,1200) en vez de abajo-centro (≈110 px más abajo, más aire arriba).
+- Simetría: tarjetas del inicio iguales y espejadas (x 40–510 / 570–1040, y 150, h 930, perspectiva ±9°); esquema 2 y tarjeta grande de la derecha con el mismo ancho (480), la misma altura (y 200–940) y márgenes iguales (40 px).
+- Entrega: `renders/capri_edit.mp4` (41 MB, calidad alta) y `renders/capri_edit_ligero.mp4` (16 MB, para enviar por chat: el límite es 30 MB). Audio igual al original (desfase 0 ms, corr. 0,9999, −26,4 dB).
+
+### CAPRI v3.1: imagen en la tarjeta grande de la izquierda
+La persona subió `remotion-video/public/entrada/CAPRI.jpeg` (render arquitectónico del edificio, 3327x4160, 4:5, sin texto) directamente a `main` ("Add files via upload"; lo llamó "imagen Neva" = nueva) y pidió ponerla en **una de las tarjetas
+grandes del inicio**: se eligió la **izquierda** (la primera en entrar, 6,45 s). `TarjetaVacia` acepta `imagen`; copia ligera `public/entrada/capri_card.jpg` (1200x1500). Como el render es 4:5 y la tarjeta casi 1:2 se recorta a lo alto (`objectFit: cover`) y se desplaza
+muy despacio de izquierda a derecha (`objectPosition` 22 %→62 %, zoom 1,02→1,08 durante los 2,8 s de la tarjeta) para que se vea todo el edificio. La tarjeta de la derecha sigue vacía a la espera de su contenido, igual que la grande de los 16,4–20,7 s.
+Se hizo `git merge origin/main` en la rama de trabajo para traer la imagen. Render y copia ligera (17 MB) en `renders/`.
+
+### CAPRI v3.2: tres fotos horizontales en la última tarjeta grande
+La tarjeta de 16,4–20,7 s (ahora x 560, y 165, 480x810) lleva tres fotos 16:9 apiladas (`public/entrada/capri_int1..3.jpg`: cocina/comedor, piscina, sala con TV), sin recorte, mismo ancho y separación, entrando una tras otra (prop `imagenes` de `TarjetaVacia`). Separación de 40 px con el esquema de la izquierda.
+
+### CAPRI v3.3: logo en la tarjeta grande de la derecha del inicio
+La tarjeta de 6,8–9,25 s lleva el logo CAPRI RESIDENCE (azul, `public/entrada/capri_logo_card.jpg`): logo al 90 % del ancho, completo, sobre el mismo azul extendido (fondo = imagen con las letras crema borradas y desenfocada, bordes difuminados para no ver costuras). Resolución del original: 1052x1122.
+
+### CAPRI v3.4: comentario de Instagram que sale del teléfono
+`public/entrada/COMENTARIO.png` (RGBA, 1836x633, usuario inventado `claudia_martinezz`). Aparece a 0,30 s (mientras pasa el dedo, ~0,1–0,5 s) desde la pantalla del teléfono (≈ x335,y1300) con resorte, arco suave, desenfoque de movimiento al arrancar y un brillo en el teléfono; queda arriba (ancho 1120 px, card ≈ 997 px, y≈266–520) hasta 6,0 s y se va antes del primer corte (6,28 s). Ella empieza a leer a 0,86 s y acaba a 6,22 s (Whisper: dice "emprendimiento" en vez de "me recomendás"). Sin marco extra: el PNG ya es la burbuja con sombra.
+
+### CAPRI v3.5: comentario al despegar el dedo + tarjeta azul
+El dedo se despega del teléfono a ≈0,54 s: el comentario sale a 0,54 s (resorte damping 22 / stiffness 160, llega arriba ≈0,95 s; ella empieza a hablar a 0,86 s). La tarjeta "CAPRI RESIDENCE" (esquema 2) usa `azul: true` en `Item`: degradado #38577F→#26405F con el mismo marco dorado, texto crema y "CAPRI" en dorado claro; las otras cuatro siguen blancas.
+
+### CAPRI v3.6: subtítulos minimalistas estilo documental
+Solo desde 6,3 s (el comentario de 0,9–6,2 s no lleva). Texto aprobado por la persona (Whisper medium + revisión): 12 frases en `SUBS` de `Capri.tsx` (voseo rioplatense tal cual: "querés", "contactame"). Inter Medium 40 px, blanco, sombra suave, dos líneas máx. (maxWidth 500), centrado, anclado a 52 px del borde inferior sobre la mesa, línea fina blanca de 64 px encima y degradado negro suave (0→42 %) abajo para el contraste. Entrada/salida con desvanecimiento (5/6 fotogramas). La zona inferior se solapa con la interfaz de Reels (aproximada).
+
+### CAPRI v3.7: subtítulos en una sola línea
+Mismo texto aprobado, reagrupado en 8 frases largas de una sola línea (`SUBS`, `nowrap`), Inter Medium 30 px (kit solo tiene Medium/ExtraBold; no hay Light), tracking 1,2, anclado a 118 px del borde inferior (≈66 px más arriba que v3.6), degradado inferior de 420 px.
+
+### CAPRI v3.8: subtítulos un poco más arriba
+Subtítulos anclados a 175 px del borde inferior (antes 118; +57 px, ≈ un tercio más de distancia al borde) y sombra algo más fuerte (en el primer plano el texto cruza el borde de la camiseta blanca).

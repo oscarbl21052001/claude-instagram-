@@ -290,3 +290,6 @@ La persona subió `remotion-video/public/entrada/CAPRI.jpeg` (render arquitectó
 grandes del inicio**: se eligió la **izquierda** (la primera en entrar, 6,45 s). `TarjetaVacia` acepta `imagen`; copia ligera `public/entrada/capri_card.jpg` (1200x1500). Como el render es 4:5 y la tarjeta casi 1:2 se recorta a lo alto (`objectFit: cover`) y se desplaza
 muy despacio de izquierda a derecha (`objectPosition` 22 %→62 %, zoom 1,02→1,08 durante los 2,8 s de la tarjeta) para que se vea todo el edificio. La tarjeta de la derecha sigue vacía a la espera de su contenido, igual que la grande de los 16,4–20,7 s.
 Se hizo `git merge origin/main` en la rama de trabajo para traer la imagen. Render y copia ligera (17 MB) en `renders/`.
+
+### CAPRI v3.2: tres fotos horizontales en la última tarjeta grande
+La tarjeta de 16,4–20,7 s (ahora x 560, y 165, 480x810) lleva tres fotos 16:9 apiladas (`public/entrada/capri_int1..3.jpg`: cocina/comedor, piscina, sala con TV), sin recorte, mismo ancho y separación, entrando una tras otra (prop `imagenes` de `TarjetaVacia`). Separación de 40 px con el esquema de la izquierda.

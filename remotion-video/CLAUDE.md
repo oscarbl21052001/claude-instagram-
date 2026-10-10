@@ -293,3 +293,6 @@ Se hizo `git merge origin/main` en la rama de trabajo para traer la imagen. Rend
 
 ### CAPRI v3.2: tres fotos horizontales en la última tarjeta grande
 La tarjeta de 16,4–20,7 s (ahora x 560, y 165, 480x810) lleva tres fotos 16:9 apiladas (`public/entrada/capri_int1..3.jpg`: cocina/comedor, piscina, sala con TV), sin recorte, mismo ancho y separación, entrando una tras otra (prop `imagenes` de `TarjetaVacia`). Separación de 40 px con el esquema de la izquierda.
+
+### CAPRI v3.3: logo en la tarjeta grande de la derecha del inicio
+La tarjeta de 6,8–9,25 s lleva el logo CAPRI RESIDENCE (azul, `public/entrada/capri_logo_card.jpg`): logo al 90 % del ancho, completo, sobre el mismo azul extendido (fondo = imagen con las letras crema borradas y desenfocada, bordes difuminados para no ver costuras). Resolución del original: 1052x1122.

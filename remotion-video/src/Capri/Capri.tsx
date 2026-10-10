@@ -21,10 +21,11 @@ const CUT1 = 314; // 6,28 s
 const CUT2 = 635; // 12,70 s
 const CUT3 = 1050; // 21,00 s
 const M_FIRST = 290;
-const M_LAST = 1049; // fotogramas con recorte de ella
+const M_LAST = 1075; // fotogramas con recorte de ella (hasta 0,5 s después del tercer corte)
+const BG_END = 1076; // el fondo sin ella se usa hasta aquí; después, el vídeo real
 const RAMP_START = 294; // el fondo empieza a difuminarse 0,4 s antes del primer corte
 const FRAME_ZOOM = 1.16; // encuadre más cercano desde el primer corte: ella se ve más grande
-const FRAME_PIVOT = "50% 100%";
+const FRAME_PIVOT = "540px 1200px"; // escala ×1,16 desde un punto alto: mismo tamaño, pero ella queda unos 110 px más abajo y deja más aire para los esquemas
 
 const GOLD = { border: "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)", deep: "#8f7138", mustard: "#B98512", ink: "#1a1a1a" };
 const METAL = "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)";
@@ -34,31 +35,40 @@ const easeIn = Easing.in(Easing.cubic);
 const easeOut = Easing.out(Easing.cubic);
 
 // ---------- cámara: zoom + desenfoque en los cortes 1 y 3 ----------
-const ZOOM_PEAK = 1.34;
-const MAX_BLUR = 18;
-const OUT_LEN = 13; // 0,26 s antes del corte
-const IN_LEN = 20; // 0,4 s después
+const CORTES = [
+  { c: CUT1, peak: 1.3, blur: 16, out: 6, inn: 20 },
+  { c: CUT2, peak: 1.18, blur: 10, out: 11, inn: 18 }, // mismo tipo de transición, más suave: la escena continúa
+  { c: CUT3, peak: 1.3, blur: 16, out: 13, inn: 20 },
+];
 const camera = (f: number) => {
-  for (const c of [CUT1, CUT3]) {
-    if (f >= c - OUT_LEN && f < c) {
-      const v = (f - (c - OUT_LEN)) / OUT_LEN;
-      return { scale: 1 + (ZOOM_PEAK - 1) * easeIn(v), blur: MAX_BLUR * v * v };
+  for (const k of CORTES) {
+    if (f >= k.c - k.out && f < k.c) {
+      const v = (f - (k.c - k.out)) / k.out;
+      return { scale: 1 + (k.peak - 1) * easeIn(v), blur: k.blur * v * v };
     }
-    if (f >= c && f < c + IN_LEN) {
-      const v = (f - c) / IN_LEN;
-      return { scale: 1 + (ZOOM_PEAK - 1) * (1 - easeOut(v)), blur: MAX_BLUR * (1 - v) * (1 - v) };
+    if (f >= k.c && f < k.c + k.inn) {
+      const v = (f - k.c) / k.inn;
+      return { scale: 1 + (k.peak - 1) * (1 - easeOut(v)), blur: k.blur * (1 - v) * (1 - v) };
     }
   }
   return { scale: 1, blur: 0 };
 };
 
-// ---------- alineación en el corte 2 (medida con el recorte: ancho de la cabeza 203→177 px, coronilla y 1022→1011, centro x 516→522) ----------
-// Después del corte, fondo y ella arrancan ampliados (×1/0,87) y se asientan en 0,5 s: así su cabeza mide igual a ambos lados del corte y nunca se ven bordes vacíos.
-const ALIGN = { len: 25, s: 203 / 177, dx: -6, dy: 11, px: 522, py: 1011 };
+// ---------- alineación de ella en los cortes 1 y 2 (medida con el recorte) ----------
+// Después de cada corte, fondo y ella arrancan en la posición/tamaño que tenía ella justo antes y se asientan en ~0,4 s: su cabeza no salta.
+//  corte 1 (6,28 s): mismo tamaño (ancho de cabeza ≈ 200 px), pero ella queda 64 px más abajo y 14 px a la izquierda → se sube 64 y se mueve 14.
+//  corte 2 (12,70 s): ancho de cabeza 209→182 px (×1,148), coronilla y 1023→1010, centro x 516→523 → ampliación ×1,148 desde la cabeza.
+// Siempre escala ≥ 1 y desplazamientos pequeños: nunca se ven bordes vacíos.
+const ALIGNS = [
+  { c: CUT1, len: 22, s: 1, dx: 14, dy: -64, px: 600, py: 1062 },
+  { c: CUT2, len: 25, s: 209 / 182, dx: -7, dy: 13, px: 523, py: 1010 },
+];
 const personAlign = (f: number): { transform: string; origin: string } | undefined => {
-  if (f >= CUT2 && f < CUT2 + ALIGN.len) {
-    const q = 1 - easeOut(clamp01((f - CUT2) / ALIGN.len));
-    return { transform: `translate(${q * ALIGN.dx}px, ${q * ALIGN.dy}px) scale(${1 + q * (ALIGN.s - 1)})`, origin: `${ALIGN.px}px ${ALIGN.py}px` };
+  for (const k of ALIGNS) {
+    if (f >= k.c && f < k.c + k.len) {
+      const q = 1 - easeOut(clamp01((f - k.c) / k.len));
+      return { transform: `translate(${q * k.dx}px, ${q * k.dy}px) scale(${1 + q * (k.s - 1)})`, origin: `${k.px}px ${k.py}px` };
+    }
   }
   return undefined;
 };
@@ -184,15 +194,15 @@ const Esquema1: React.FC = () => {
 const ESQ2_OUT = T(20.7);
 const Esquema2: React.FC = () => {
   const f = useCurrentFrame();
-  const X = 64;
-  const W = 510;
-  const H = 108;
+  const X = 40;
+  const W = 480;
+  const H = 134;
   const items: Item[] = [
-    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 200, w: W, h: 124, mainSize: 44 },
-    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 338, w: W, h: H, mainSize: 46 },
-    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 460, w: W, h: H, mainSize: 46 },
-    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 582, w: W, h: H, mainSize: 46 },
-    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 704, w: W, h: H, mainSize: 46 },
+    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 200, w: W, h: 140, mainSize: 40 },
+    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 356, w: W, h: H, mainSize: 42 },
+    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 506, w: W, h: H, mainSize: 42 },
+    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 656, w: W, h: H, mainSize: 42 },
+    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 806, w: W, h: H, mainSize: 42 },
   ];
   let act = 0;
   items.forEach((it, i) => {
@@ -206,11 +216,11 @@ const Esquema2: React.FC = () => {
   return (
     <>
       {f >= items[0].start && (
-        <div style={{ position: "absolute", left: 34, top, width: 5, height: Math.max(bottom - top, 0), borderRadius: 3, background: METAL, opacity: 0.9 * (1 - out) }} />
+        <div style={{ position: "absolute", left: 22, top, width: 5, height: Math.max(bottom - top, 0), borderRadius: 3, background: METAL, opacity: 0.9 * (1 - out) }} />
       )}
       {items.map((it, i) =>
         f >= it.start ? (
-          <div key={`d${i}`} style={{ position: "absolute", left: 24, top: it.y + it.h / 2 - 12, width: 24, height: 24, borderRadius: 12, background: METAL, boxShadow: "0 0 0 4px rgba(226,168,38,0.25)", opacity: 1 - out }} />
+          <div key={`d${i}`} style={{ position: "absolute", left: 12, top: it.y + it.h / 2 - 12, width: 24, height: 24, borderRadius: 12, background: METAL, boxShadow: "0 0 0 4px rgba(226,168,38,0.25)", opacity: 1 - out }} />
         ) : null
       )}
       {items.map((it, i) => (
@@ -225,37 +235,39 @@ export const CapriEdit: React.FC = () => {
   useKitFonts();
   const f = useCurrentFrame();
   const { scale, blur } = camera(f);
-  const plateOp = f < RAMP_START ? 0 : f < CUT3 ? clamp01((f - RAMP_START) / 20) : 0;
+  const plateOp = f < RAMP_START ? 0 : f < BG_END ? clamp01((f - RAMP_START) / 14) : 0;
   const hasMatte = f >= M_FIRST && f <= M_LAST;
   const n = String(Math.min(Math.max(f, M_FIRST), M_LAST)).padStart(4, "0");
   const al = personAlign(f);
   const fr = framing(f);
+  const ORIGIN = "50% 62%";
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: "50% 62%", filter: blur > 0.3 ? `blur(${blur}px)` : undefined }}>
-        {/* vídeo + fondo difuminado + ella: comparten encuadre y alineación */}
+      {/* FONDO: vídeo real + fondo progresivo (real abajo, camel liso arriba). El zoom y el desenfoque de las transiciones actúan SOLO aquí */}
+      <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: ORIGIN, filter: blur > 0.3 ? `blur(${blur}px)` : undefined }}>
         <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
           <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
-            <AbsoluteFill style={{ filter: plateOp > 0 && plateOp < 1 ? `blur(${plateOp * 22}px)` : undefined }}>
-              <Video src={staticFile("entrada/edit_1080_50.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
-            </AbsoluteFill>
+            <Video src={staticFile("entrada/edit_1080_50.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
             {plateOp > 0 && <Img src={staticFile(`edit_bg/b_${n}.jpg`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: plateOp }} />}
           </AbsoluteFill>
         </AbsoluteFill>
-        {/* tarjetas grandes vacías (detrás de ella): caben enteras en el plano */}
-        <TarjetaVacia x={40} y={140} w={470} h={950} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" />
-        <TarjetaVacia x={570} y={190} w={470} h={900} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={0.5} from="right" />
-        <TarjetaVacia x={610} y={230} w={430} h={940} start={T(16.4)} end={T(20.7)} rotY={-9} rotZ={0.5} from="right" />
-        {hasMatte && (
+      </AbsoluteFill>
+      {/* tarjetas grandes vacías (detrás de ella): enteras en el plano y simétricas */}
+      <TarjetaVacia x={40} y={150} w={470} h={930} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" />
+      <TarjetaVacia x={570} y={150} w={470} h={930} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={1} from="right" />
+      <TarjetaVacia x={560} y={200} w={480} h={740} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" />
+      {/* ELLA: siempre nítida (sin desenfoque en ningún momento); solo sigue el zoom del fondo */}
+      {hasMatte && (
+        <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: ORIGIN }}>
           <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
             <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
               <Img src={staticFile(`recorte_hq/m_${n}.webp`)} style={{ width: "100%", height: "100%" }} />
             </AbsoluteFill>
           </AbsoluteFill>
-        )}
-        <Esquema1 />
-        <Esquema2 />
-      </AbsoluteFill>
+        </AbsoluteFill>
+      )}
+      <Esquema1 />
+      <Esquema2 />
     </AbsoluteFill>
   );
 };

@@ -299,3 +299,6 @@ La tarjeta de 6,8–9,25 s lleva el logo CAPRI RESIDENCE (azul, `public/entrada/
 
 ### CAPRI v3.4: comentario de Instagram que sale del teléfono
 `public/entrada/COMENTARIO.png` (RGBA, 1836x633, usuario inventado `claudia_martinezz`). Aparece a 0,30 s (mientras pasa el dedo, ~0,1–0,5 s) desde la pantalla del teléfono (≈ x335,y1300) con resorte, arco suave, desenfoque de movimiento al arrancar y un brillo en el teléfono; queda arriba (ancho 1120 px, card ≈ 997 px, y≈266–520) hasta 6,0 s y se va antes del primer corte (6,28 s). Ella empieza a leer a 0,86 s y acaba a 6,22 s (Whisper: dice "emprendimiento" en vez de "me recomendás"). Sin marco extra: el PNG ya es la burbuja con sombra.
+
+### CAPRI v3.5: comentario al despegar el dedo + tarjeta azul
+El dedo se despega del teléfono a ≈0,54 s: el comentario sale a 0,54 s (resorte damping 22 / stiffness 160, llega arriba ≈0,95 s; ella empieza a hablar a 0,86 s). La tarjeta "CAPRI RESIDENCE" (esquema 2) usa `azul: true` en `Item`: degradado #38577F→#26405F con el mismo marco dorado, texto crema y "CAPRI" en dorado claro; las otras cuatro siguen blancas.

@@ -305,3 +305,6 @@ El dedo se despega del teléfono a ≈0,54 s: el comentario sale a 0,54 s (resor
 
 ### CAPRI v3.6: subtítulos minimalistas estilo documental
 Solo desde 6,3 s (el comentario de 0,9–6,2 s no lleva). Texto aprobado por la persona (Whisper medium + revisión): 12 frases en `SUBS` de `Capri.tsx` (voseo rioplatense tal cual: "querés", "contactame"). Inter Medium 40 px, blanco, sombra suave, dos líneas máx. (maxWidth 500), centrado, anclado a 52 px del borde inferior sobre la mesa, línea fina blanca de 64 px encima y degradado negro suave (0→42 %) abajo para el contraste. Entrada/salida con desvanecimiento (5/6 fotogramas). La zona inferior se solapa con la interfaz de Reels (aproximada).
+
+### CAPRI v3.7: subtítulos en una sola línea
+Mismo texto aprobado, reagrupado en 8 frases largas de una sola línea (`SUBS`, `nowrap`), Inter Medium 30 px (kit solo tiene Medium/ExtraBold; no hay Light), tracking 1,2, anclado a 118 px del borde inferior (≈66 px más arriba que v3.6), degradado inferior de 420 px.

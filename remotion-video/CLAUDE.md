@@ -237,3 +237,20 @@ mostaza con volumen, entrando desde abajo con desenfoque **por detrás de ella**
   sombra grande detrás, brillo que barre la cara una vez, balanceo suave. Entrada: curva `bezier(0.3,0.05,0.2,1)` en 30 fotogramas, desenfoque 30→0 px, giro de 62° que se endereza. Bloque final centrado en y=640.
   Con una curva más agresiva (expo-out) el texto subía demasiado deprisa y no se notaba que salía de detrás de ella.
 - Audio original (estéreo): desfase 0 ms, correlación 0,9998, mismo nivel (−26,3 dB). Trampa no ocurrida aquí: Remotion solo baja 3 dB el audio **mono**.
+
+## Edit "CAPRI" (EDIT_COMPLETO.mov): fondo difuminado, tarjetas detrás de ella y esquemas (`CapriEdit`, `src/Capri/`, `tools/capri/`, `renders/capri_edit.mp4`)
+`EDIT_COMPLETO.mov` (24,9 s, 1080x1920, HEVC 50 fps, audio estéreo; la persona lo subió comprimido con `avconvert` porque el original pesaba 114 MB > 100 MB de GitHub). Tres cortes duros: **6,28 s** (fotograma 314),
+**12,70 s** (635) y **21,00 s** (1050; cambia de sala). Transcripción (`faster-whisper` medium; "Residenz" = **Capri Residence**, confirmado): "Hoy este emprendimiento es uno de los mejores para poder ingresar con un monto mínimo
+y un gran financiamiento (ingresar 9,5 · monto mínimo 10,32–11,16 · gran financiamiento 11,68–12,68). Capri Residence (12,94) es uno de los emprendimientos más completos (14,5) con unidades de dos dormitorios (16,28),
+amenities premium (18,12) y una ubicación extraordinaria (19,36–20,94). Si querés más info… contactame."
+- Pedido: desde 6,28 s fondo difuminado con los colores del propio fondo (corte tapado), 7–8 s dos tarjetas vacías detrás de ella (referencia), esquema ~9–12,5 s, corte de 12,70 s mínimo, 13–21 s esquema arriba a la izquierda,
+  18–19 s tarjeta grande vacía a la derecha, 21 s transición y fondo real. **Estilo de tarjetas: fondo blanco con marco dorado** (decisión de la persona). El contenido de las tarjetas grandes llegará después.
+- Recorte de ella: `recorte.py` **por escena** (el suavizado temporal no debe cruzar los cortes): `out/e_s1` (290–313), `e_s2` (314–634), `e_s3` (635–1049) → `public/recorte_edit/` (gitignore; ~13 min para 760 fotogramas). Fotogramas
+  extraídos con `-start_number 0` (nombre = índice a 50 fps). La mesa y la taza se difuminan con el fondo: el recorte de ella se funde con un degradado hacia 1680 px (escena 2) / 1610 px (escena 3).
+- Fondo: `python tools/capri/plate.py 400 800 public/edit_plate/plate.jpg` (silueta rellena + desenfoque fuerte de un fotograma de cada escena, promediados + mezcla con un degradado azul profundo). Un solo fondo para las dos escenas.
+- Capas: vídeo (se desenfoca y se cubre con el fondo entre 5,88 y 6,28 s) → fondo → tarjetas de detrás → recorte de ella → esquemas delanteros. Cortes 1 y 3: zoom ×1,34 y desenfoque (como VideoIdeas, sin brillo).
+- **Corte de 12,70 s**: medido en el recorte (ancho de cabeza 203→177 px, coronilla 1022→1011, centro 516→522): mitad del ajuste de escala/posición justo antes y mitad justo después (16 fotogramas). Trampa: el ancho de hombros
+  daba 595→443 (0,745) porque cambia la pose de los brazos; el de la cabeza (0,87) es el fiable. Se reduce mucho pero no es invisible: cambia su pose.
+- Esquema 1 (9,3–12,42 s): "PARA INGRESAR" · "CON UN / MONTO MÍNIMO" · "+" · "Y UN / GRAN FINANCIAMIENTO". Esquema 2 (12,94–20,7 s, x 70, y 250–950): CAPRI RESIDENCE · UNO DE LOS MÁS COMPLETOS · UNIDADES DE 2 DORMITORIOS · AMENITIES PREMIUM ·
+  UBICACIÓN EXTRAORDINARIA, con hilo dorado que se dibuja y la tarjeta activa resaltada. Solo palabras de ella; sin cifras inventadas. Tarjeta grande vacía a la derecha desde 18,4 s.
+- Render: ~13 min para 1244 fotogramas a 50 fps (`--gl=swangle`). Audio estéreo del original verificado: desfase 0 ms, correlación 0,9999, nivel −26,4 dB.

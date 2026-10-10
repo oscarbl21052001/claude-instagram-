@@ -225,3 +225,15 @@ original ("Atualizações!", logos, interfaz) y poner "CONSTRUCTORAS DE RENOMBRE
 - Composición: vídeo con zoom 1,025 (quita los puntitos de las esquinas), velo oscuro suave abajo y el texto (Bebas Neue 112 px, crema `#FFF8E7`, sombra suave) que entra a 0,27 s.
 - Límites: puede quedar algún resto muy tenue del contorno hexagonal del logo superior, y todo lo rellenado (logos, interfaz) es inventado por el modelo.
   Es contenido de un tercero: avisar de permisos de marca/personas antes de publicar.
+
+## Clip "UNIDADES": texto 3D protagonista que sale por detrás de la mujer (`Unidades`, `src/Unidades/`, `renders/unidades_vendidas.mp4`)
+`UNIDADES.mov` (2,67 s, HEVC 1440x2560, 30 fps, audio estéreo, plano fijo de un edificio con la presentadora abajo, sin texto ni interfaz). Transcripción (`faster-whisper` medium):
+"Llevamos más de 15 unidades comercializadas." (0–2,64 s; "más" 0,42 · "15" 0,78–1,0 · "unidades" 1,0–1,66 · "comercializadas" 1,66–2,64).
+Pedido: en ese momento aparece "**+15 UNIDADES VENDIDAS**" (texto elegido por la persona; "+MÁS DE" era redundante), en dos líneas ("+15" grande / "UNIDADES VENDIDAS"),
+mostaza con volumen, entrando desde abajo con desenfoque **por detrás de ella** hasta la zona alta. Sin añadir segundos: se adelantó la entrada (empieza a 0,1 s, legible desde ~0,7 s).
+- Recorte de la mujer: `python tools/recorte/recorte.py out/un_f public/recorte_unidades x.json` con fotogramas `f_NNNN.jpg` desde 0 (MODNet, ~80 s para 80 fotogramas a 1440x2560;
+  `public/recorte_unidades/` está en .gitignore). Capas: vídeo → velo oscuro superior → texto 3D → recorte encima. `public/entrada/unidades_1440.mp4` = copia H.264 con audio.
+- Texto: Bebas Neue 430 px ("+15") y 160 px; pila de 30 capas con `translateZ` (96 px de grosor), cara con degradado `#FFDD85→#F2BE45→#E2A826→#B98512`, laterales hacia `#4A3006`,
+  sombra grande detrás, brillo que barre la cara una vez, balanceo suave. Entrada: curva `bezier(0.3,0.05,0.2,1)` en 30 fotogramas, desenfoque 30→0 px, giro de 62° que se endereza. Bloque final centrado en y=640.
+  Con una curva más agresiva (expo-out) el texto subía demasiado deprisa y no se notaba que salía de detrás de ella.
+- Audio original (estéreo): desfase 0 ms, correlación 0,9998, mismo nivel (−26,3 dB). Trampa no ocurrida aquí: Remotion solo baja 3 dB el audio **mono**.

@@ -101,7 +101,7 @@ const Marco: React.FC<{ style?: React.CSSProperties; radius?: number; glow?: boo
 );
 
 // Tarjeta grande vacía (el contenido llegará después), con perspectiva 3D como las de la referencia
-const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start: number; end: number; rotY: number; rotZ: number; from: "left" | "right" }> = ({ x, y, w, h, start, end, rotY, rotZ, from }) => {
+const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start: number; end: number; rotY: number; rotZ: number; from: "left" | "right"; imagen?: string }> = ({ x, y, w, h, start, end, rotY, rotZ, from, imagen }) => {
   const f = useCurrentFrame();
   const p = useSpr(start, 18, 80);
   if (f < start || f > end + 14) return null;
@@ -111,7 +111,23 @@ const TarjetaVacia: React.FC<{ x: number; y: number; w: number; h: number; start
   return (
     <div style={{ position: "absolute", left: x, top: y, width: w, height: h, perspective: 1800, opacity: clamp01(e * 2.2) * (1 - out), filter: out > 0 ? `blur(${out * 12}px)` : undefined }}>
       <div style={{ width: "100%", height: "100%", transform: `translateX(${slide}px) rotateY(${rotY * (0.4 + 0.6 * e)}deg) rotateZ(${rotZ}deg)`, transformStyle: "preserve-3d" }}>
-        <Marco radius={64} style={{ width: "100%", height: "100%" }} />
+        <Marco radius={64} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
+          {imagen && (
+            // el render es 4:5 y la tarjeta casi 1:2: se recorta a lo alto y se desplaza muy despacio de izquierda a derecha (zoom suave) para que se vea todo el edificio
+            <Img
+              src={staticFile(imagen)}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: `${22 + 40 * clamp01((f - start) / (end - start))}% 50%`,
+                transform: `scale(${1.02 + 0.06 * clamp01((f - start) / (end - start))})`,
+              }}
+            />
+          )}
+        </Marco>
       </div>
     </div>
   );
@@ -253,7 +269,7 @@ export const CapriEdit: React.FC = () => {
         </AbsoluteFill>
       </AbsoluteFill>
       {/* tarjetas grandes vacías (detrás de ella): enteras en el plano y simétricas */}
-      <TarjetaVacia x={40} y={150} w={470} h={930} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" />
+      <TarjetaVacia x={40} y={150} w={470} h={930} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" imagen="entrada/capri_card.jpg" />
       <TarjetaVacia x={570} y={150} w={470} h={930} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={1} from="right" />
       <TarjetaVacia x={560} y={200} w={480} h={740} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" />
       {/* ELLA: siempre nítida (sin desenfoque en ningún momento); solo sigue el zoom del fondo */}

@@ -254,3 +254,19 @@ amenities premium (18,12) y una ubicación extraordinaria (19,36–20,94). Si qu
 - Esquema 1 (9,3–12,42 s): "PARA INGRESAR" · "CON UN / MONTO MÍNIMO" · "+" · "Y UN / GRAN FINANCIAMIENTO". Esquema 2 (12,94–20,7 s, x 70, y 250–950): CAPRI RESIDENCE · UNO DE LOS MÁS COMPLETOS · UNIDADES DE 2 DORMITORIOS · AMENITIES PREMIUM ·
   UBICACIÓN EXTRAORDINARIA, con hilo dorado que se dibuja y la tarjeta activa resaltada. Solo palabras de ella; sin cifras inventadas. Tarjeta grande vacía a la derecha desde 18,4 s.
 - Render: ~13 min para 1244 fotogramas a 50 fps (`--gl=swangle`). Audio estéreo del original verificado: desfase 0 ms, correlación 0,9999, nivel −26,4 dB.
+
+### CAPRI v2 (cambios pedidos tras ver la v1)
+La persona pidió: fondo difuminado **más claro y camel** (no oscuro ni tan fuerte) **con la mesa y sus elementos visibles**; tarjetas grandes que **quepan enteras en el plano y duren más**; ella **algo más grande**;
+y "el recorte y el fondo lo más perfectos posible, aunque tardes más". Lo que cambió:
+- **Recorte de alta calidad** (`tools/capri/recorte_hq.py` + `recorte_post.py`, ~35 min en total para 760 fotogramas): MODNet *crudo* (sin los rellenos de `recorte.py`, que cerraban huecos y dejaban parches de fondo) → trimap (suavizado ±1 fotograma sin
+  cruzar cortes) → **ViTMatte small** (`hustvl/vitmatte-small-distinctions-646`, ~3 s por recuadro de ella en CPU) → suavizado temporal solo donde el alfa es estable → **estimación del color de primer plano** (`pymatting.estimate_foreground_ml`, quita el
+  borde oscuro del fondo en el pelo) → corte contra la mesa con borde de 12 px → `public/recorte_hq/` (gitignore). Mucho mejor que MODNet solo en pelo y bordes. Pip: `transformers` 4.35 pide `tokenizers<0.15` (se fijó `tokenizers==0.14.1`, que
+  baja `huggingface-hub` a 0,17; `faster-whisper` sigue funcionando) y `pymatting`.
+- **Fondo** (`tools/capri/fondo.py`, un JPG por fotograma en `public/edit_bg/`, gitignore): fotograma real **sin ella** (desenfoque normalizado σ=18 donde los píxeles de ella no cuentan; σ=70 de reserva) → luminancia mapeada a una rampa **camel claro**
+  (`STOPS`) mezclada con algo de color real (más en zonas cálidas: mesa y paredes). La mesa, la taza y el móvil son parte del fondo: ella se corta en el borde superior de la taza (escena 2: y 1758, escena 3: y 1632; escena 1: 1678).
+- **Encuadre más cercano** ×1,16 (pivote abajo-centro) desde el primer corte, para que ella se vea mayor. Corte de 12,70 s: ahora solo **después** del corte, fondo y ella arrancan ampliados ×1,147 (=203/177 del ancho de cabeza) y se asientan en 0,5 s
+  (no hay bordes vacíos porque la escala siempre es ≥ 1).
+- **Tarjetas grandes**: las dos de 7–9 s ahora entran a 6,45 y 6,8 s y salen a 9,25 s (x 40–510 y 570–1040: enteras en el plano, ligera perspectiva); la grande de la derecha entra a 16,4 s (antes 18,4) y sale a 20,7 s (x 610–1040).
+  Esquemas movidos hacia arriba para no chocar con su cabeza más grande (esquema 1 y 230–730; esquema 2 x 64, y 200–812, tarjetas de 510 px).
+- Render: ~13 min (`--gl=swangle`, 1244 fotogramas a 50 fps, 40 MB). Audio igual al original (desfase 0 ms, corr. 0,9999).
+- Trampa: `pkill -f <patrón>` mata la propia shell si el patrón aparece en el comando; matar por PID (`ps aux | grep … | awk '{print $2}' | xargs kill`).

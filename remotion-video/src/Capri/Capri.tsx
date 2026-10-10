@@ -23,6 +23,8 @@ const CUT3 = 1050; // 21,00 s
 const M_FIRST = 290;
 const M_LAST = 1049; // fotogramas con recorte de ella
 const RAMP_START = 294; // el fondo empieza a difuminarse 0,4 s antes del primer corte
+const FRAME_ZOOM = 1.16; // encuadre más cercano desde el primer corte: ella se ve más grande
+const FRAME_PIVOT = "50% 100%";
 
 const GOLD = { border: "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)", deep: "#8f7138", mustard: "#B98512", ink: "#1a1a1a" };
 const METAL = "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)";
@@ -50,22 +52,21 @@ const camera = (f: number) => {
   return { scale: 1, blur: 0 };
 };
 
-// ---------- alineación de ella en el corte 2 (medida con el recorte: ancho de la cabeza 203→177 px, coronilla y 1022→1011, centro x 516→522) ----------
-// Mitad del ajuste en cada lado del corte: justo antes se encoge/desplaza un poco y justo después vuelve desde la posición intermedia.
-const ALIGN = { len: 16, sh: Math.sqrt(177 / 203), dx: 6, dy: -11, pre: { px: 516, py: 1022 }, post: { px: 522, py: 1011 } };
+// ---------- alineación en el corte 2 (medida con el recorte: ancho de la cabeza 203→177 px, coronilla y 1022→1011, centro x 516→522) ----------
+// Después del corte, fondo y ella arrancan ampliados (×1/0,87) y se asientan en 0,5 s: así su cabeza mide igual a ambos lados del corte y nunca se ven bordes vacíos.
+const ALIGN = { len: 25, s: 203 / 177, dx: -6, dy: 11, px: 522, py: 1011 };
 const personAlign = (f: number): { transform: string; origin: string } | undefined => {
-  if (f >= CUT2 - ALIGN.len && f < CUT2) {
-    const q = easeIn(clamp01((f - (CUT2 - ALIGN.len)) / ALIGN.len));
-    return { transform: `translate(${q * ALIGN.dx * 0.5}px, ${q * ALIGN.dy * 0.5}px) scale(${1 + q * (ALIGN.sh - 1)})`, origin: `${ALIGN.pre.px}px ${ALIGN.pre.py}px` };
-  }
   if (f >= CUT2 && f < CUT2 + ALIGN.len) {
     const q = 1 - easeOut(clamp01((f - CUT2) / ALIGN.len));
-    return { transform: `translate(${-q * ALIGN.dx * 0.5}px, ${-q * ALIGN.dy * 0.5}px) scale(${1 + q * (1 / ALIGN.sh - 1)})`, origin: `${ALIGN.post.px}px ${ALIGN.post.py}px` };
+    return { transform: `translate(${q * ALIGN.dx}px, ${q * ALIGN.dy}px) scale(${1 + q * (ALIGN.s - 1)})`, origin: `${ALIGN.px}px ${ALIGN.py}px` };
   }
   return undefined;
 };
-// fila (px) donde el recorte de ella termina contra la mesa, por escena: se funde con un degradado
-const BOTTOM = (f: number) => (f < CUT2 ? 1680 : 1610); // por encima de la taza, que forma parte de la mesa y se difumina
+// encuadre general: a partir del primer corte la imagen es algo más cercana
+const framing = (f: number) => {
+  if (f < RAMP_START || f >= CUT3) return 1;
+  return 1 + (FRAME_ZOOM - 1) * easeOut(clamp01((f - RAMP_START) / 20));
+};
 
 // ---------- piezas ----------
 const useSpr = (start: number, damping = 20, stiffness = 90) => {
@@ -81,7 +82,7 @@ const Marco: React.FC<{ style?: React.CSSProperties; radius?: number; glow?: boo
       border: "8px solid transparent",
       borderRadius: radius,
       background: `linear-gradient(180deg, #FFFFFF 0%, #F6F1E6 100%) padding-box, ${GOLD.border} border-box`,
-      boxShadow: glow ? "0 0 0 3px rgba(226,168,38,0.35), 0 0 54px rgba(226,168,38,0.5), 0 26px 64px rgba(0,0,0,0.45)" : "0 26px 64px rgba(0,0,0,0.45)",
+      boxShadow: glow ? "0 0 0 3px rgba(226,168,38,0.35), 0 0 54px rgba(226,168,38,0.5), 0 26px 64px rgba(70,44,18,0.42)" : "0 26px 64px rgba(70,44,18,0.42)",
       ...style,
     }}
   >
@@ -130,7 +131,7 @@ const Tarjeta: React.FC<{ it: Item; active: boolean; exitFrom: number; exitLen?:
       }}
     >
       <Marco glow={active} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        {it.label && <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 28, letterSpacing: 5, color: GOLD.deep, marginBottom: 2 }}>{it.label}</div>}
+        {it.label && <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 26, letterSpacing: 5, color: GOLD.deep, marginBottom: 2 }}>{it.label}</div>}
         <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: it.mainSize ?? 48, letterSpacing: 2.5, color: GOLD.ink, whiteSpace: "nowrap" }}>
           {it.accent ? (
             <>
@@ -164,9 +165,9 @@ const ESQ1_OUT = T(12.42);
 const Esquema1: React.FC = () => {
   const f = useCurrentFrame();
   const items: Item[] = [
-    { start: T(9.3), main: "PARA INGRESAR", accent: "INGRESAR", x: 250, y: 290, w: 580, h: 104, mainSize: 40 },
-    { start: T(10.2), label: "CON UN", main: "MONTO MÍNIMO", x: 150, y: 430, w: 780, h: 150, mainSize: 56 },
-    { start: T(11.6), label: "Y UN", main: "GRAN FINANCIAMIENTO", x: 150, y: 690, w: 780, h: 150, mainSize: 52 },
+    { start: T(9.3), main: "PARA INGRESAR", accent: "INGRESAR", x: 250, y: 230, w: 580, h: 100, mainSize: 40 },
+    { start: T(10.2), label: "CON UN", main: "MONTO MÍNIMO", x: 150, y: 360, w: 780, h: 140, mainSize: 56 },
+    { start: T(11.6), label: "Y UN", main: "GRAN FINANCIAMIENTO", x: 150, y: 590, w: 780, h: 140, mainSize: 52 },
   ];
   const act = f < items[1].start ? 0 : f < items[2].start ? 1 : 2;
   return (
@@ -174,7 +175,7 @@ const Esquema1: React.FC = () => {
       {items.map((it, i) => (
         <Tarjeta key={i} it={it} active={i === act} exitFrom={ESQ1_OUT} />
       ))}
-      <Signo start={T(11.4)} y={635} exitFrom={ESQ1_OUT} />
+      <Signo start={T(11.4)} y={545} exitFrom={ESQ1_OUT} />
     </>
   );
 };
@@ -183,15 +184,15 @@ const Esquema1: React.FC = () => {
 const ESQ2_OUT = T(20.7);
 const Esquema2: React.FC = () => {
   const f = useCurrentFrame();
-  const X = 70;
-  const W = 590;
-  const H = 126;
+  const X = 64;
+  const W = 510;
+  const H = 108;
   const items: Item[] = [
-    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 250, w: W, h: 128, mainSize: 50 },
-    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 396, w: W, h: H },
-    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 538, w: W, h: H },
-    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 680, w: W, h: H },
-    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 822, w: W, h: H },
+    { start: T(12.94), main: "CAPRI RESIDENCE", accent: "CAPRI", x: X, y: 200, w: W, h: 124, mainSize: 44 },
+    { start: T(14.5), label: "UNO DE LOS", main: "MÁS COMPLETOS", x: X, y: 338, w: W, h: H, mainSize: 46 },
+    { start: T(16.28), label: "UNIDADES DE", main: "2 DORMITORIOS", x: X, y: 460, w: W, h: H, mainSize: 46 },
+    { start: T(18.12), label: "AMENITIES", main: "PREMIUM", x: X, y: 582, w: W, h: H, mainSize: 46 },
+    { start: T(19.36), label: "UBICACIÓN", main: "EXTRAORDINARIA", x: X, y: 704, w: W, h: H, mainSize: 46 },
   ];
   let act = 0;
   items.forEach((it, i) => {
@@ -227,27 +228,29 @@ export const CapriEdit: React.FC = () => {
   const plateOp = f < RAMP_START ? 0 : f < CUT3 ? clamp01((f - RAMP_START) / 20) : 0;
   const hasMatte = f >= M_FIRST && f <= M_LAST;
   const n = String(Math.min(Math.max(f, M_FIRST), M_LAST)).padStart(4, "0");
-  const b = BOTTOM(f);
   const al = personAlign(f);
-  const drift = 1 + 0.05 * clamp01((f - CUT1) / (CUT3 - CUT1)); // el fondo respira muy despacio
+  const fr = framing(f);
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: "50% 62%", filter: blur > 0.3 ? `blur(${blur}px)` : undefined }}>
-        <AbsoluteFill style={{ filter: plateOp > 0 && plateOp < 1 ? `blur(${plateOp * 26}px)` : undefined }}>
-          <Video src={staticFile("entrada/edit_1080_50.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
-        </AbsoluteFill>
-        {plateOp > 0 && (
-          <AbsoluteFill style={{ opacity: plateOp, overflow: "hidden" }}>
-            <Img src={staticFile("edit_plate/plate.jpg")} style={{ width: "100%", height: "100%", transform: `scale(${drift})` }} />
-          </AbsoluteFill>
-        )}
-        {/* tarjetas de detrás de ella */}
-        <TarjetaVacia x={-70} y={170} w={500} h={1190} start={T(7.0)} end={T(9.0)} rotY={14} rotZ={-1.5} from="left" />
-        <TarjetaVacia x={650} y={250} w={480} h={1060} start={T(7.4)} end={T(9.0)} rotY={-26} rotZ={0} from="right" />
-        <TarjetaVacia x={710} y={250} w={440} h={1060} start={T(18.4)} end={T(20.7)} rotY={-22} rotZ={0} from="right" />
-        {hasMatte && (
+        {/* vídeo + fondo difuminado + ella: comparten encuadre y alineación */}
+        <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
           <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
-            <Img src={staticFile(`recorte_edit/m_${n}.webp`)} style={{ width: "100%", height: "100%", WebkitMaskImage: `linear-gradient(to bottom, #000 0px, #000 ${b - 130}px, transparent ${b}px)`, maskImage: `linear-gradient(to bottom, #000 0px, #000 ${b - 130}px, transparent ${b}px)` }} />
+            <AbsoluteFill style={{ filter: plateOp > 0 && plateOp < 1 ? `blur(${plateOp * 22}px)` : undefined }}>
+              <Video src={staticFile("entrada/edit_1080_50.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
+            </AbsoluteFill>
+            {plateOp > 0 && <Img src={staticFile(`edit_bg/b_${n}.jpg`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: plateOp }} />}
+          </AbsoluteFill>
+        </AbsoluteFill>
+        {/* tarjetas grandes vacías (detrás de ella): caben enteras en el plano */}
+        <TarjetaVacia x={40} y={140} w={470} h={950} start={T(6.45)} end={T(9.25)} rotY={9} rotZ={-1} from="left" />
+        <TarjetaVacia x={570} y={190} w={470} h={900} start={T(6.8)} end={T(9.25)} rotY={-9} rotZ={0.5} from="right" />
+        <TarjetaVacia x={610} y={230} w={430} h={940} start={T(16.4)} end={T(20.7)} rotY={-9} rotZ={0.5} from="right" />
+        {hasMatte && (
+          <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
+            <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
+              <Img src={staticFile(`recorte_edit/m_${n}.webp`)} style={{ width: "100%", height: "100%" }} />
+            </AbsoluteFill>
           </AbsoluteFill>
         )}
         <Esquema1 />

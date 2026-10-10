@@ -308,3 +308,6 @@ Solo desde 6,3 s (el comentario de 0,9–6,2 s no lleva). Texto aprobado por la 
 
 ### CAPRI v3.7: subtítulos en una sola línea
 Mismo texto aprobado, reagrupado en 8 frases largas de una sola línea (`SUBS`, `nowrap`), Inter Medium 30 px (kit solo tiene Medium/ExtraBold; no hay Light), tracking 1,2, anclado a 118 px del borde inferior (≈66 px más arriba que v3.6), degradado inferior de 420 px.
+
+### CAPRI v3.8: subtítulos un poco más arriba
+Subtítulos anclados a 175 px del borde inferior (antes 118; +57 px, ≈ un tercio más de distancia al borde) y sombra algo más fuerte (en el primer plano el texto cruza el borde de la camiseta blanca).

@@ -301,17 +301,13 @@ const Comentario: React.FC = () => {
 
 // Subtítulos minimalistas estilo documental (desde que termina de leer el comentario). Texto confirmado por la persona.
 const SUBS: { a: number; b: number; t: string }[] = [
-  { a: 6.32, b: 8.05, t: "Hoy este emprendimiento es" },
-  { a: 8.12, b: 9.98, t: "uno de los mejores para poder ingresar" },
-  { a: 10.0, b: 11.1, t: "con un monto mínimo" },
+  { a: 6.32, b: 8.95, t: "Hoy este emprendimiento es uno de los mejores" },
+  { a: 8.94, b: 11.1, t: "para poder ingresar con un monto mínimo" },
   { a: 11.16, b: 12.55, t: "y un gran financiamiento." },
-  { a: 12.94, b: 14.42, t: "Capri Residence es uno de los" },
-  { a: 14.5, b: 16.05, t: "emprendimientos más completos" },
-  { a: 16.1, b: 18.0, t: "con unidades de dos dormitorios," },
-  { a: 18.12, b: 18.85, t: "amenities premium" },
-  { a: 18.86, b: 20.6, t: "y una ubicación extraordinaria." },
-  { a: 21.12, b: 22.62, t: "Si querés más info sobre este" },
-  { a: 22.64, b: 23.9, t: "grandioso emprendimiento," },
+  { a: 12.94, b: 15.15, t: "Capri Residence es uno de los emprendimientos" },
+  { a: 15.2, b: 18.0, t: "más completos con unidades de dos dormitorios," },
+  { a: 18.12, b: 20.6, t: "amenities premium y una ubicación extraordinaria." },
+  { a: 21.12, b: 23.9, t: "Si querés más info sobre este grandioso emprendimiento," },
   { a: 24.36, b: 24.88, t: "contactame." },
 ];
 const Subtitulos: React.FC = () => {
@@ -330,10 +326,10 @@ const Subtitulos: React.FC = () => {
   if (op <= 0) return null;
   return (
     <>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 330, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.42) 100%)", opacity: 1 }} />
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 52, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
-        <div style={{ width: 64, height: 2, background: "rgba(255,255,255,0.85)", marginBottom: 18, boxShadow: "0 1px 6px rgba(0,0,0,0.5)" }} />
-        <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 40, letterSpacing: 0.8, color: "#FFFFFF", textShadow: "0 2px 10px rgba(0,0,0,0.65), 0 0 2px rgba(0,0,0,0.45)", textAlign: "center", lineHeight: 1.3, maxWidth: 500 }}>{text}</div>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 420, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)", opacity: 1 }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 118, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
+        <div style={{ width: 56, height: 1.5, background: "rgba(255,255,255,0.8)", marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.5)" }} />
+        <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 30, letterSpacing: 1.2, color: "#FFFFFF", textShadow: "0 2px 10px rgba(0,0,0,0.65), 0 0 2px rgba(0,0,0,0.45)", textAlign: "center", whiteSpace: "nowrap" }}>{text}</div>
       </div>
     </>
   );

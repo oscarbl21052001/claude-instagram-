@@ -207,11 +207,10 @@ const ESQ1_OUT = T(12.42);
 const Esquema1: React.FC = () => {
   const f = useCurrentFrame();
   const items: Item[] = [
-    { start: T(9.3), main: "PARA INGRESAR", accent: "INGRESAR", x: 250, y: 230, w: 580, h: 100, mainSize: 40 },
-    { start: T(10.2), label: "CON UN", main: "MONTO MÍNIMO", x: 150, y: 360, w: 780, h: 140, mainSize: 56 },
-    { start: T(11.6), label: "Y UN", main: "GRAN FINANCIAMIENTO", x: 150, y: 590, w: 780, h: 140, mainSize: 52 },
+    { start: T(10.2), main: "ANTICIPO MÍNIMO", x: 150, y: 360, w: 780, h: 140, mainSize: 56 },
+    { start: T(11.6), main: "FINANCIAMIENTO LARGO", x: 150, y: 590, w: 780, h: 140, mainSize: 50 },
   ];
-  const act = f < items[1].start ? 0 : f < items[2].start ? 1 : 2;
+  const act = f < items[1].start ? 0 : 1;
   return (
     <>
       {items.map((it, i) => (

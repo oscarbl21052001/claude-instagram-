@@ -311,3 +311,6 @@ Mismo texto aprobado, reagrupado en 8 frases largas de una sola línea (`SUBS`, 
 
 ### CAPRI v3.8: subtítulos un poco más arriba
 Subtítulos anclados a 175 px del borde inferior (antes 118; +57 px, ≈ un tercio más de distancia al borde) y sombra algo más fuerte (en el primer plano el texto cruza el borde de la camiseta blanca).
+
+### CAPRI v3.9: esquema 1 con textos nuevos
+Esquema 1 (9,3–12,42 s): se elimina la tarjeta "PARA INGRESAR"; la tarjeta de 10,2 s pasa a "ANTICIPO MÍNIMO" (56 px, sin etiqueta) y la de 11,6 s a "FINANCIAMIENTO LARGO" (50 px, sin etiqueta). Mismas posiciones, tiempos, efectos y "+" central. Ojo: el texto en pantalla ya no coincide con lo que ella dice ("monto mínimo", "gran financiamiento"), decisión de la persona usuaria. Los subtítulos no se tocaron.

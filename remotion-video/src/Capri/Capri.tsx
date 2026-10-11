@@ -1,5 +1,6 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, Easing, Img, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, Img, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { CUADRO, CUADRO_EH, CUADRO_EW } from "./cuadroQuads";
 import { useKitFonts } from "../kit";
 
 // Edit "Capri Residence" (24,9 s, 1080x1920, 50 fps). Plano original con tres cortes (6,28 · 12,70 · 21,00 s).
@@ -21,7 +22,7 @@ const CUT1 = 314; // 6,28 s
 const CUT2 = 635; // 12,70 s
 const CUT3 = 1050; // 21,00 s
 const M_FIRST = 290;
-const M_LAST = 1075; // fotogramas con recorte de ella (hasta 0,5 s después del tercer corte)
+const M_LAST = 1243; // fotogramas con recorte de ella (hasta el final: en la escena 4 ella pasa por delante del cuadro)
 const BG_END = 1076; // el fondo sin ella se usa hasta aquí; después, el vídeo real
 const RAMP_START = 294; // el fondo empieza a difuminarse 0,4 s antes del primer corte
 const FRAME_ZOOM = 1.16; // encuadre más cercano desde el primer corte: ella se ve más grande
@@ -207,17 +208,16 @@ const ESQ1_OUT = T(12.42);
 const Esquema1: React.FC = () => {
   const f = useCurrentFrame();
   const items: Item[] = [
-    { start: T(9.3), main: "PARA INGRESAR", accent: "INGRESAR", x: 250, y: 230, w: 580, h: 100, mainSize: 40 },
-    { start: T(10.2), label: "CON UN", main: "MONTO MÍNIMO", x: 150, y: 360, w: 780, h: 140, mainSize: 56 },
-    { start: T(11.6), label: "Y UN", main: "GRAN FINANCIAMIENTO", x: 150, y: 590, w: 780, h: 140, mainSize: 52 },
+    { start: T(10.2), main: "ANTICIPO MÍNIMO", x: 150, y: 270, w: 780, h: 140, mainSize: 56 },
+    { start: T(11.6), main: "FINANCIAMIENTO LARGO", x: 150, y: 500, w: 780, h: 140, mainSize: 50 },
   ];
-  const act = f < items[1].start ? 0 : f < items[2].start ? 1 : 2;
+  const act = f < items[1].start ? 0 : 1;
   return (
     <>
       {items.map((it, i) => (
         <Tarjeta key={i} it={it} active={i === act} exitFrom={ESQ1_OUT} />
       ))}
-      <Signo start={T(11.4)} y={545} exitFrom={ESQ1_OUT} />
+      <Signo start={T(11.4)} y={455} exitFrom={ESQ1_OUT} />
     </>
   );
 };
@@ -335,6 +335,27 @@ const Subtitulos: React.FC = () => {
   );
 };
 
+// Cuadro de la pared (escena 4, desde el tercer corte): el vídeo del yate sustituye a la foto, con la perspectiva del cuadro seguida fotograma a fotograma
+const proyecta = (m: number[], x: number, y: number): [number, number] => {
+  const w = m[3] * x + m[7] * y + m[15];
+  return [(m[0] * x + m[4] * y + m[12]) / w, (m[1] * x + m[5] * y + m[13]) / w];
+};
+const CuadroYate: React.FC = () => {
+  const f = useCurrentFrame();
+  const m = CUADRO[f];
+  if (!m || f < CUT3) return null;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: CUADRO_EW, height: CUADRO_EH, transformOrigin: "0 0", transform: `matrix3d(${m.join(",")})`, overflow: "hidden", background: "#000" }}>
+      <Sequence from={CUT3} layout="none">
+        <Video src={staticFile("entrada/yate_cuadro.mp4")} muted objectFit="cover" style={{ width: "100%", height: "100%", filter: "brightness(0.97) contrast(1.02) saturate(1.02)" }} />
+      </Sequence>
+      {/* luz de la sala: reflejo suave en diagonal y sombra interior del marco, para que parezca una pantalla empotrada */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg, rgba(255,246,228,0.10) 0%, rgba(255,246,228,0) 42%)" }} />
+      <div style={{ position: "absolute", inset: 0, boxShadow: "inset 0 0 40px rgba(0,0,0,0.38)" }} />
+    </div>
+  );
+};
+
 // ---------- composición ----------
 export const CapriEdit: React.FC = () => {
   useKitFonts();
@@ -345,6 +366,15 @@ export const CapriEdit: React.FC = () => {
   const n = String(Math.min(Math.max(f, M_FIRST), M_LAST)).padStart(4, "0");
   const al = personAlign(f);
   const fr = framing(f);
+  // a partir de BG_END el fondo ya lleva a ella; su recorte solo hace falta delante del cuadro (en su entorno)
+  let clipCuadro: string | undefined;
+  if (f >= BG_END && CUADRO[f]) {
+    const mm = CUADRO[f];
+    const c = [proyecta(mm, 0, 0), proyecta(mm, CUADRO_EW, 0), proyecta(mm, CUADRO_EW, CUADRO_EH), proyecta(mm, 0, CUADRO_EH)];
+    const cx = c.reduce((a, p) => a + p[0], 0) / 4;
+    const cy = c.reduce((a, p) => a + p[1], 0) / 4;
+    clipCuadro = `polygon(${c.map(([x, y]) => { const d = Math.hypot(x - cx, y - cy); const k = (d + 26) / d; return `${cx + (x - cx) * k}px ${cy + (y - cy) * k}px`; }).join(",")})`;
+  }
   const ORIGIN = "50% 62%";
   return (
     <AbsoluteFill style={{ background: "#000" }}>
@@ -354,6 +384,7 @@ export const CapriEdit: React.FC = () => {
           <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
             <Video src={staticFile("entrada/edit_1080_50.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
             {plateOp > 0 && <Img src={staticFile(`edit_bg/b_${n}.jpg`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: plateOp }} />}
+            <CuadroYate />
           </AbsoluteFill>
         </AbsoluteFill>
       </AbsoluteFill>
@@ -363,7 +394,7 @@ export const CapriEdit: React.FC = () => {
       <TarjetaVacia x={560} y={165} w={480} h={810} start={T(16.4)} end={T(20.7)} rotY={-8} rotZ={0.5} from="right" imagenes={["entrada/capri_int1.jpg", "entrada/capri_int2.jpg", "entrada/capri_int3.jpg"]} />
       {/* ELLA: siempre nítida (sin desenfoque en ningún momento); solo sigue el zoom del fondo */}
       {hasMatte && (
-        <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: ORIGIN }}>
+        <AbsoluteFill style={{ transform: `scale(${scale})`, transformOrigin: ORIGIN, clipPath: clipCuadro }}>
           <AbsoluteFill style={{ transform: `scale(${fr})`, transformOrigin: FRAME_PIVOT }}>
             <AbsoluteFill style={{ transform: al?.transform, transformOrigin: al?.origin }}>
               <Img src={staticFile(`recorte_hq/m_${n}.webp`)} style={{ width: "100%", height: "100%" }} />

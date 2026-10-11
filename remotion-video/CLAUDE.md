@@ -314,3 +314,10 @@ Subtítulos anclados a 175 px del borde inferior (antes 118; +57 px, ≈ un terc
 
 ### CAPRI v3.9: esquema 1 con textos nuevos
 Esquema 1 (9,3–12,42 s): se elimina la tarjeta "PARA INGRESAR"; la tarjeta de 10,2 s pasa a "ANTICIPO MÍNIMO" (56 px, sin etiqueta) y la de 11,6 s a "FINANCIAMIENTO LARGO" (50 px, sin etiqueta). Mismas posiciones, tiempos, efectos y "+" central. Ojo: el texto en pantalla ya no coincide con lo que ella dice ("monto mínimo", "gran financiamiento"), decisión de la persona usuaria. Los subtítulos no se tocaron.
+
+### CAPRI v4.0: video del yate dentro del cuadro de la escena 4 (+ tarjetas del esquema 1 más arriba)
+- Escena 4 (desde 21 s, fotograma 1050; cámara en la mano, se mueve ~30 px): el cuadro de la pared (foto aérea con marco negro) muestra `YATE.mp4` (67 MB, 1920x1080 HEVC, solo está en `main`; empieza con fundido desde negro de 1,6 s). Segmento usado: 0,8 s–4,9 s, recorte central 1123x1080 (excluye la marca "RMS" de la esquina inferior derecha), sin audio → `public/entrada/yate_cuadro.mp4` (1120x1076, 50 fps con `framerate` por mezcla).
+- `tools/capri/cuadro_plate.py`: placa limpia del cuadro (media de los fotogramas alineados, sin ella). `cuadro_medir.py`: bordes interiores del marco por ajuste de rectas (la esquina inferior derecha está siempre tapada por ella: sale de la intersección; fiable ±1–2 px). `cuadro_seguir.py`: SIFT+RANSAC del fondo estático → homografía por fotograma → `src/Capri/cuadroQuads.ts` (matrix3d, ampliado 1,8 px para no dejar ver la foto original bajo el marco).
+- `CuadroYate` va dentro del grupo de fondo (sigue zoom/desenfoque del tercer corte) y ella va por delante: recorte de ella ampliado a 1051–1243 (`M_LAST=1243`; `recorte_hq.py 1076 1243` + `recorte_post.py`), recortado con `clip-path` a un entorno del cuadro para no engordar su contorno. Aspecto del cuadro ≈ 1:1,04 (estimado con f≈1170 px; la estimación por ortogonalidad salió inconsistente).
+- Luz: reflejo diagonal suave + sombra interior para que parezca pantalla empotrada.
+- Tarjetas del esquema 1: y=270 y 500, "+" en 455 (antes 360/590/545).

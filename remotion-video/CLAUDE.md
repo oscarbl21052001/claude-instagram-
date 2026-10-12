@@ -329,3 +329,6 @@ Esquema 1 (9,3–12,42 s): se elimina la tarjeta "PARA INGRESAR"; la tarjeta de 
 - `componer.py`: texto nuevo en el plano, warp con supersampling x2, color medido en cada fotograma sobre el texto viejo (vivo/oscuro). Diseño: etiquetas L=75; "PERSONALIZADAS" ajustada a 900 px planos de ancho (tamaño 90, mucho menor que el "$500" original porque la palabra es larga); "10%" tamaño 260 (V2); hueco entre líneas 16.
 - Montaje por partes con ffmpeg (decodificar el 4K dos veces a la vez agota la memoria): fotogramas 0–221 y 379–845 del original reescalados + 222–378 compuestos (x264 crf 15), audio AAC copiado (correlación 1,0).
 - El disco de la sesión es limitado: borrar intermedios (`out/*.mp4`, `out/e_all`, etc.) antes de extraer fotogramas.
+
+### NUEVO v2: "SALDO / HASTA EN 100 VECES / ANTICIPO / 10%"
+La persona usuaria corrigió el texto: "CUOTAS" → "SALDO" y "PERSONALIZADAS" → "HASTA EN 100 VECES" ("ANTICIPO 10%" igual). Solo se recompone el texto (`componer.py` con `TEXTO_E1`/`TEXTO_V1`; el relleno de fondo y el seguimiento se reutilizan): `L_NEW=66 V2=260 python tools/nuevo/componer.py <dir> 222 378`; la línea larga queda en tamaño 79 (ajustada a 900 px planos) y las etiquetas en 66 (misma proporción 1:1,2 que antes). Salida: `renders/nuevo_saldo_anticipo.mp4`. Se retira la versión anterior (`nuevo_cuotas_personalizadas*.mp4`).

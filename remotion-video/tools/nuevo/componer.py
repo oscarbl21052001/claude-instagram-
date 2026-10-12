@@ -17,20 +17,21 @@ LIN_OLD = [("CUOTAS", "e"), ("$500", "v"), ("ANTICIPO", "e"), ("$10.000", "v")]
 _, cajas_old = plano.render(LIN_OLD, L_OLD, V_OLD, G, cfg["align"])
 old_top, old_bot = cajas_old[0][1], cajas_old[-1][3]
 W_OLD = max(c[2] - c[0] for c in cajas_old)
+TEXTO_E1 = os.environ.get("TEXTO_E1", "SALDO"); TEXTO_V1 = os.environ.get("TEXTO_V1", "HASTA EN 100 VECES")
 L_NEW = float(os.environ.get("L_NEW", 75)); WMAX = float(os.environ.get("WMAX", 900)); G_NEW = float(os.environ.get("G_NEW", 16))
 def ancho(t, sz): b = plano.fuente(sz).getbbox(t, anchor="ls"); return b[2] - b[0]
 def alto(t, sz): b = plano.fuente(sz).getbbox(t, anchor="ls"); return b[3] - b[1]
-V1 = V_OLD * WMAX / ancho("PERSONALIZADAS", V_OLD)
+V1 = V_OLD * WMAX / ancho(TEXTO_V1, V_OLD)
 # "10%" lo más grande posible para que el bloque nuevo ocupe el mismo alto que el viejo (mismo reparto de pesos: valores grandes, etiquetas pequeñas)
 H_OLD = old_bot - old_top
 lo, hi = 40.0, 400.0
 for _ in range(30):
     V2 = (lo + hi) / 2
-    h = alto("CUOTAS", L_NEW) + alto("PERSONALIZADAS", V1) + alto("ANTICIPO", L_NEW) + alto("10%", V2) + 3 * G_NEW
+    h = alto(TEXTO_E1, L_NEW) + alto(TEXTO_V1, V1) + alto("ANTICIPO", L_NEW) + alto("10%", V2) + 3 * G_NEW
     lo, hi = (V2, hi) if h < H_OLD else (lo, V2)
 V2 = float(os.environ.get("V2", min(V2, 330)))
-print("tamaños planos: etiquetas", L_NEW, "PERSONALIZADAS", round(V1, 1), "10%", round(V2, 1), "ancho 10%", round(ancho("10%", V2)), "alto bloque", round(H_OLD), flush=True)
-LIN_NEW = [("CUOTAS", "e", L_NEW), ("PERSONALIZADAS", "v", V1), ("ANTICIPO", "e", L_NEW), ("10%", "v", V2)]
+print("tamaños planos: etiquetas", L_NEW, TEXTO_V1, round(V1, 1), "10%", round(V2, 1), "ancho 10%", round(ancho("10%", V2)), "alto bloque", round(H_OLD), flush=True)
+LIN_NEW = [(TEXTO_E1, "e", L_NEW), (TEXTO_V1, "v", V1), ("ANTICIPO", "e", L_NEW), ("10%", "v", V2)]
 def capa(tipo, ss):
     """alfa (float 0..1) de las líneas de un tipo ('e' etiquetas / 'v' valores), plano, a ss x."""
     # alturas de cajas para apilar y centrar el bloque donde estaba el viejo

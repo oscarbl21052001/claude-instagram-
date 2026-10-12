@@ -22,7 +22,7 @@ const SUBS: { a: number; b: number; t: string }[] = [
   { a: 763, b: 790, t: "este es el mejor momento" },
   { a: 803, b: 837, t: "contactame ahora mismo" },
 ];
-const SUB_BOTTOM = Number(process.env.REMOTION_SUB_BOTTOM ?? 570); // distancia del texto al borde inferior (donde estaban los originales, y≈1300)
+const SUB_BOTTOM = Number(process.env.REMOTION_SUB_BOTTOM ?? 620); // distancia del texto al borde inferior (subido 50 px sobre la posición de los originales para tapar restos del borrado; antes 570)
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 export const NuevoSubs: React.FC = () => {

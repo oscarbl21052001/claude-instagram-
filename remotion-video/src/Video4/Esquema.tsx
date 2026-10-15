@@ -393,7 +393,7 @@ export const Esquema: React.FC = () => {
       {R > 0 && (
         <AbsoluteFill style={{ clipPath: `circle(${R}px at ${IRIS_CX}px ${IRIS_CY}px)` }}>
           <Camel />
-          <Placa inS={14.9} outS={22.3} main="COMPRA DE POZO" />
+          <Placa inS={14.9} outS={22.3} eyebrow="01 · EN OBRA" main="COMPRA DE POZO" />
           <CurvaPluma />
           <Placa inS={22.65} outS={31.9} eyebrow="02 · AL ENTREGARSE" main="TRES SALIDAS" />
           <InterfazApp />

@@ -1,5 +1,5 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { useKitFonts } from "../kit";
 import { Cierre, Esquema, T } from "./Esquema";
 
@@ -17,16 +17,16 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 // ---------- subtítulos (estilo CAPRI v3.7/3.8: una línea, Inter Medium 30 px, blanco, 175 px del borde) ----------
 // Texto de la transcripción (faster-whisper medium) con las correcciones de la persona: "de pozo", "vos podés", "apalancamiento".
-const SUBS: { a: number; b: number; t: string }[] = [
+const SUBS: { a: number; b: number; t: string; k?: string }[] = [
   { a: 0.0, b: 3.2, t: "Si estás invirtiendo solo con tu dinero," },
   { a: 3.66, b: 4.3, t: "estás perdiendo." },
   { a: 4.42, b: 5.4, t: "¿Cómo funciona?" },
-  { a: 5.78, b: 7.15, t: "Básicamente, el financiamiento" },
-  { a: 7.18, b: 8.7, t: "te lo dan las constructoras." },
+  { a: 5.78, b: 7.15, t: "Básicamente, el financiamiento", k: "financiamiento" },
+  { a: 7.18, b: 8.7, t: "te lo dan las constructoras.", k: "constructoras" },
   { a: 8.8, b: 10.2, t: "Es decir, que vos podés iniciar" },
-  { a: 10.22, b: 11.3, t: "con un capital mínimo" },
-  { a: 11.32, b: 12.5, t: "comprando de pozo" },
-  { a: 12.58, b: 14.8, t: "y financiarte directamente con ellos." },
+  { a: 10.22, b: 11.3, t: "con un capital mínimo", k: "capital mínimo" },
+  { a: 11.32, b: 12.5, t: "comprando de pozo", k: "de pozo" },
+  { a: 12.58, b: 14.8, t: "y financiarte directamente con ellos.", k: "financiarte" },
   { a: 14.86, b: 16.3, t: "Cuando invertís de esta forma," },
   { a: 16.42, b: 17.6, t: "comprás al mejor precio" },
   { a: 17.7, b: 19.3, t: "y con la mayor financiación." },
@@ -48,6 +48,8 @@ const Subtitulos: React.FC = () => {
   const f = useCurrentFrame();
   let op = 0;
   let text = "";
+  let kw: string | undefined;
+  let kwStart = 0;
   for (const s of SUBS) {
     const a = T(s.a) - 1;
     const b = T(s.b);
@@ -55,6 +57,8 @@ const Subtitulos: React.FC = () => {
     if (o > op) {
       op = o;
       text = s.t;
+      kw = s.k;
+      kwStart = s.a;
     }
   }
   return (
@@ -75,7 +79,31 @@ const Subtitulos: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            {text}
+            {kw && text.includes(kw) ? (
+              <>
+                {text.slice(0, text.indexOf(kw))}
+                <span style={{ position: "relative", display: "inline-block" }}>
+                  {kw}
+                  <svg width="100%" height="14" viewBox="0 0 100 14" preserveAspectRatio="none" style={{ position: "absolute", left: 0, bottom: -12, overflow: "visible" }}>
+                    <path
+                      d="M 0 8 C 20 3, 45 12, 70 6 S 95 5, 100 7"
+                      fill="none"
+                      stroke="#E9CD7B"
+                      strokeWidth={3.5}
+                      strokeLinecap="round"
+                      vectorEffect="non-scaling-stroke"
+                      pathLength={1}
+                      strokeDasharray={1}
+                      strokeDashoffset={1 - Easing.out(Easing.cubic)(clamp01((f - T(kwStart) - 6) / 14))}
+                      style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.6))" }}
+                    />
+                  </svg>
+                </span>
+                {text.slice(text.indexOf(kw) + kw.length)}
+              </>
+            ) : (
+              text
+            )}
           </div>
         </div>
       )}
@@ -83,14 +111,55 @@ const Subtitulos: React.FC = () => {
   );
 };
 
+// Empuje suave de cámara 4,4 → 14,7 s: un escalón por idea y vuelta a 1 antes de que el iris tape el plano.
+const ZOOM_KEYS: [number, number][] = [
+  [4.4, 1],
+  [5.78, 1.025],
+  [7.18, 1.05],
+  [10.22, 1.07],
+  [11.32, 1.09],
+  [12.58, 1.11],
+  [14.0, 1.11],
+  [14.7, 1],
+];
+const useZoom = () => {
+  const f = useCurrentFrame();
+  const t = f / V4_FPS;
+  if (t <= ZOOM_KEYS[0][0] || t >= ZOOM_KEYS[ZOOM_KEYS.length - 1][0]) return 1;
+  for (let i = 0; i < ZOOM_KEYS.length - 1; i++) {
+    const [t0, z0] = ZOOM_KEYS[i];
+    const [t1, z1] = ZOOM_KEYS[i + 1];
+    if (t >= t0 && t < t1) return interpolate(t, [t0, t0 + Math.min(0.5, t1 - t0), t1], [z0, z1, z1], { easing: Easing.inOut(Easing.cubic) });
+  }
+  return 1;
+};
+
+const BarraIdeas: React.FC = () => {
+  const f = useCurrentFrame();
+  const a = T(4.4);
+  const b = T(14.2);
+  if (f < a - 6 || f > b + 10) return null;
+  const p = clamp01((f - a) / (b - a));
+  const op = Math.min(clamp01((f - a + 6) / 8), clamp01((b + 10 - f) / 8));
+  return (
+    <div style={{ position: "absolute", left: 340, width: 400, bottom: 222, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.25)", opacity: op }}>
+      <div style={{ width: `${p * 100}%`, height: "100%", borderRadius: 3, background: "linear-gradient(90deg, #C7AE6A, #F3EBB6)", boxShadow: "0 0 10px rgba(231,205,123,0.7)" }} />
+    </div>
+  );
+};
+
 export const Video4Edit: React.FC = () => {
   useKitFonts();
+  const zoom = useZoom();
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
-      <Video src={staticFile("entrada/VIDEO-4-completo.mp4")} style={{ width: V4_W, height: V4_H }} objectFit="cover" />
+      <AbsoluteFill style={{ transform: `scale(${zoom})`, transformOrigin: "50% 35%" }}>
+        <Video src={staticFile("entrada/VIDEO-4-completo.mp4")} style={{ width: V4_W, height: V4_H }} objectFit="cover" />
+      </AbsoluteFill>
       <Esquema />
       <Cierre />
       <Subtitulos />
+      <BarraIdeas />
     </AbsoluteFill>
   );
 };

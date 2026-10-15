@@ -1,7 +1,7 @@
 import { Video } from "@remotion/media";
 import { AbsoluteFill, staticFile, useCurrentFrame } from "remotion";
 import { useKitFonts } from "../kit";
-import { Esquema, T } from "./Esquema";
+import { Cierre, Esquema, T } from "./Esquema";
 
 // Edit "VIDEO 4" (43,97 s, 1080x1920, 30 fps): inversión en pozo con financiamiento de la constructora.
 // El plano tiene un hueco sin imagen (fotogramas 442–930: fondo gris, solo se oye su voz). Ese hueco se tapa con un fondo camel
@@ -89,6 +89,7 @@ export const Video4Edit: React.FC = () => {
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       <Video src={staticFile("entrada/VIDEO-4-completo.mp4")} style={{ width: V4_W, height: V4_H }} objectFit="cover" />
       <Esquema />
+      <Cierre />
       <Subtitulos />
     </AbsoluteFill>
   );

@@ -1,6 +1,6 @@
 import { loadFont } from "@remotion/fonts";
 import { useEffect, useState } from "react";
-import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, continueRender, delayRender, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 
 // Esquema del hueco gris de VIDEO 4 (14,73–31,03 s), inspirado en awesome-opus5-5-videos (solo el lenguaje visual, ninguna pieza copiada):
 //  · titular en dos voces, sans negrita + serif cursiva ("They write or record.", "Already have reviews?");
@@ -49,11 +49,12 @@ const useAppear = (inS: number, outS: number) => {
 };
 
 // ---------- placa de título: tarjeta oscura con marco dorado, Bebas Neue en mayúsculas ----------
-const Placa: React.FC<{ inS: number; outS: number; eyebrow?: string; main: string }> = ({ inS, outS, eyebrow, main }) => {
+const Placa: React.FC<{ inS: number; outS: number; eyebrow?: string; main: string; typed?: [number, number] }> = ({ inS, outS, eyebrow, main, typed }) => {
   const f = useCurrentFrame();
   const a = useAppear(inS, outS);
   if (!a.visible) return null;
   const sh = clamp01((f - T(inS) - 10) / 28); // un solo destello que cruza la placa
+  const n = typed ? Math.round(main.length * clamp01((f - T(typed[0])) / (T(typed[1]) - T(typed[0])))) : main.length;
   return (
     <div style={{ position: "absolute", left: 130, top: 230, width: 820, height: 230, opacity: a.opacity, transform: `translateY(${a.y}px)`, filter: `blur(${a.blur}px)` }}>
       <div
@@ -74,7 +75,18 @@ const Placa: React.FC<{ inS: number; outS: number; eyebrow?: string; main: strin
         }}
       >
         {eyebrow && <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#C7AE6A" }}>{eyebrow}</div>}
-        <div style={{ fontFamily: "Bebas Neue", fontSize: 118, letterSpacing: 7, lineHeight: 1, color: "#F4EAD3", marginTop: eyebrow ? 8 : 0 }}>{main}</div>
+        <div style={{ fontFamily: "Bebas Neue", fontSize: 118, letterSpacing: 7, lineHeight: 1, color: "#F4EAD3", marginTop: eyebrow ? 8 : 0, whiteSpace: "nowrap" }}>
+          {typed ? (
+            <>
+              <span>{main.slice(0, n)}</span>
+              {/* cursor que parpadea mientras no ha terminado de teclear */}
+              <span style={{ display: "inline-block", width: 7, height: 96, marginLeft: 2, marginRight: -9, transform: "translateY(10px)", background: "#E2A826", opacity: n >= main.length && f > T(typed[1]) + 20 ? 0 : Math.sin((f / V4_FPS) * 14) > -0.3 ? 1 : 0 }} />
+              <span style={{ opacity: 0 }}>{main.slice(n)}</span>
+            </>
+          ) : (
+            main
+          )}
+        </div>
         {sh > 0 && sh < 1 && (
           <div style={{ position: "absolute", top: -20, bottom: -20, left: -240 + sh * 1300, width: 150, background: "linear-gradient(100deg, rgba(255,248,225,0), rgba(255,248,225,0.3), rgba(255,248,225,0))", transform: "skewX(-18deg)" }} />
         )}
@@ -293,7 +305,7 @@ const Cursor: React.FC = () => {
   if (s < PATH[0][0] - 0.1) return null;
   const [x, y] = cursorAt(f);
   const inn = clamp01((s - PATH[0][0]) / 0.3);
-  const out = clamp01((f - T(31.0)) / 8);
+  const out = clamp01((f - T(31.9)) / 8);
   // pequeño "hundimiento" al hacer clic y onda
   let press = 0;
   let ripple: { x: number; y: number; q: number } | null = null;
@@ -314,7 +326,7 @@ const Cursor: React.FC = () => {
 
 const InterfazApp: React.FC = () => {
   const f = useCurrentFrame();
-  const a = useAppear(22.6, 31.0);
+  const a = useAppear(22.6, 31.9);
   if (!a.visible) return null;
   const idx = (() => {
     let k = -1;
@@ -359,21 +371,59 @@ const Camel: React.FC = () => (
   </AbsoluteFill>
 );
 
+const IRIS_MAX = 1160; // radio que cubre la pantalla desde el centro
+const IRIS_CX = 540;
+const IRIS_CY = 960;
+const IRIS_FRAMES = 18;
+
+// A. Iris: un punto dorado crece hasta un círculo camel que cubre el hueco gris (se abre sobre ella, ya llena el plano cuando
+// llega el corte a gris de 14,73 s) y se cierra sobre el fondo gris justo cuando ella reaparece (31,03 s).
 export const Esquema: React.FC = () => {
   const f = useCurrentFrame();
   useEsquemaFonts();
-  // fundido de entrada sobre el corte de 14,73 s y de salida sobre el de 31,03 s
-  const inn = clamp01((f - (GAP_IN - 8)) / 10);
-  const out = interpolate(f, [GAP_OUT - 2, GAP_OUT + 12], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const op = Math.min(inn, out);
-  if (op <= 0) return null;
+  const open0 = GAP_IN - IRIS_FRAMES;
+  const openQ = easeIO(clamp01((f - open0) / IRIS_FRAMES));
+  const closeQ = easeIO(clamp01((f - GAP_OUT) / IRIS_FRAMES));
+  const R = IRIS_MAX * openQ * (1 - closeQ);
+  const dot = 26 * clamp01((f - (open0 - 8)) / 8) * (1 - clamp01((f - (GAP_OUT + IRIS_FRAMES)) / 8));
+  if (f < open0 - 8 || f > GAP_OUT + IRIS_FRAMES + 9) return null;
+  const ring = Math.max(0, 1 - R / 1000);
   return (
-    <AbsoluteFill style={{ opacity: op }}>
-      <Camel />
-      <Placa inS={14.9} outS={22.3} main="COMPRA DE POZO" />
-      <CurvaPluma />
-      <Placa inS={22.65} outS={31.0} eyebrow="02 · AL ENTREGARSE" main="TRES SALIDAS" />
-      <InterfazApp />
+    <AbsoluteFill>
+      {R > 0 && (
+        <AbsoluteFill style={{ clipPath: `circle(${R}px at ${IRIS_CX}px ${IRIS_CY}px)` }}>
+          <Camel />
+          <Placa inS={14.9} outS={22.3} main="COMPRA DE POZO" />
+          <CurvaPluma />
+          <Placa inS={22.65} outS={31.9} eyebrow="02 · AL ENTREGARSE" main="TRES SALIDAS" />
+          <InterfazApp />
+        </AbsoluteFill>
+      )}
+      {R > 0 && R < IRIS_MAX && (
+        <div style={{ position: "absolute", left: IRIS_CX - R, top: IRIS_CY - R, width: 2 * R, height: 2 * R, borderRadius: "50%", border: "5px solid rgba(243,235,182,0.9)", boxSizing: "border-box", opacity: 0.85 * ring, boxShadow: "0 0 40px rgba(226,168,38,0.55)" }} />
+      )}
+      {dot > 0.5 && R < 40 && (
+        <div style={{ position: "absolute", left: IRIS_CX - dot, top: IRIS_CY - dot, width: 2 * dot, height: 2 * dot, borderRadius: "50%", background: "radial-gradient(circle, #FFF1C4 0%, #E2A826 70%)", boxShadow: "0 0 50px 14px rgba(226,168,38,0.65)" }} />
+      )}
     </AbsoluteFill>
+  );
+};
+
+// B. Cierre (41,15–44 s): la placa de título hace de caja de texto y teclea la palabra clave mientras ella la dice
+// ("Escribí apalancamiento"); al terminar, el botón pasa de ENVIAR a ✓ ENVIADO. Vive sobre el vídeo real (ella sigue en pantalla).
+export const Cierre: React.FC = () => {
+  const f = useCurrentFrame();
+  const q = Math.min(useSpr(42.5, 20, 110), 1);
+  const sent = clamp01((f - T(42.95)) / 6);
+  const press = f >= T(42.95) && f < T(42.95) + 6 ? 1 : 0;
+  return (
+    <>
+      <Placa inS={41.15} outS={44.6} eyebrow="ESCRIBÍ" main="APALANCAMIENTO" typed={[41.72, 42.5]} />
+      {f >= T(42.5) && (
+        <div style={{ position: "absolute", left: 540 - 170, top: 500, width: 340, height: 78, opacity: clamp01(q * 2), transform: `translateY(${(1 - q) * 24}px) scale(${1 - 0.06 * press})`, borderRadius: 39, border: "4px solid #C7AE6A", background: sent > 0.5 ? GOLD : INK, color: sent > 0.5 ? INK : "#F4EAD3", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter", fontWeight: 800, fontSize: 28, letterSpacing: 4, boxShadow: sent > 0.5 ? "0 0 0 6px rgba(226,168,38,0.3), 0 14px 30px rgba(70,44,18,0.35)" : "0 12px 26px rgba(70,44,18,0.35)" }}>
+          {sent > 0.5 ? "✓ ENVIADO" : "ENVIAR ↗"}
+        </div>
+      )}
+    </>
   );
 };

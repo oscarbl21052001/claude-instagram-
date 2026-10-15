@@ -17,7 +17,7 @@ const easeIO = Easing.inOut(Easing.cubic);
 const easeOut = Easing.out(Easing.cubic);
 const back = Easing.out(Easing.back(1.7));
 
-export const REC_IN = T(4.4);
+export const REC_IN = T(4.0);
 const REC_FRAME_IN = 14; // frames que tarda el vídeo en encogerse
 const REC_OUT = GAP_IN; // el iris ya cubre el plano: vuelve a pantalla completa mientras tanto
 const REC_RETURN = 18;
@@ -51,21 +51,21 @@ const useRecetaFonts = () => {
 
 // ---------- línea de tiempo (s) ----------
 const STEPS = [
-  { at: 5.78, word: "FINANCIAMIENTO", sub: "te lo dan las constructoras", done: 6.9 },
-  { at: 7.18, word: "CONSTRUCTORAS", sub: "ponen el financiamiento", done: 9.0 },
-  { at: 10.22, word: "CAPITAL MÍNIMO", sub: "para iniciar", done: 11.5 },
-  { at: 11.32, word: "DE POZO", sub: "comprando de pozo", done: 12.3 },
+  { at: 5.4, word: "FINANCIAMIENTO", sub: "te lo dan las constructoras", done: 6.6 },
+  { at: 7.0, word: "CONSTRUCTORAS", sub: "ponen el financiamiento", done: 8.9 },
+  { at: 9.6, word: "CAPITAL MÍNIMO", sub: "para iniciar", done: 10.9 },
+  { at: 11.0, word: "DE POZO", sub: "comprando de pozo", done: 12.0 },
 ];
-const RESULT_AT = 12.58;
-const FADE_UI = 13.2; // la interfaz se va y queda solo el edificio
-const SPIN_A = 12.9;
-const MOVE_A = 13.4;
+const RESULT_AT = 12.4;
+const FADE_UI = 13.5; // la interfaz se va y queda solo el edificio
+const SPIN_A = 13.2;
+const MOVE_A = 13.6;
 const END = 14.1;
 
 const BX = { l: 130, r: 430, top: 1020, bot: 1430 };
 const levelAt = (t: number) => {
   const r = (a: number, b: number) => easeIO(clamp01((t - a) / (b - a)));
-  return (r(6.9, 7.4) + r(8.5, 9.0) + r(11.4, 11.9)) / 3;
+  return (r(6.35, 6.85) + r(8.4, 8.9) + r(10.6, 11.1)) / 3;
 };
 
 const Check: React.FC<{ x: number; y: number; k: number }> = ({ x, y, k }) => (
@@ -78,8 +78,8 @@ export const Receta: React.FC = () => {
   const t = f / V4_FPS;
   if (f < REC_IN || f >= REC_OUT) return null;
 
-  const ui = clamp01((t - 5.0) / 0.5) * (1 - clamp01((t - FADE_UI) / 0.5)); // título, tarjeta, pasos
-  const drawK = easeOut(clamp01((t - 4.9) / 0.9)); // el edificio se dibuja
+  const ui = clamp01((t - 4.5) / 0.5) * (1 - clamp01((t - FADE_UI) / 0.5)); // título, tarjeta, pasos
+  const drawK = easeOut(clamp01((t - 4.4) / 0.9)); // el edificio se dibuja
   const level = levelAt(t);
   const fillTop = BX.bot - (BX.bot - BX.top) * level;
 
@@ -90,8 +90,8 @@ export const Receta: React.FC = () => {
   const sc = 1 - 0.93 * mv;
   const cx = 280 + (540 - 280) * mv;
   const cy = 1225 + (960 - 1225) * mv;
-  const bOp = clamp01((t - 4.9) / 0.3) * (1 - clamp01((f - (GAP_IN - 18)) / 6));
-  const pulse = t >= 11.32 && t < 12.5 ? 1 + 0.025 * Math.sin((t - 11.32) * 9) : 1;
+  const bOp = clamp01((t - 4.4) / 0.3) * (1 - clamp01((f - (GAP_IN - 18)) / 6));
+  const pulse = t >= 11.0 && t < 12.3 ? 1 + 0.025 * Math.sin((t - 11.0) * 9) : 1;
 
   // paso actual de la tarjeta
   let step = -1;
@@ -99,16 +99,16 @@ export const Receta: React.FC = () => {
   const isResult = t >= RESULT_AT;
   const stepStart = isResult ? RESULT_AT : step >= 0 ? STEPS[step].at : 0;
   const cardIn = back(clamp01((t - stepStart) / 0.35));
-  const cardBoxIn = back(clamp01((t - 5.5) / 0.4));
+  const cardBoxIn = back(clamp01((t - 5.0) / 0.4));
 
-  const billT = t - 5.9; // billete
-  const billFly = easeIO(clamp01((t - 6.45) / 0.5));
-  const coinFly = easeIO(clamp01((t - 10.9) / 0.5));
+  const billT = t - 5.55; // billete
+  const billFly = easeIO(clamp01((t - 5.95) / 0.6));
+  const coinFly = easeIO(clamp01((t - 10.2) / 0.5));
 
   // grúa
-  const craneIn = easeOut(clamp01((t - 7.5) / 0.5)) * (1 - clamp01((t - 9.3) / 0.4));
-  const hook = 925 + 125 * easeIO(clamp01((t - 8.0) / 0.5)) - 125 * easeIO(clamp01((t - 8.7) / 0.35));
-  const blockVisible = t >= 7.95 && t < 8.55;
+  const craneIn = easeOut(clamp01((t - 7.0) / 0.5)) * (1 - clamp01((t - 9.2) / 0.4));
+  const hook = 925 + 125 * easeIO(clamp01((t - 7.7) / 0.6)) - 125 * easeIO(clamp01((t - 8.6) / 0.4));
+  const blockVisible = t >= 7.65 && t < 8.5;
 
   const circleX = [180, 420, 660, 900];
   const doneAt = [...STEPS.map((s) => s.done), 12.9];
@@ -128,7 +128,7 @@ export const Receta: React.FC = () => {
         </defs>
 
         {/* título */}
-        <g opacity={ui} transform={`translate(0 ${(1 - easeOut(clamp01((t - 4.9) / 0.5))) * 20})`}>
+        <g opacity={ui} transform={`translate(0 ${(1 - easeOut(clamp01((t - 4.4) / 0.5))) * 20})`}>
           <text x={540} y={830} textAnchor="middle" fontFamily="Chewy" fontSize={78} letterSpacing={3} fill={GOLD} stroke={INK} strokeWidth={9} strokeLinejoin="round" paintOrder="stroke">
             RECETA DE INVERSIÓN
           </text>
@@ -148,7 +148,7 @@ export const Receta: React.FC = () => {
             <path d={`M 250 ${BX.bot} L 250 1385 Q 280 1360 310 1385 L 310 ${BX.bot}`} fill="rgba(42,29,12,0.2)" stroke={INK} strokeWidth={3.5} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M ${BX.l} ${BX.bot} L ${BX.l} ${BX.top} L ${BX.r} ${BX.top} L ${BX.r} ${BX.bot}`} fill="none" stroke={INK} strokeWidth={5} strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M 118 ${BX.top} L 118 990 L 442 990 L 442 ${BX.top} Z`} fill="rgba(255,248,230,0.7)" stroke={INK} strokeWidth={5} strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
-            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 11.32 ? GOLD_DEEP : INK} strokeWidth={t >= 11.32 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
+            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 11.0 ? GOLD_DEEP : INK} strokeWidth={t >= 11.0 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
           </g>
         </g>
 
@@ -215,11 +215,11 @@ export const Receta: React.FC = () => {
         )}
 
         {/* moneda (capital mínimo) */}
-        {t > 10.4 && coinFly < 1 && (
+        {t > 9.75 && coinFly < 1 && (
           <g
             filter="url(#rough)"
             opacity={(1 - clamp01((coinFly - 0.7) / 0.3)) * ui}
-            transform={`translate(${940 + (300 - 940) * coinFly} ${1000 + (1240 - 1000) * coinFly - Math.sin(coinFly * Math.PI) * 120}) scale(${back(clamp01((t - 10.4) / 0.3)) * (1 - 0.5 * coinFly)})`}
+            transform={`translate(${940 + (300 - 940) * coinFly} ${1000 + (1240 - 1000) * coinFly - Math.sin(coinFly * Math.PI) * 120}) scale(${back(clamp01((t - 9.75) / 0.3)) * (1 - 0.5 * coinFly)})`}
           >
             <circle cx={0} cy={0} r={30} fill={GOLD} stroke={INK} strokeWidth={4} />
             <circle cx={0} cy={0} r={21} fill="none" stroke={INK} strokeWidth={2.5} />

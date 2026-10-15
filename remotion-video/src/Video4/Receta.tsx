@@ -51,10 +51,8 @@ const useRecetaFonts = () => {
 
 // ---------- línea de tiempo (s) ----------
 const STEPS = [
-  { at: 5.4, word: "FINANCIAMIENTO", sub: "te lo dan las constructoras", done: 6.6 },
-  { at: 7.0, word: "CONSTRUCTORAS", sub: "ponen el financiamiento", done: 8.9 },
-  { at: 9.6, word: "CAPITAL MÍNIMO", sub: "para iniciar", done: 10.9 },
-  { at: 11.0, word: "DE POZO", sub: "comprando de pozo", done: 12.0 },
+  { at: 5.4, lines: ["LA CONSTRUCTORA", "TE FINANCIA"], sub: "directamente con ellos", done: 7.2 },
+  { at: 8.7, lines: ["TÚ INICIAS CON", "CAPITAL MÍNIMO"], sub: "para comprar de pozo", done: 10.7 },
 ];
 const RESULT_AT = 12.4;
 const FADE_UI = 13.5; // la interfaz se va y queda solo el edificio
@@ -65,7 +63,7 @@ const END = 14.1;
 const BX = { l: 130, r: 430, top: 1020, bot: 1430 };
 const levelAt = (t: number) => {
   const r = (a: number, b: number) => easeIO(clamp01((t - a) / (b - a)));
-  return (r(6.35, 6.85) + r(8.4, 8.9) + r(10.6, 11.1)) / 3;
+  return (r(6.8, 7.3) + r(10.3, 10.8)) / 2;
 };
 
 const Check: React.FC<{ x: number; y: number; k: number }> = ({ x, y, k }) => (
@@ -91,7 +89,7 @@ export const Receta: React.FC = () => {
   const cx = 280 + (540 - 280) * mv;
   const cy = 1225 + (960 - 1225) * mv;
   const bOp = clamp01((t - 4.4) / 0.3) * (1 - clamp01((f - (GAP_IN - 18)) / 6));
-  const pulse = t >= 11.0 && t < 12.3 ? 1 + 0.025 * Math.sin((t - 11.0) * 9) : 1;
+  const pulse = t >= 10.8 && t < 12.3 ? 1 + 0.025 * Math.sin((t - 10.8) * 9) : 1;
 
   // paso actual de la tarjeta
   let step = -1;
@@ -101,18 +99,23 @@ export const Receta: React.FC = () => {
   const cardIn = back(clamp01((t - stepStart) / 0.35));
   const cardBoxIn = back(clamp01((t - 5.0) / 0.4));
 
-  const billT = t - 5.55; // billete
-  const billFly = easeIO(clamp01((t - 5.95) / 0.6));
-  const coinFly = easeIO(clamp01((t - 10.2) / 0.5));
+  // grúa: engancha el billete (paso 1) y la moneda (paso 2) y los deja caer en el edificio
+  const craneIn = easeOut(clamp01((t - 5.6) / 0.5));
+  const hook =
+    925 +
+    125 * easeIO(clamp01((t - 6.3) / 0.6)) -
+    125 * easeIO(clamp01((t - 7.0) / 0.5)) +
+    125 * easeIO(clamp01((t - 9.8) / 0.6)) -
+    125 * easeIO(clamp01((t - 10.6) / 0.5));
+  const billVisible = t >= 6.0 && t < 6.85;
+  const coinVisible = t >= 9.3 && t < 10.35;
+  const billPop = back(clamp01((t - 6.0) / 0.25));
+  const coinPop = back(clamp01((t - 9.3) / 0.25));
 
-  // grúa
-  const craneIn = easeOut(clamp01((t - 7.0) / 0.5)) * (1 - clamp01((t - 9.2) / 0.4));
-  const hook = 925 + 125 * easeIO(clamp01((t - 7.7) / 0.6)) - 125 * easeIO(clamp01((t - 8.6) / 0.4));
-  const blockVisible = t >= 7.65 && t < 8.5;
-
-  const circleX = [180, 420, 660, 900];
-  const doneAt = [...STEPS.map((s) => s.done), 12.9];
-  const barK = isResult ? 1 : step >= 0 ? (step + 1) / 4 : 0;
+  const circleX = [330, 750];
+  const doneAt = STEPS.map((s) => s.done);
+  const barK = isResult ? 1 : step >= 0 ? (step + 1) / 2 : 0;
+  const lineK = easeOut(clamp01((t - 8.7) / 0.7));
 
   return (
     <AbsoluteFill>
@@ -130,7 +133,7 @@ export const Receta: React.FC = () => {
         {/* título */}
         <g opacity={ui} transform={`translate(0 ${(1 - easeOut(clamp01((t - 4.4) / 0.5))) * 20})`}>
           <text x={540} y={830} textAnchor="middle" fontFamily="Chewy" fontSize={78} letterSpacing={3} fill={GOLD} stroke={INK} strokeWidth={9} strokeLinejoin="round" paintOrder="stroke">
-            RECETA DE INVERSIÓN
+            ¿CÓMO FUNCIONA?
           </text>
         </g>
 
@@ -148,7 +151,7 @@ export const Receta: React.FC = () => {
             <path d={`M 250 ${BX.bot} L 250 1385 Q 280 1360 310 1385 L 310 ${BX.bot}`} fill="rgba(42,29,12,0.2)" stroke={INK} strokeWidth={3.5} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M ${BX.l} ${BX.bot} L ${BX.l} ${BX.top} L ${BX.r} ${BX.top} L ${BX.r} ${BX.bot}`} fill="none" stroke={INK} strokeWidth={5} strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M 118 ${BX.top} L 118 990 L 442 990 L 442 ${BX.top} Z`} fill="rgba(255,248,230,0.7)" stroke={INK} strokeWidth={5} strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
-            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 11.0 ? GOLD_DEEP : INK} strokeWidth={t >= 11.0 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
+            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 10.8 ? GOLD_DEEP : INK} strokeWidth={t >= 10.8 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
           </g>
         </g>
 
@@ -156,7 +159,7 @@ export const Receta: React.FC = () => {
         <g opacity={ui * clamp01(level * 6)}>
           <path d={`M 96 ${fillTop} L 126 ${fillTop}`} stroke={INK} strokeWidth={3.5} strokeLinecap="round" filter="url(#rough)" />
           <text x={88} y={fillTop + 9} textAnchor="end" fontFamily="Caveat" fontWeight={700} fontSize={32} fill={INK}>
-            {level > 0.99 ? "lleno" : level > 0.6 ? "2/3" : "1/3"}
+            {level > 0.99 ? "lleno" : "1/2"}
           </text>
         </g>
 
@@ -170,7 +173,18 @@ export const Receta: React.FC = () => {
           <rect x={500} y={925} width={34} height={36} fill={GOLD} stroke={INK} strokeWidth={3.5} />
           <path d={`M 300 925 L 300 ${hook}`} stroke={INK} strokeWidth={3} />
           <path d={`M 292 ${hook} L 308 ${hook} L 304 ${hook + 12} L 296 ${hook + 12} Z`} fill={INK} />
-          {blockVisible && <rect x={273} y={hook + 12} width={54} height={40} rx={4} fill={GOLD} stroke={INK} strokeWidth={4} />}
+          {billVisible && (
+            <g transform={`translate(300 ${hook + 12 + 24}) scale(${billPop})`}>
+              <rect x={-46} y={-24} width={92} height={48} rx={7} fill={GOLD} stroke={INK} strokeWidth={4} />
+              <circle cx={0} cy={0} r={14} fill="rgba(255,244,207,0.7)" stroke={INK} strokeWidth={3} />
+            </g>
+          )}
+          {coinVisible && (
+            <g transform={`translate(300 ${hook + 12 + 28}) scale(${coinPop})`}>
+              <circle cx={0} cy={0} r={28} fill={GOLD} stroke={INK} strokeWidth={4} />
+              <circle cx={0} cy={0} r={19} fill="none" stroke={INK} strokeWidth={2.5} />
+            </g>
+          )}
         </g>
 
         {/* tarjeta de paso */}
@@ -180,12 +194,14 @@ export const Receta: React.FC = () => {
           {step >= 0 && (
             <g opacity={clamp01(cardIn * 2)} transform={`translate(0 ${(1 - cardIn) * 16})`}>
               <text x={540} y={1012} fontFamily="Inter" fontWeight={800} fontSize={20} letterSpacing={3} fill={GOLD_DEEP}>
-                {isResult ? "RESULTADO" : `PASO ${step + 1} DE 4`}
+                {isResult ? "RESULTADO" : `PASO ${step + 1} DE 2`}
               </text>
-              <text x={540} y={1100} fontFamily="Chewy" fontSize={isResult ? 66 : 52} letterSpacing={1.5} fill={GOLD} stroke={INK} strokeWidth={7} strokeLinejoin="round" paintOrder="stroke">
-                {isResult ? "INVERSIÓN" : STEPS[step].word}
-              </text>
-              <text x={540} y={1160} fontFamily="Caveat" fontWeight={700} fontSize={36} fill={INK}>
+              {(isResult ? ["INVERSIÓN"] : STEPS[step].lines).map((ln, i, arr) => (
+                <text key={ln} x={540} y={arr.length === 1 ? 1100 : 1074 + i * 50} fontFamily="Chewy" fontSize={isResult ? 66 : 44} letterSpacing={1.5} fill={GOLD} stroke={INK} strokeWidth={6} strokeLinejoin="round" paintOrder="stroke">
+                  {ln}
+                </text>
+              ))}
+              <text x={540} y={1186} fontFamily="Caveat" fontWeight={700} fontSize={36} fill={INK}>
                 {isResult ? "con financiación" : STEPS[step].sub}
               </text>
             </g>
@@ -195,45 +211,15 @@ export const Receta: React.FC = () => {
             <rect x={542} y={1238} width={Math.max(0, 366 * barK)} height={16} rx={8} fill={GOLD} />
           </g>
           <text x={924} y={1253} fontFamily="Caveat" fontWeight={700} fontSize={30} fill={INK}>
-            {isResult ? "4/4" : step >= 0 ? `${step + 1}/4` : ""}
+            {isResult ? "2/2" : step >= 0 ? `${step + 1}/2` : ""}
           </text>
         </g>
-
-        {/* billete (financiamiento) */}
-        {billT > 0 && billFly < 1 && (
-          <g
-            filter="url(#rough)"
-            opacity={(1 - clamp01((billFly - 0.7) / 0.3)) * ui}
-            transform={`translate(${940 + (300 - 940) * billFly} ${1000 + (1230 - 1000) * billFly - Math.sin(billFly * Math.PI) * 120}) scale(${back(clamp01(billT / 0.3)) * (1 - 0.6 * billFly)}) rotate(${-8 + billFly * 8})`}
-          >
-            <rect x={-60} y={-30} width={120} height={60} rx={8} fill={GOLD} stroke={INK} strokeWidth={4} />
-            <circle cx={0} cy={0} r={18} fill="rgba(255,244,207,0.7)" stroke={INK} strokeWidth={3} />
-            <text x={0} y={9} textAnchor="middle" fontFamily="Chewy" fontSize={26} fill={INK}>
-              $
-            </text>
-          </g>
-        )}
-
-        {/* moneda (capital mínimo) */}
-        {t > 9.75 && coinFly < 1 && (
-          <g
-            filter="url(#rough)"
-            opacity={(1 - clamp01((coinFly - 0.7) / 0.3)) * ui}
-            transform={`translate(${940 + (300 - 940) * coinFly} ${1000 + (1240 - 1000) * coinFly - Math.sin(coinFly * Math.PI) * 120}) scale(${back(clamp01((t - 9.75) / 0.3)) * (1 - 0.5 * coinFly)})`}
-          >
-            <circle cx={0} cy={0} r={30} fill={GOLD} stroke={INK} strokeWidth={4} />
-            <circle cx={0} cy={0} r={21} fill="none" stroke={INK} strokeWidth={2.5} />
-            <text x={0} y={9} textAnchor="middle" fontFamily="Chewy" fontSize={26} fill={INK}>
-              $
-            </text>
-          </g>
-        )}
 
         {/* fila de pasos con las palabras clave */}
         <g opacity={ui}>
           <g filter="url(#rough)">
-            <path d="M 200 1470 L 880 1470" stroke="rgba(42,29,12,0.3)" strokeWidth={5} strokeLinecap="round" />
-            <path d={`M 200 1470 L ${200 + 680 * (barK === 1 && !isResult ? 1 : Math.min(1, Math.max(0, (isResult ? 4 : step + 1) - 1) / 3))} 1470`} stroke={GOLD_DEEP} strokeWidth={6} strokeLinecap="round" />
+            <path d="M 352 1470 L 728 1470" stroke="rgba(42,29,12,0.3)" strokeWidth={5} strokeLinecap="round" />
+            <path d={`M 352 1470 L ${352 + 376 * lineK} 1470`} stroke={GOLD_DEEP} strokeWidth={6} strokeLinecap="round" />
             {circleX.map((x, i) => {
               const d = easeOut(clamp01((t - doneAt[i]) / 0.3));
               return (
@@ -254,8 +240,8 @@ export const Receta: React.FC = () => {
                     {i + 1}
                   </text>
                 )}
-                <text x={x} y={1522} textAnchor="middle" fontFamily="Inter" fontWeight={800} fontSize={17} letterSpacing={1.5} fill={d > 0 ? INK : "rgba(42,29,12,0.6)"}>
-                  {["FINANCIAMIENTO", "CONSTRUCTORAS", "CAPITAL MÍNIMO", "DE POZO"][i]}
+                <text x={x} y={1522} textAnchor="middle" fontFamily="Inter" fontWeight={800} fontSize={20} letterSpacing={2} fill={d > 0 ? INK : "rgba(42,29,12,0.6)"}>
+                  {["LA CONSTRUCTORA", "TÚ"][i]}
                 </text>
               </g>
             );

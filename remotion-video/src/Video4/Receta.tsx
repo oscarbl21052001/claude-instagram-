@@ -52,9 +52,9 @@ const useRecetaFonts = () => {
 // ---------- línea de tiempo (s) ----------
 const STEPS = [
   { at: 5.4, lines: ["LA CONSTRUCTORA", "TE FINANCIA"], sub: "directamente con ellos", done: 7.2 },
-  { at: 8.7, lines: ["TÚ INICIAS CON", "CAPITAL MÍNIMO"], sub: "para comprar de pozo", done: 10.7 },
+  { at: 8.7, lines: ["TÚ INICIAS CON", "CAPITAL MÍNIMO"], sub: "para comprar de pozo", done: 10.9 },
 ];
-const RESULT_AT = 12.4;
+const RESULT_AT = 1e9; // sin tarjeta de resultado
 const FADE_UI = 13.5; // la interfaz se va y queda solo el edificio
 const SPIN_A = 13.2;
 const MOVE_A = 13.6;
@@ -63,7 +63,7 @@ const END = 14.1;
 const BX = { l: 130, r: 430, top: 1020, bot: 1430 };
 const levelAt = (t: number) => {
   const r = (a: number, b: number) => easeIO(clamp01((t - a) / (b - a)));
-  return (r(6.8, 7.3) + r(10.3, 10.8)) / 2;
+  return (r(6.8, 7.3) + r(10.55, 11.05)) / 2;
 };
 
 const Check: React.FC<{ x: number; y: number; k: number }> = ({ x, y, k }) => (
@@ -89,7 +89,7 @@ export const Receta: React.FC = () => {
   const cx = 280 + (540 - 280) * mv;
   const cy = 1225 + (960 - 1225) * mv;
   const bOp = clamp01((t - 4.4) / 0.3) * (1 - clamp01((f - (GAP_IN - 18)) / 6));
-  const pulse = t >= 10.8 && t < 12.3 ? 1 + 0.025 * Math.sin((t - 10.8) * 9) : 1;
+  const pulse = t >= 11.0 && t < 12.3 ? 1 + 0.025 * Math.sin((t - 11.0) * 9) : 1;
 
   // paso actual de la tarjeta
   let step = -1;
@@ -99,18 +99,23 @@ export const Receta: React.FC = () => {
   const cardIn = back(clamp01((t - stepStart) / 0.35));
   const cardBoxIn = back(clamp01((t - 5.0) / 0.4));
 
-  // grúa: engancha el billete (paso 1) y la moneda (paso 2) y los deja caer en el edificio
+  // grúa (paso 1): engancha el billete y lo deja caer en el edificio; después se retira
   const craneIn = easeOut(clamp01((t - 5.6) / 0.5));
-  const hook =
-    925 +
-    125 * easeIO(clamp01((t - 6.3) / 0.6)) -
-    125 * easeIO(clamp01((t - 7.0) / 0.5)) +
-    125 * easeIO(clamp01((t - 9.8) / 0.6)) -
-    125 * easeIO(clamp01((t - 10.6) / 0.5));
+  const craneOut = easeIO(clamp01((t - 7.6) / 0.6));
+  const hook = 925 + 125 * easeIO(clamp01((t - 6.3) / 0.6)) - 125 * easeIO(clamp01((t - 7.0) / 0.5));
   const billVisible = t >= 6.0 && t < 6.85;
-  const coinVisible = t >= 9.3 && t < 10.35;
   const billPop = back(clamp01((t - 6.0) / 0.25));
-  const coinPop = back(clamp01((t - 9.3) / 0.25));
+
+  // mano (paso 2): sale de detrás de la tarjeta, sostiene la moneda sobre el edificio y la suelta
+  const HAND_Y = 1000;
+  const handIn = easeIO(clamp01((t - 9.2) / 0.6));
+  const handOut = easeIO(clamp01((t - 10.75) / 0.5));
+  const handX = 600 - 258 * handIn + 258 * handOut;
+  const release = easeOut(clamp01((t - 10.3) / 0.2));
+  const fall = clamp01((t - 10.3) / 0.55);
+  const coinY = HAND_Y + 200 * fall * fall;
+  const coinFalling = t >= 10.3 && t < 10.9;
+  const coinHeld = t >= 9.2 && t < 10.3;
 
   const circleX = [330, 750];
   const doneAt = STEPS.map((s) => s.done);
@@ -151,7 +156,7 @@ export const Receta: React.FC = () => {
             <path d={`M 250 ${BX.bot} L 250 1385 Q 280 1360 310 1385 L 310 ${BX.bot}`} fill="rgba(42,29,12,0.2)" stroke={INK} strokeWidth={3.5} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M ${BX.l} ${BX.bot} L ${BX.l} ${BX.top} L ${BX.r} ${BX.top} L ${BX.r} ${BX.bot}`} fill="none" stroke={INK} strokeWidth={5} strokeLinejoin="round" strokeLinecap="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
             <path d={`M 118 ${BX.top} L 118 990 L 442 990 L 442 ${BX.top} Z`} fill="rgba(255,248,230,0.7)" stroke={INK} strokeWidth={5} strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - drawK} />
-            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 10.8 ? GOLD_DEEP : INK} strokeWidth={t >= 10.8 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
+            <path d={`M 100 ${BX.bot} L 460 ${BX.bot}`} stroke={t >= 11.0 ? GOLD_DEEP : INK} strokeWidth={t >= 11.0 ? 9 : 5} strokeLinecap="round" opacity={drawK} />
           </g>
         </g>
 
@@ -164,7 +169,7 @@ export const Receta: React.FC = () => {
         </g>
 
         {/* grúa */}
-        <g opacity={craneIn * ui} filter="url(#rough)" transform={`translate(0 ${(1 - craneIn) * 40})`}>
+        <g opacity={craneIn * (1 - craneOut) * ui} filter="url(#rough)" transform={`translate(${craneOut * 70} ${(1 - craneIn) * 40 - craneOut * 50})`}>
           <path d="M 456 1430 L 456 905 L 472 905 L 472 1430" fill="none" stroke={INK} strokeWidth={4} />
           {Array.from({ length: 10 }).map((_, i) => (
             <path key={i} d={`M 456 ${1430 - i * 52} L 472 ${1430 - i * 52 - 52} M 472 ${1430 - i * 52} L 456 ${1430 - i * 52 - 52}`} stroke={INK} strokeWidth={2} />
@@ -179,13 +184,36 @@ export const Receta: React.FC = () => {
               <circle cx={0} cy={0} r={14} fill="rgba(255,244,207,0.7)" stroke={INK} strokeWidth={3} />
             </g>
           )}
-          {coinVisible && (
-            <g transform={`translate(300 ${hook + 12 + 28}) scale(${coinPop})`}>
-              <circle cx={0} cy={0} r={28} fill={GOLD} stroke={INK} strokeWidth={4} />
-              <circle cx={0} cy={0} r={19} fill="none" stroke={INK} strokeWidth={2.5} />
-            </g>
-          )}
         </g>
+
+        {/* mano (paso 2) */}
+        {t >= 9.2 && handOut < 1 && (
+          <g opacity={ui}>
+            {coinFalling && (
+              <g filter="url(#rough)" opacity={1 - clamp01((coinY - 1130) / 60)} transform={`translate(${handX - 66} ${coinY}) rotate(${fall * 200})`}>
+                <circle cx={0} cy={0} r={20} fill={GOLD} stroke={INK} strokeWidth={4} />
+                <circle cx={0} cy={0} r={13} fill="none" stroke={INK} strokeWidth={2.5} />
+              </g>
+            )}
+            <g filter="url(#rough)" transform={`translate(${handX} ${HAND_Y})`}>
+              <rect x={70} y={-36} width={270} height={72} rx={10} fill="#5a4630" stroke={INK} strokeWidth={4} />
+              <rect x={58} y={-42} width={22} height={84} rx={8} fill={GOLD} stroke={INK} strokeWidth={4} />
+              {coinHeld && (
+                <g transform={`translate(-66 0) scale(${back(clamp01((t - 9.5) / 0.25))})`}>
+                  <circle cx={0} cy={0} r={20} fill={GOLD} stroke={INK} strokeWidth={4} />
+                  <circle cx={0} cy={0} r={13} fill="none" stroke={INK} strokeWidth={2.5} />
+                </g>
+              )}
+              <rect x={-14} y={-32} width={84} height={64} rx={22} fill="#F2D3A5" stroke={INK} strokeWidth={4} />
+              <g transform={`rotate(${-release * 22} -10 -18)`}>
+                <rect x={-62} y={-27} width={56} height={18} rx={9} fill="#F2D3A5" stroke={INK} strokeWidth={4} />
+              </g>
+              <g transform={`rotate(${release * 22} -10 18)`}>
+                <rect x={-58} y={9} width={52} height={18} rx={9} fill="#F2D3A5" stroke={INK} strokeWidth={4} />
+              </g>
+            </g>
+          </g>
+        )}
 
         {/* tarjeta de paso */}
         <g opacity={ui * clamp01(cardBoxIn * 2)} transform={`translate(0 ${(1 - cardBoxIn) * 24})`}>

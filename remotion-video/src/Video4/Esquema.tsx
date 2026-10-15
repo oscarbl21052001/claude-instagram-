@@ -172,12 +172,12 @@ const CurvaPluma: React.FC = () => {
           </>
         )}
         {d && <path d={d} fill="none" stroke={PEN} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />}
-        {d && <path d={d} fill="none" stroke="#E2A826" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} transform="translate(0,-5)" />}
+        {d && <path d={d} fill="none" stroke="#C9A55A" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} transform="translate(0,-5)" />}
         {dot(m1, CURVE_FROM)}
         {f >= T(21.4) && (
           <>
             <circle cx={m3[0]} cy={m3[1]} r={34 * pulse} fill="rgba(226,168,38,0.28)" />
-            <circle cx={m3[0]} cy={m3[1]} r={15} fill="#E2A826" stroke={PEN} strokeWidth={5} />
+            <circle cx={m3[0]} cy={m3[1]} r={15} fill="#C9A55A" stroke={PEN} strokeWidth={5} />
           </>
         )}
         {/* subrayado manuscrito bajo "plusvalía" */}
@@ -276,7 +276,7 @@ const Panel: React.FC<{ i: number }> = ({ i }) => {
       <div style={{ marginTop: 34, fontFamily: "Inter", fontWeight: 800, fontSize: 104, letterSpacing: -2, color: INK, lineHeight: 1 }}>{t.key}</div>
       <div style={{ marginTop: 14, fontFamily: "Playfair Display", fontStyle: "italic", fontWeight: 500, fontSize: 48, color: GOLD_DEEP, textAlign: "center" }}>{t.sub}</div>
       {i === 2 && (
-        <div style={{ marginTop: 56, opacity: chipIn, transform: `translateY(${(1 - chipIn) * 24}px)`, display: "flex", alignItems: "center", gap: 14, padding: "0 34px", height: 84, borderRadius: 42, background: chipOn > 0.5 ? GOLD : INK, border: "3px solid #C7AE6A", color: chipOn > 0.5 ? INK : "#F4EAD3", fontFamily: "Inter", fontWeight: 800, fontSize: 30, letterSpacing: 3, boxShadow: chipOn > 0.5 ? "0 0 0 6px rgba(226,168,38,0.3), 0 14px 30px rgba(70,44,18,0.35)" : "0 12px 26px rgba(70,44,18,0.35)" }}>
+        <div style={{ marginTop: 56, opacity: chipIn, transform: `translateY(${(1 - chipIn) * 24}px)`, display: "flex", alignItems: "center", gap: 14, padding: "0 34px", height: 84, borderRadius: 42, background: chipOn > 0.5 ? GOLD : INK, border: "3px solid #C7AE6A", color: chipOn > 0.5 ? INK : "#F4EAD3", fontFamily: "Inter", fontWeight: 800, fontSize: 30, letterSpacing: 3, boxShadow: chipOn > 0.5 ? "0 0 0 6px rgba(201,165,90,0.3), 0 14px 30px rgba(70,44,18,0.35)" : "0 12px 26px rgba(70,44,18,0.35)" }}>
           <span style={{ fontSize: 36, lineHeight: 1 }}>↻</span>
           FINANCIA LA INVERSIÓN
         </div>
@@ -365,9 +365,9 @@ const InterfazApp: React.FC = () => {
 };
 
 const Camel: React.FC = () => (
-  <AbsoluteFill style={{ background: "linear-gradient(180deg, #E5CA9C 0%, #DDBC8D 45%, #CEA676 100%)" }}>
-    <AbsoluteFill style={{ background: "radial-gradient(900px 700px at 50% 18%, rgba(255,245,222,0.45), rgba(255,245,222,0))" }} />
-    <AbsoluteFill style={{ background: "radial-gradient(1400px 1400px at 50% 55%, rgba(0,0,0,0), rgba(90,58,20,0.22))" }} />
+  <AbsoluteFill style={{ background: "linear-gradient(180deg, #EFE6D4 0%, #E6D8BF 45%, #DCCBAE 100%)" }}>
+    <AbsoluteFill style={{ background: "radial-gradient(900px 700px at 50% 18%, rgba(255,252,243,0.55), rgba(255,252,243,0))" }} />
+    <AbsoluteFill style={{ background: "radial-gradient(1400px 1400px at 50% 55%, rgba(0,0,0,0), rgba(90,58,20,0.12))" }} />
   </AbsoluteFill>
 );
 
@@ -420,7 +420,7 @@ export const Cierre: React.FC = () => {
     <>
       <Placa inS={41.15} outS={44.6} eyebrow="ESCRIBÍ" main="APALANCAMIENTO" typed={[41.72, 42.5]} />
       {f >= T(42.5) && (
-        <div style={{ position: "absolute", left: 540 - 170, top: 500, width: 340, height: 78, opacity: clamp01(q * 2), transform: `translateY(${(1 - q) * 24}px) scale(${1 - 0.06 * press})`, borderRadius: 39, border: "4px solid #C7AE6A", background: sent > 0.5 ? GOLD : INK, color: sent > 0.5 ? INK : "#F4EAD3", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter", fontWeight: 800, fontSize: 28, letterSpacing: 4, boxShadow: sent > 0.5 ? "0 0 0 6px rgba(226,168,38,0.3), 0 14px 30px rgba(70,44,18,0.35)" : "0 12px 26px rgba(70,44,18,0.35)" }}>
+        <div style={{ position: "absolute", left: 540 - 170, top: 500, width: 340, height: 78, opacity: clamp01(q * 2), transform: `translateY(${(1 - q) * 24}px) scale(${1 - 0.06 * press})`, borderRadius: 39, border: "4px solid #C7AE6A", background: sent > 0.5 ? GOLD : INK, color: sent > 0.5 ? INK : "#F4EAD3", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter", fontWeight: 800, fontSize: 28, letterSpacing: 4, boxShadow: sent > 0.5 ? "0 0 0 6px rgba(201,165,90,0.3), 0 14px 30px rgba(70,44,18,0.35)" : "0 12px 26px rgba(70,44,18,0.35)" }}>
           {sent > 0.5 ? "✓ ENVIADO" : "ENVIAR ↗"}
         </div>
       )}

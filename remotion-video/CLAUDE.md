@@ -15,6 +15,9 @@ Nunca guardar ni repetir tokens de GitHub en archivos o mensajes.
   y pedir permiso antes de generar nada (Higgsfield consume créditos).
 - Antes de entregar, mirar varios fotogramas por escena y decir qué no convence.
 
+## Inspiración externa: awesome-opus5-5-videos (`inspiracion/opus55.md`)
+Repo público de la persona usuaria con 703 prompts de vídeos hechos con Opus 5.5 (motion graphics, explainers, 3D, interactivos). Solo se usa como inspiración de técnicas y patrones (tarjetas de interfaz, titulares por bloques, cifras que cuentan, esquemas que se construyen, mapas con línea que se dibuja); no se copian piezas ni textos. Cómo releerlo, qué patrones se vieron y sus límites: ver `inspiracion/opus55.md`. Antes de usar un patrón, proponer ideas adaptadas (vertical, paleta negro/dorado/mostaza, tono sobrio) y esperar elección.
+
 ## Flujo para un video nuevo
 1. La persona sube el video a la rama `mi-video` (carpeta `remotion-video/public/`) y avisa del nombre.
    Máx. 100 MB por archivo en GitHub; mejor 1080p/30 fps. Un adjunto de chat debe pesar < 25 MB.

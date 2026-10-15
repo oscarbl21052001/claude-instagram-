@@ -3,6 +3,7 @@ import { MyComposition } from "./Composition";
 import { CONTACTAR_DURATION, CONTACTAR_FPS, Contactanos } from "./Contactar/Contactanos";
 import { INTRIGA_DURATION, INTRIGA_FPS, TresCosas } from "./Intriga/TresCosas";
 import { IDEAS_DURATION, IDEAS_FPS, VideoIdeas } from "./Ideas/VideoIdeas";
+import { V4_DURATION, V4_FPS, V4_H, V4_W, Video4Edit } from "./Video4/Video4";
 import { CAPRI_DURATION, CAPRI_FPS, CAPRI_H, CAPRI_W, CapriEdit } from "./Capri/Capri";
 import { UN_DURATION, UN_FPS, UN_H, UN_W, Unidades } from "./Unidades/Unidades";
 import { CONS_DURATION, CONS_FPS, CONS_H, CONS_W, Constructora } from "./Constructora/Constructora";
@@ -92,6 +93,14 @@ export const RemotionRoot: React.FC = () => {
         fps={IDEAS_FPS}
         width={1080}
         height={1920}
+      />
+      <Composition
+        id="Video4Edit"
+        component={Video4Edit}
+        durationInFrames={V4_DURATION}
+        fps={V4_FPS}
+        width={V4_W}
+        height={V4_H}
       />
       <Composition
         id="CapriEdit"

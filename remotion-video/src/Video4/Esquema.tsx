@@ -49,7 +49,7 @@ const useAppear = (inS: number, outS: number) => {
 };
 
 // ---------- placa de título: tarjeta oscura con marco dorado, Bebas Neue en mayúsculas ----------
-const Placa: React.FC<{ inS: number; outS: number; eyebrow: string; main: string }> = ({ inS, outS, eyebrow, main }) => {
+const Placa: React.FC<{ inS: number; outS: number; eyebrow?: string; main: string }> = ({ inS, outS, eyebrow, main }) => {
   const f = useCurrentFrame();
   const a = useAppear(inS, outS);
   if (!a.visible) return null;
@@ -73,8 +73,8 @@ const Placa: React.FC<{ inS: number; outS: number; eyebrow: string; main: string
           justifyContent: "center",
         }}
       >
-        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#C7AE6A" }}>{eyebrow}</div>
-        <div style={{ fontFamily: "Bebas Neue", fontSize: 118, letterSpacing: 7, lineHeight: 1, color: "#F4EAD3", marginTop: 8 }}>{main}</div>
+        {eyebrow && <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#C7AE6A" }}>{eyebrow}</div>}
+        <div style={{ fontFamily: "Bebas Neue", fontSize: 118, letterSpacing: 7, lineHeight: 1, color: "#F4EAD3", marginTop: eyebrow ? 8 : 0 }}>{main}</div>
         {sh > 0 && sh < 1 && (
           <div style={{ position: "absolute", top: -20, bottom: -20, left: -240 + sh * 1300, width: 150, background: "linear-gradient(100deg, rgba(255,248,225,0), rgba(255,248,225,0.3), rgba(255,248,225,0))", transform: "skewX(-18deg)" }} />
         )}
@@ -174,7 +174,6 @@ const CurvaPluma: React.FC = () => {
       </svg>
       <Nota at={CURVE_FROM} x={178} y={1040} text="mejor precio" />
       <Nota at={18.3} x={170} y={1372} text="mayor financiación" rot={-1.5} />
-      <Nota at={19.9} x={600} y={1452} text="durante la obra" size={46} rot={0} color="#6b5230" />
       <Nota at={21.45} x={655} y={618} text="plusvalía" size={78} rot={-4} color="#B03A2E" />
     </AbsoluteFill>
   );
@@ -371,7 +370,7 @@ export const Esquema: React.FC = () => {
   return (
     <AbsoluteFill style={{ opacity: op }}>
       <Camel />
-      <Placa inS={14.9} outS={22.3} eyebrow="01 · EN OBRA" main="COMPRA DE POZO" />
+      <Placa inS={14.9} outS={22.3} main="COMPRA DE POZO" />
       <CurvaPluma />
       <Placa inS={22.65} outS={31.0} eyebrow="02 · AL ENTREGARSE" main="TRES SALIDAS" />
       <InterfazApp />

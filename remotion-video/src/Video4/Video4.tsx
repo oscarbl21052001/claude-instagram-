@@ -59,9 +59,9 @@ const Subtitulos: React.FC = () => {
   }
   return (
     <>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 420, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)" }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 520, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)" }} />
       {op > 0 && (
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 175, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 270, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
           <div style={{ width: 56, height: 1.5, background: "rgba(255,255,255,0.8)", marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.5)" }} />
           <div
             style={{

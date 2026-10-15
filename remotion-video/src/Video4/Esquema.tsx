@@ -48,14 +48,37 @@ const useAppear = (inS: number, outS: number) => {
   return { visible, opacity: clamp01(p * 2) * (1 - out), y: (1 - p) * 34 - out * 30, blur: (1 - p) * 10 + out * 10 };
 };
 
-// ---------- titular en dos voces ----------
-const Titular: React.FC<{ inS: number; outS: number; y: number; sans: string; serif: string }> = ({ inS, outS, y, sans, serif }) => {
+// ---------- placa de título: tarjeta oscura con marco dorado, Bebas Neue en mayúsculas ----------
+const Placa: React.FC<{ inS: number; outS: number; eyebrow: string; main: string }> = ({ inS, outS, eyebrow, main }) => {
+  const f = useCurrentFrame();
   const a = useAppear(inS, outS);
   if (!a.visible) return null;
+  const sh = clamp01((f - T(inS) - 10) / 28); // un solo destello que cruza la placa
   return (
-    <div style={{ position: "absolute", left: 70, right: 70, top: y, textAlign: "center", opacity: a.opacity, transform: `translateY(${a.y}px)`, filter: `blur(${a.blur}px)` }}>
-      <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 84, lineHeight: 1.02, letterSpacing: -1.5, color: INK }}>{sans}</div>
-      <div style={{ fontFamily: "Playfair Display", fontStyle: "italic", fontWeight: 500, fontSize: 92, lineHeight: 1.08, color: GOLD_DEEP }}>{serif}</div>
+    <div style={{ position: "absolute", left: 130, top: 230, width: 820, height: 230, opacity: a.opacity, transform: `translateY(${a.y}px)`, filter: `blur(${a.blur}px)` }}>
+      <div
+        style={{
+          boxSizing: "border-box",
+          position: "relative",
+          overflow: "hidden",
+          width: "100%",
+          height: "100%",
+          borderRadius: 44,
+          border: "6px solid transparent",
+          background: `linear-gradient(180deg, #2B2B2B 0%, ${INK} 100%) padding-box, ${GOLD} border-box`,
+          boxShadow: "0 30px 70px rgba(70,44,18,0.45)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#C7AE6A" }}>{eyebrow}</div>
+        <div style={{ fontFamily: "Bebas Neue", fontSize: 118, letterSpacing: 7, lineHeight: 1, color: "#F4EAD3", marginTop: 8 }}>{main}</div>
+        {sh > 0 && sh < 1 && (
+          <div style={{ position: "absolute", top: -20, bottom: -20, left: -240 + sh * 1300, width: 150, background: "linear-gradient(100deg, rgba(255,248,225,0), rgba(255,248,225,0.3), rgba(255,248,225,0))", transform: "skewX(-18deg)" }} />
+        )}
+      </div>
     </div>
   );
 };
@@ -102,27 +125,43 @@ const CurvaPluma: React.FC = () => {
   const tip = bez(prog);
   const axis = easeOut(clamp01((f - T(15.1)) / 16));
   const m1 = bez(0);
-  const m2 = bez((18.0 - CURVE_FROM) / (CURVE_TO - CURVE_FROM));
   const m3 = bez((21.4 - CURVE_FROM) / (CURVE_TO - CURVE_FROM));
   const dot = (p: [number, number], at: number, r = 13) => {
     const q = clamp01((f - T(at)) / 8);
     return q > 0 ? <circle cx={p[0]} cy={p[1]} r={r * easeOut(q)} fill="#F6F1E6" stroke={PEN} strokeWidth={5} /> : null;
   };
   const swoosh = easeOut(clamp01((f - T(21.5)) / 14));
+  const band = easeOut(clamp01((f - T(17.8)) / 55));
   const pulse = 1 + 0.18 * Math.sin(((f - T(21.4)) / V4_FPS) * 7);
   return (
     <AbsoluteFill style={{ opacity: a.opacity, filter: `blur(${a.blur}px)` }}>
       <svg width={1080} height={1920}>
+        <defs>
+          <linearGradient id="gb" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#8f7138" />
+            <stop offset="45%" stopColor="#E6CE86" />
+            <stop offset="100%" stopColor="#B98512" />
+          </linearGradient>
+        </defs>
         {/* ejes y guías (sin cifras: el gráfico es ilustrativo) */}
         <path d="M 150 1310 L 150 700" stroke={PEN} strokeWidth={3.5} strokeLinecap="round" fill="none" opacity={0.55} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - axis} />
         <path d="M 150 1310 L 980 1310" stroke={PEN} strokeWidth={3.5} strokeLinecap="round" fill="none" opacity={0.55} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - axis} />
         {[1100, 900].map((yy) => (
           <line key={yy} x1={150} x2={980} y1={yy} y2={yy} stroke={PEN} strokeWidth={1.5} strokeDasharray="4 12" opacity={0.28 * axis} />
         ))}
+        {/* banda de financiación: corre por debajo del eje mientras la curva sube (la constructora financia durante la obra) */}
+        {f >= T(17.8) && (
+          <>
+            <rect x={150} y={1338} width={830 * band} height={26} rx={13} fill="url(#gb)" />
+            {Array.from({ length: 11 }).map((_, k) => {
+              const x = 150 + ((k + 1) * 830) / 12;
+              return x < 150 + 830 * band - 8 ? <line key={k} x1={x} x2={x} y1={1342} y2={1360} stroke="#FFF8E7" strokeWidth={3} strokeLinecap="round" opacity={0.85} /> : null;
+            })}
+          </>
+        )}
         {d && <path d={d} fill="none" stroke={PEN} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />}
         {d && <path d={d} fill="none" stroke="#E2A826" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} transform="translate(0,-5)" />}
         {dot(m1, CURVE_FROM)}
-        {dot(m2, 18.0)}
         {f >= T(21.4) && (
           <>
             <circle cx={m3[0]} cy={m3[1]} r={34 * pulse} fill="rgba(226,168,38,0.28)" />
@@ -134,8 +173,8 @@ const CurvaPluma: React.FC = () => {
         {f < T(CURVE_TO) && prog > 0 && <circle cx={tip[0]} cy={tip[1]} r={8} fill={PEN} opacity={0.9} />}
       </svg>
       <Nota at={CURVE_FROM} x={178} y={1040} text="mejor precio" />
-      <Nota at={18.0} x={m2[0] + 36} y={m2[1] + 38} text="mayor financiación" rot={-2} />
-      <Nota at={19.9} x={430} y={1342} text="durante la obra" size={46} rot={0} color="#6b5230" />
+      <Nota at={18.3} x={170} y={1372} text="mayor financiación" rot={-1.5} />
+      <Nota at={19.9} x={600} y={1452} text="durante la obra" size={46} rot={0} color="#6b5230" />
       <Nota at={21.45} x={655} y={618} text="plusvalía" size={78} rot={-4} color="#B03A2E" />
     </AbsoluteFill>
   );
@@ -162,11 +201,11 @@ const PATH: [number, number, number][] = [
   [25.2, tabCx(1) + 24, TAB_Y + 18],
   [26.4, tabCx(1) + 24, TAB_Y + 18],
   [27.85, tabCx(2) + 24, TAB_Y + 18],
-  [28.6, tabCx(2) + 24, TAB_Y + 18],
-  [30.3, CHIP.cx + 120, CHIP.cy + 14],
+  [28.4, tabCx(2) + 24, TAB_Y + 18],
+  [29.55, CHIP.cx + 120, CHIP.cy + 14],
   [31.1, CHIP.cx + 120, CHIP.cy + 14],
 ];
-const CLICKS = [23.84, 25.3, 28.0, 30.45];
+const CLICKS = [23.84, 25.3, 28.0, 29.7];
 
 const cursorAt = (f: number): [number, number] => {
   const s = f / V4_FPS;
@@ -218,8 +257,8 @@ const Panel: React.FC<{ i: number }> = ({ i }) => {
   const q = clamp01((f - T(t.at)) / 14);
   const out = i < TABS.length - 1 ? clamp01((f - (T(t.until) - 6)) / 6) : 0;
   if (q <= 0 || out >= 1) return null;
-  const chipOn = i === 2 ? clamp01((f - T(30.45)) / 8) : 0;
-  const chipIn = i === 2 ? easeOut(clamp01((f - T(30.35)) / 12)) : 0;
+  const chipOn = i === 2 ? clamp01((f - T(29.7)) / 8) : 0;
+  const chipIn = i === 2 ? easeOut(clamp01((f - T(28.5)) / 12)) : 0;
   return (
     <div style={{ position: "absolute", left: CARD.x + 36, top: CARD.y + 150, width: CARD.w - 72, height: 560, opacity: easeOut(q) * (1 - out), transform: `translateY(${(1 - easeOut(q)) * 36 - out * 20}px)`, filter: `blur(${(1 - q) * 8 + out * 8}px)`, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 36 }}>
       <Icono k={t.key} />
@@ -332,9 +371,9 @@ export const Esquema: React.FC = () => {
   return (
     <AbsoluteFill style={{ opacity: op }}>
       <Camel />
-      <Titular inS={14.9} outS={22.3} y={250} sans="Compras" serif="de pozo." />
+      <Placa inS={14.9} outS={22.3} eyebrow="01 · EN OBRA" main="COMPRA DE POZO" />
       <CurvaPluma />
-      <Titular inS={22.65} outS={31.0} y={250} sans="Al entregarse," serif="tres salidas." />
+      <Placa inS={22.65} outS={31.0} eyebrow="02 · AL ENTREGARSE" main="TRES SALIDAS" />
       <InterfazApp />
     </AbsoluteFill>
   );

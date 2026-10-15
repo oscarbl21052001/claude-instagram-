@@ -57,9 +57,9 @@ const STEPS = [
   { at: 11.32, word: "DE POZO", sub: "comprando de pozo", done: 12.3 },
 ];
 const RESULT_AT = 12.58;
-const FADE_UI = 12.9; // la interfaz se va y queda solo el edificio
-const SPIN_A = 13.0;
-const MOVE_A = 13.45;
+const FADE_UI = 13.2; // la interfaz se va y queda solo el edificio
+const SPIN_A = 12.9;
+const MOVE_A = 13.4;
 const END = 14.1;
 
 const BX = { l: 130, r: 430, top: 1020, bot: 1430 };
@@ -78,14 +78,14 @@ export const Receta: React.FC = () => {
   const t = f / V4_FPS;
   if (f < REC_IN || f >= REC_OUT) return null;
 
-  const ui = clamp01((t - 5.0) / 0.5) * (1 - clamp01((t - FADE_UI) / 0.4)); // título, tarjeta, pasos
+  const ui = clamp01((t - 5.0) / 0.5) * (1 - clamp01((t - FADE_UI) / 0.5)); // título, tarjeta, pasos
   const drawK = easeOut(clamp01((t - 4.9) / 0.9)); // el edificio se dibuja
   const level = levelAt(t);
   const fillTop = BX.bot - (BX.bot - BX.top) * level;
 
   // giro + viaje al punto del iris
   const spin = easeIO(clamp01((t - SPIN_A) / (END - SPIN_A)));
-  const sx = t < SPIN_A ? 1 : Math.cos(spin * 4 * Math.PI);
+  const sx = t < SPIN_A ? 1 : Math.cos(spin * 3 * Math.PI);
   const mv = easeIO(clamp01((t - MOVE_A) / (END - MOVE_A)));
   const sc = 1 - 0.93 * mv;
   const cx = 280 + (540 - 280) * mv;

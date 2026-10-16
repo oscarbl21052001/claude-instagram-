@@ -29,7 +29,7 @@ export const useMarco = () => {
   const b = easeIO(clamp01((f - REC_OUT) / REC_RETURN));
   const p = a * (1 - b);
   // ella sube a todo el ancho, sin marco: su borde inferior se difumina hacia el fondo camel
-  return { p, h: 1920 - 1180 * p, it: -640 * p, fade: 160 * p, zoom: 1 + 0.18 * p };
+  return { p, h: 1920 - 1180 * p, it: -640 * p, fade: 160 * p, zoom: 1 };
 };
 
 export const FondoReceta: React.FC = () => {

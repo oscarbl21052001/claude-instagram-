@@ -1,4 +1,4 @@
-import { Video } from "@remotion/media";
+import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, staticFile, useCurrentFrame } from "remotion";
 import { useKitFonts } from "../kit";
 import { Cierre, Esquema, T } from "./Esquema";
@@ -89,6 +89,7 @@ export const Video4Edit: React.FC = () => {
   const m = useMarco();
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      <Audio src={staticFile("audio/sfx_video4.m4a")} />
       <FondoReceta />
       <div
         style={{

@@ -3,6 +3,7 @@ import { AbsoluteFill, staticFile, useCurrentFrame } from "remotion";
 import { useKitFonts } from "../kit";
 import { Cierre, Esquema, T } from "./Esquema";
 import { FondoReceta, Receta, useMarco } from "./Receta";
+import { Titular } from "./Titular";
 
 // Edit "VIDEO 4" (43,97 s, 1080x1920, 30 fps): inversión en pozo con financiamiento de la constructora.
 // El plano tiene un hueco sin imagen (fotogramas 442–930: fondo gris, solo se oye su voz). Ese hueco se tapa con un fondo camel
@@ -125,6 +126,7 @@ export const Video4Edit: React.FC = () => {
       <Receta />
       <Esquema />
       <Cierre />
+      <Titular />
       <Subtitulos />
     </AbsoluteFill>
   );

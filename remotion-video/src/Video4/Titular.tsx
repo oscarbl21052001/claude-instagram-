@@ -21,13 +21,13 @@ const OUT_A = 4.0;
 const OUT_B = 4.3;
 
 const BASE: React.CSSProperties = {
-  fontFamily: "Chewy",
-  fontSize: 118,
-  lineHeight: 1.02,
-  letterSpacing: 2,
+  fontFamily: "Bebas Neue",
+  fontSize: 158,
+  lineHeight: 0.95,
+  letterSpacing: 3,
   textAlign: "center",
   whiteSpace: "nowrap",
-  WebkitTextStroke: `14px ${INK}`,
+  WebkitTextStroke: `12px ${INK}`,
   paintOrder: "stroke fill",
   textShadow: "0 8px 0 rgba(27,18,8,0.9), 0 16px 34px rgba(0,0,0,0.45)",
 };
@@ -50,7 +50,7 @@ export const Titular: React.FC = () => {
         style={{
           position: "absolute",
           left: -18,
-          top: "52%",
+          top: "47%",
           height: 16,
           width: `calc(${easeOut(sk) * 100}% + 36px)`,
           borderRadius: 8,

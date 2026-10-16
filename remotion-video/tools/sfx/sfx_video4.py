@@ -134,6 +134,13 @@ def hum(t0, dur, amp=0.03, f=95):
 
 
 # ------------------------------------------------ EVENTOS (segundos; mismos que el código de la animación)
+# Titular del inicio "¿INVIERTES SOLO CON TU DINERO?" (entra 0,12 s; tachado 3,66 s; sale 4,0 s)
+whoosh(0.1, 0.4, 300, 3000, 0.12, "rise")
+thud(0.42, 0.18, 70, 0.3)
+pop(0.42, 0.09, 520)
+scratch(3.66, 0.3, 0.05)
+thud(3.9, 0.12, 90, 0.2)
+whoosh(4.0, 0.3, 2800, 500, 0.08, "fall")
 # Ella sube arriba (4,0 s) y aparece "¿CÓMO FUNCIONA?" + el edificio se dibuja
 whoosh(4.0, 0.55, 300, 3200, 0.14, "bell")
 pop(4.45, 0.09, 600)

@@ -93,18 +93,33 @@ export const Video4Edit: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: m.left,
-          top: m.top,
-          width: m.w,
+          left: 0,
+          top: 0,
+          width: V4_W,
           height: m.h,
-          borderRadius: m.r,
           overflow: "hidden",
-          boxShadow: m.p > 0 ? `0 0 0 ${6 * m.p}px #C7AE6A, 0 24px 50px rgba(70,44,18,${0.45 * m.p})` : "none",
+          WebkitMaskImage: `linear-gradient(180deg, #000 ${m.h - m.fade}px, rgba(0,0,0,0) ${m.h}px)`,
+          maskImage: `linear-gradient(180deg, #000 ${m.h - m.fade}px, rgba(0,0,0,0) ${m.h}px)`,
         }}
       >
-        <div style={{ position: "absolute", left: m.il, top: m.it, width: V4_W * m.s, height: V4_H * m.s }}>
+        <div style={{ position: "absolute", left: 0, top: m.it, width: V4_W, height: V4_H, transform: `scale(${m.zoom})`, transformOrigin: "540px 900px" }}>
           <Video src={staticFile("entrada/VIDEO-4-completo.mp4")} style={{ width: "100%", height: "100%" }} objectFit="cover" />
         </div>
+        {m.fade > 1 && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: m.h - m.fade,
+              height: m.fade,
+              backdropFilter: "blur(18px)",
+              WebkitBackdropFilter: "blur(18px)",
+              WebkitMaskImage: "linear-gradient(180deg, rgba(0,0,0,0), #000 70%)",
+              maskImage: "linear-gradient(180deg, rgba(0,0,0,0), #000 70%)",
+            }}
+          />
+        )}
       </div>
       <Receta />
       <Esquema />

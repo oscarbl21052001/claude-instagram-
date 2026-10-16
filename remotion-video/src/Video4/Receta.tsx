@@ -28,8 +28,8 @@ export const useMarco = () => {
   const a = easeIO(clamp01((f - REC_IN) / REC_FRAME_IN));
   const b = easeIO(clamp01((f - REC_OUT) / REC_RETURN));
   const p = a * (1 - b);
-  const s = 1 - 0.2 * p;
-  return { p, left: 190 * p, top: 90 * p, w: 1080 - 380 * p, h: 1920 - 1280 * p, r: 44 * p, s, il: ((1080 - 380 * p) - 1080 * s) / 2, it: -700 * p * s };
+  // ella sube a todo el ancho, sin marco: su borde inferior se difumina hacia el fondo camel
+  return { p, h: 1920 - 1180 * p, it: -640 * p, fade: 160 * p, zoom: 1 + 0.18 * p };
 };
 
 export const FondoReceta: React.FC = () => {
@@ -137,7 +137,7 @@ export const Receta: React.FC = () => {
 
         {/* título */}
         <g opacity={ui} transform={`translate(0 ${(1 - easeOut(clamp01((t - 4.4) / 0.5))) * 20})`}>
-          <text x={540} y={830} textAnchor="middle" fontFamily="Chewy" fontSize={78} letterSpacing={3} fill={GOLD} stroke={INK} strokeWidth={9} strokeLinejoin="round" paintOrder="stroke">
+          <text x={540} y={860} textAnchor="middle" fontFamily="Chewy" fontSize={78} letterSpacing={3} fill={GOLD} stroke={INK} strokeWidth={9} strokeLinejoin="round" paintOrder="stroke">
             ¿CÓMO FUNCIONA?
           </text>
         </g>

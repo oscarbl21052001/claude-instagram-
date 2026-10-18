@@ -13,6 +13,7 @@ import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
 import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
 import { EDIT_DURATION, EDIT_FPS, EsquemaPip } from "./Edit/EsquemaPip";
+import { PLAYA_DURATION, PLAYA_FPS, PLAYA_H, PLAYA_W, PlayaTexto } from "./Playa/PlayaTexto";
 import { KitDemo } from "./KitDemo/KitDemo";
 import { TOUR_DURATION, TOUR_FPS, TourApto } from "./Tour/TourApto";
 import { UNIDAD_DURATION, UNIDAD_FPS, UnidadFlotante } from "./Unidad/UnidadFlotante";
@@ -22,6 +23,7 @@ export const RemotionRoot: React.FC = () => {
   return (
     <>
       <MyComposition />
+      <Composition id="PlayaTexto" component={PlayaTexto} durationInFrames={PLAYA_DURATION} fps={PLAYA_FPS} width={PLAYA_W} height={PLAYA_H} />
       <Composition
         id="KitDemo"
         component={KitDemo}

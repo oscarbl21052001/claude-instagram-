@@ -20,7 +20,7 @@ const BLOQUES: Bloque[] = [
     t0: 12.7,
     t1: 14.9,
     x: 540,
-    y: 360,
+    y: 480,
     rot: -4,
   },
   {
@@ -31,7 +31,7 @@ const BLOQUES: Bloque[] = [
     t0: 14.95,
     t1: 17.05,
     x: 540,
-    y: 380,
+    y: 500,
     rot: 4,
   },
 ];

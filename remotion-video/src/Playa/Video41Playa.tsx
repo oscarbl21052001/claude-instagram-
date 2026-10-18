@@ -13,17 +13,45 @@ export const V41_DURATION = 755; // 25,17 s
 export const V41_W = 1080;
 export const V41_H = 1920;
 
-// Escena 3 (render, 5,0–7,1 s): "SPOT 335" en el cielo; la cámara lo cruza al decir "Spot 335" (5,98–7,26).
-const BLOQUE_SPOT: Bloque = {
-  lineas: [
-    { texto: "TE PRESENTO", size: 52, cifra: false, tracking: 12 },
-    { texto: "SPOT 335", size: 190, cifra: true, tracking: -3 },
-  ],
-  t0: 4.95,
-  t1: 7.0,
-  x: 540,
-  y: 400,
-  rot: -3,
+// Escena 3 (render, 5,0–7,1 s): logo "SPOT / 3 3 5" con la tipografía condensada del edificio, gris claro liso (sin 3D ni dorado).
+// Cada línea sube desde una máscara con la voz ("Spot" 5,98 · "335" 6,24) y sale en fundido antes del corte.
+const SPOT_T0 = 5.55;
+const SPOT_OUT = 6.85;
+
+const LogoSpot: React.FC = () => {
+  const frame = useCurrentFrame();
+  const s = frame / V41_FPS;
+  const ease = (k: number) => 1 - Math.pow(1 - Math.min(Math.max(k, 0), 1), 3);
+  const subida = (t: number) => ease((s - t) / 0.7);
+  const sale = interpolate(s, [SPOT_OUT, SPOT_OUT + 0.3], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  if (s < SPOT_T0 || sale <= 0) return null;
+  const lineas = [
+    { t: "SPOT", t0: SPOT_T0 + 0.3, size: 250, tracking: 5 },
+    { t: "335", t0: SPOT_T0 + 0.55, size: 250, tracking: 46 },
+  ];
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, top: 330, display: "flex", flexDirection: "column", alignItems: "center", opacity: sale }}>
+      {lineas.map((l) => (
+        <div key={l.t} style={{ overflow: "hidden", height: l.size * 0.84, lineHeight: 1 }}>
+          <div
+            style={{
+              fontFamily: "Big Shoulders Display",
+              fontWeight: 700,
+              fontSize: l.size,
+              lineHeight: 0.84,
+              letterSpacing: l.tracking,
+              marginRight: -l.tracking,
+              color: "#E6E8EA",
+              textShadow: "0 8px 30px rgba(0,0,0,0.35)",
+              transform: `translateY(${(1 - subida(l.t0)) * 105}%)`,
+            }}
+          >
+            {l.t}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 // Escena 8 (calle, 19,6–25,17 s): palabras clave de la voz, una a una (inicio de cada palabra).
@@ -55,7 +83,10 @@ const ListaFinal: React.FC = () => {
 const useBebas = () => {
   const [h] = useState(() => delayRender("Cargando Bebas Neue"));
   useEffect(() => {
-    loadFont({ family: "Bebas Neue", url: staticFile("fonts/BebasNeue-Regular.woff2") }).then(() => continueRender(h));
+    Promise.all([
+      loadFont({ family: "Bebas Neue", url: staticFile("fonts/BebasNeue-Regular.woff2") }),
+      loadFont({ family: "Big Shoulders Display", url: staticFile("fonts/BigShouldersDisplay-Bold.woff2"), weight: "700" }),
+    ]).then(() => continueRender(h));
   }, [h]);
 };
 
@@ -92,9 +123,10 @@ export const Video41Playa: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <Video src={staticFile("playa/video41_1080.mp4")} objectFit="cover" style={{ width: "100%", height: "100%" }} />
-      {[BLOQUE_SPOT, ...BLOQUES].map((b) => (
+      {BLOQUES.map((b) => (
         <TextoFlotante key={b.lineas[0].texto} b={b} />
       ))}
+      <LogoSpot />
       <ListaFinal />
       <AbsoluteFill style={{ background: "#000", opacity: 1 - fin }} />
     </AbsoluteFill>

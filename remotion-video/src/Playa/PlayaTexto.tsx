@@ -47,7 +47,7 @@ const TEMA = TEMAS.dorado;
 const mix = (a: number[], b: number[], k: number) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(",")})`;
 
 type Linea = { texto: string; size: number; cifra: boolean; tracking: number };
-type Bloque = {
+export type Bloque = {
   lineas: Linea[];
   t0: number; // segundo en que arranca la aproximación
   t1: number; // segundo en que la cámara cruza el plano del texto (desaparece justo después)
@@ -85,7 +85,7 @@ const BLOQUES: Bloque[] = [
   },
 ];
 
-const useFuente = () => {
+export const useFuente = () => {
   const [handle] = useState(() => delayRender("Cargando Poppins ExtraBold"));
   useEffect(() => {
     loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-ExtraBold.woff2"), weight: "800" }).then(() => continueRender(handle));
@@ -118,7 +118,7 @@ const Linea3D: React.FC<{ l: Linea; i: number }> = ({ l, i }) => {
   );
 };
 
-const TextoFlotante: React.FC<{ b: Bloque }> = ({ b }) => {
+export const TextoFlotante: React.FC<{ b: Bloque }> = ({ b }) => {
   const frame = useCurrentFrame();
   const s = frame / PLAYA_FPS;
   if (s < b.t0 || s > b.t1 + 0.02) return null;

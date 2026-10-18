@@ -1,11 +1,12 @@
 import { Audio, Video } from "@remotion/media";
 import { loadFont } from "@remotion/fonts";
 import { useEffect, useState } from "react";
-import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, delayRender, continueRender, interpolate, staticFile, useCurrentFrame } from "remotion";
 
-// Toma de dron de la playa de `video 4.1` (13,3–18,4 s) con dos textos verdes que flotan fijos en el aire; el dron avanza y la cámara los atraviesa.
+// Toma de dron de la playa de `video 4.1` (13,3–18,4 s) con dos textos que flotan fijos en el aire; el dron avanza y la cámara los atraviesa.
 // Voz (tiempo de la toma): "12" −0,36 · "anticipo" 0,86–1,48 · "700" 2,0–2,4 · "mensuales" 2,96–3,56 · "refuerzos" 3,78–4,44.
-// Profundidad: capas apiladas en translateZ con perspectiva (como CONTÁCTANOS). La cámara = z creciente; al pasar cerca del plano de la cámara se desvanece.
+// Cámara a velocidad CONSTANTE (z lineal): la escala sube sola de forma natural (PERSP / distancia), sin pausas ni tirones.
+// Volumen: pocas capas con `translateZ`. Paleta intercambiable en `TEMAS`.
 
 export const PLAYA_FPS = 30;
 export const PLAYA_DURATION = 153; // 5,1 s
@@ -13,47 +14,74 @@ export const PLAYA_W = 1080;
 export const PLAYA_H = 1920;
 
 const PERSP = 1400;
-const CAPAS = 16;
-const PROF = 74; // grosor del volumen (px)
+const CAPAS = 9;
+const PROF = 36; // grosor del volumen (px)
 
-const DARK = [10, 62, 20];
-const LIGHT = [76, 175, 60];
-const SHADE_D = [4, 26, 8];
-const SHADE_L = [30, 92, 28];
+type Tema = { etiqueta: number[]; etiquetaFondo: number[]; cifra: number[]; cifraFondo: number[]; degradado?: string; sombra: string };
+const TEMAS: Record<string, Tema> = {
+  dorado: {
+    etiqueta: [255, 248, 231], // crema
+    etiquetaFondo: [120, 100, 70],
+    cifra: [242, 190, 69], // mostaza
+    cifraFondo: [74, 48, 6],
+    degradado: "linear-gradient(180deg, #FFE7A0 0%, #F2BE45 45%, #D69A1C 100%)",
+    sombra: "0 18px 40px rgba(0,20,40,0.35)",
+  },
+  verde: {
+    etiqueta: [255, 255, 255],
+    etiquetaFondo: [60, 90, 70],
+    cifra: [64, 184, 120],
+    cifraFondo: [8, 60, 36],
+    degradado: "linear-gradient(180deg, #8EF0BC 0%, #3FB878 50%, #1E8F57 100%)",
+    sombra: "0 18px 40px rgba(0,20,40,0.35)",
+  },
+  blanco: {
+    etiqueta: [255, 255, 255],
+    etiquetaFondo: [150, 165, 180],
+    cifra: [255, 255, 255],
+    cifraFondo: [120, 140, 160],
+    sombra: "0 18px 40px rgba(0,20,40,0.4)",
+  },
+};
+const TEMA = TEMAS.dorado;
 const mix = (a: number[], b: number[], k: number) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(",")})`;
 
-type Linea = { texto: string; size: number; claro: boolean };
+type Linea = { texto: string; size: number; cifra: boolean; tracking: number };
 type Bloque = {
   lineas: Linea[];
-  t: number[]; // tiempos clave (s de la toma)
-  z: number[]; // profundidad de la cámara respecto al texto (px; negativo = lejos)
-  x: number; // centro horizontal (px)
-  y: number; // centro vertical (px)
-  rot: number; // inclinación (°)
+  t0: number; // segundo en que arranca la aproximación
+  t1: number; // segundo en que la cámara cruza el plano del texto (desaparece justo después)
+  x: number;
+  y: number;
+  rot: number;
 };
+
+// Cámara: z va de Z0 (lejos) a Z1 (pasa) de forma lineal entre t0 y t1.
+const Z0 = -1000;
+const Z1 = 1000;
 
 const BLOQUES: Bloque[] = [
   {
     lineas: [
-      { texto: "ANTICIPO", size: 150, claro: false },
-      { texto: "$12.000", size: 250, claro: true },
+      { texto: "ANTICIPO", size: 64, cifra: false, tracking: 14 },
+      { texto: "$12.000", size: 196, cifra: true, tracking: -3 },
     ],
-    t: [0, 0.4, 1.0, 1.75],
-    z: [-1500, -650, -250, 1250],
-    x: 520,
-    y: 330,
-    rot: -8,
+    t0: -0.1,
+    t1: 1.9,
+    x: 540,
+    y: 360,
+    rot: -4,
   },
   {
     lineas: [
-      { texto: "CUOTAS", size: 190, claro: false },
-      { texto: "$700", size: 330, claro: true },
+      { texto: "CUOTAS", size: 64, cifra: false, tracking: 14 },
+      { texto: "$700", size: 230, cifra: true, tracking: -3 },
     ],
-    t: [1.85, 2.3, 3.0, 3.75],
-    z: [-1500, -650, -250, 1250],
-    x: 500,
-    y: 350,
-    rot: 7,
+    t0: 1.65,
+    t1: 3.75,
+    x: 540,
+    y: 380,
+    rot: 4,
   },
 ];
 
@@ -66,19 +94,23 @@ const useFuente = () => {
 
 const Linea3D: React.FC<{ l: Linea; i: number }> = ({ l, i }) => {
   const front = i === 0;
-  const base = l.claro ? LIGHT : DARK;
-  const shade = l.claro ? SHADE_L : SHADE_D;
+  const base = l.cifra ? TEMA.cifra : TEMA.etiqueta;
+  const fondo = l.cifra ? TEMA.cifraFondo : TEMA.etiquetaFondo;
+  const grad = l.cifra && front && TEMA.degradado;
   return (
     <div
       style={{
         fontFamily: "Poppins",
         fontWeight: 800,
         fontSize: l.size,
-        lineHeight: 0.98,
-        letterSpacing: -2,
+        lineHeight: 1.02,
+        letterSpacing: l.tracking,
         whiteSpace: "nowrap",
-        color: front ? mix(base, [255, 255, 255], l.claro ? 0.04 : 0) : mix(base, shade, Math.pow(i / CAPAS, 0.7)),
-        textShadow: i === CAPAS ? "0 40px 60px rgba(0,0,0,0.35)" : undefined,
+        color: front ? mix(base, [255, 255, 255], l.cifra ? 0 : 0) : mix(base, fondo, Math.pow(i / CAPAS, 0.8)),
+        backgroundImage: grad || undefined,
+        WebkitBackgroundClip: grad ? "text" : undefined,
+        WebkitTextFillColor: grad ? "transparent" : undefined,
+        textShadow: i === CAPAS ? TEMA.sombra : undefined,
       }}
     >
       {l.texto}
@@ -89,20 +121,14 @@ const Linea3D: React.FC<{ l: Linea; i: number }> = ({ l, i }) => {
 const TextoFlotante: React.FC<{ b: Bloque }> = ({ b }) => {
   const frame = useCurrentFrame();
   const s = frame / PLAYA_FPS;
-  if (s < b.t[0] || s > b.t[3] + 0.05) return null;
-  const zc = interpolate(s, b.t, b.z, {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.45, 0.0, 0.75, 0.6),
-  });
-  const entra = interpolate(s, [b.t[0], b.t[0] + 0.25], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const sale = interpolate(zc, [650, 1150], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const lejos = Math.max(0, (-zc - 900) / 700);
-  const blur = lejos * 8 + interpolate(zc, [500, 1200], [0, 22], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  if (s < b.t0 || s > b.t1 + 0.02) return null;
+  const k = (s - b.t0) / (b.t1 - b.t0);
+  const z = Z0 + (Z1 - Z0) * k; // velocidad constante
+  const entra = interpolate(s, [Math.max(b.t0, 0), Math.max(b.t0, 0) + 0.35], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const sale = interpolate(z, [560, 940], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const blur = interpolate(z, [420, 940], [0, 16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const W = 1500;
-  const H = 760;
-  // la cámara avanza: el texto queda quieto en el mundo y se acerca (z positivo relativo al plano del texto)
-  const z = -(-zc); // zc negativo = lejos del texto
+  const H = 560;
   return (
     <div
       style={{
@@ -114,19 +140,12 @@ const TextoFlotante: React.FC<{ b: Bloque }> = ({ b }) => {
         opacity: entra * sale,
         filter: blur > 0.3 ? `blur(${blur}px)` : undefined,
         perspective: PERSP,
-        perspectiveOrigin: "50% 62%",
+        perspectiveOrigin: "50% 70%",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          transformStyle: "preserve-3d",
-          transform: `translateZ(${z}px) rotateZ(${b.rot}deg) rotateX(6deg) rotateY(${b.rot > 0 ? -8 : 8}deg)`,
-        }}
-      >
-        {Array.from({ length: CAPAS + 1 }).map((_, k) => {
-          const i = CAPAS - k;
+      <div style={{ width: "100%", height: "100%", transformStyle: "preserve-3d", transform: `translateZ(${z}px) rotateZ(${b.rot}deg) rotateX(4deg)` }}>
+        {Array.from({ length: CAPAS + 1 }).map((_, kk) => {
+          const i = CAPAS - kk;
           return (
             <div
               key={i}

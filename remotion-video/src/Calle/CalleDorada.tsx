@@ -17,6 +17,7 @@ export type CalleConfig = {
   texto: { desde: number; hasta: number }; // aparición del texto en el sentido de lectura
   finEntra: { desde: number; hasta: number }; // la calle vuelve a entrar al final del giro (sin texto)
   lineas: string[];
+  fontSize?: number; // por defecto 420 (textura de 1800 px)
 };
 
 export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) => {
@@ -76,7 +77,7 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
               alignItems: "center",
               justifyContent: "center",
               fontFamily: "Bebas Neue",
-              fontSize: 420,
+              fontSize: c.fontSize ?? 420,
               whiteSpace: "nowrap",
               lineHeight: 0.9,
               letterSpacing: 6,

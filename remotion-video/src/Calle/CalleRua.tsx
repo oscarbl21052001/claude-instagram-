@@ -15,7 +15,8 @@ export const RUA_CONFIG: CalleConfig = {
   pintura: { desde: 8, hasta: 44 },
   texto: { desde: 34, hasta: 80 },
   finEntra: { desde: 9999, hasta: 10000 },
-  lineas: ["A TAN SOLO", "350 METROS", "DEL MAR"],
-  fontSize: 330,
+  lineas: ["350 METROS", "DEL MAR"],
+  fontSize: 400,
+  sombra: "0 0 6px rgba(70,45,0,0.95), 0 0 22px rgba(70,45,0,0.7)",
 };
 export const CalleRua: React.FC = () => <CalleEscena config={RUA_CONFIG} />;

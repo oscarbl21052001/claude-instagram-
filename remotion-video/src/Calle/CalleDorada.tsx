@@ -17,6 +17,7 @@ export type CalleConfig = {
   texto: { desde: number; hasta: number }; // aparición del texto en el sentido de lectura
   finEntra: { desde: number; hasta: number }; // la calle vuelve a entrar al final del giro (sin texto)
   lineas: string[];
+  sombra?: string; // sombra del texto (por defecto un halo suave)
   fontSize?: number; // por defecto 420 (textura de 1800 px)
 };
 
@@ -82,7 +83,7 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
               lineHeight: 0.9,
               letterSpacing: 6,
               color: "#FFF8E7",
-              textShadow: "0 0 30px rgba(60,40,0,0.45)",
+              textShadow: c.sombra ?? "0 0 30px rgba(60,40,0,0.45)",
               opacity: 0.96,
             }}
           >

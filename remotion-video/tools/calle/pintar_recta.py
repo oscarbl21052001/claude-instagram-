@@ -3,7 +3,8 @@
 Uso: python tools/calle/pintar_recta.py <fotogramas f_NNNN.jpg> <carpeta road_/occ_ de fotogramas clave> <G_todo.npy> <config.json> <salida_webp> <salida.ts>
 
 config.json:
-  {"tramos": [{"nombre": "inicio", "ref": 0, "poligono": [[x,y],...], "desde": 0, "hasta": 70},
+  {"excluir": [{"nombre": "...", "ref": 0, "poligono": [[x,y],...]}],   (opcional: quita del dorado objetos fijos que el modelo no ve)
+   "tramos": [{"nombre": "inicio", "ref": 0, "poligono": [[x,y],...], "desde": 0, "hasta": 70},
               {"nombre": "final", "ref": 98, "poligono": [...], "desde": 84, "hasta": 98}],
    "quad": [x1,y1,x2,y2,x3,y3,x4,y4]}
 - "poligono": contorno de la calle en el fotograma "ref" (px de 1080x1920), con lados rectos. Se lleva a cada fotograma con la
@@ -64,6 +65,11 @@ for t in range(N):
             occ = cv2.warpPerspective(occ, G[t] @ Ginv[k], (W, Hh), flags=cv2.INTER_NEAREST)
         occ = cv2.GaussianBlur(cv2.dilate(occ, np.ones((7, 7), np.uint8)).astype(np.float32), (0, 0), 1.5)
         alpha = np.maximum(alpha, a * (1 - np.clip(occ, 0, 1)))
+    # "excluir": objetos fijos en el suelo que el modelo no reconoce (p. ej. una moto aparcada); polígonos en el fotograma "ref"
+    for ex in cfg.get("excluir", []):
+        pe = warp_poly(ex["poligono"], ex["ref"], t)
+        if pe is not None and np.abs(pe).max() < 20000:
+            alpha = alpha * (1 - cv2.GaussianBlur(raster(pe), (0, 0), 1.2))
     img = cv2.imread(os.path.join(fr, f"f_{t:04d}.jpg"))[..., ::-1].astype(np.float32)
     luma = (0.3 * img[..., 0] + 0.59 * img[..., 1] + 0.11 * img[..., 2]) / 255.0
     shade = np.clip(0.62 + 0.9 * luma, 0.0, 1.5)[..., None]  # conserva sombras y textura

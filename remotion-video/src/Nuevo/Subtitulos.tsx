@@ -1,7 +1,7 @@
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 
 // Subtítulos minimalistas estilo documental (mismo estilo, tamaño y altura que en CAPRI): Inter Medium 30 px, blanco, sombra suave, una línea,
-// centrado a 175 px del borde inferior, con una línea fina blanca encima y un degradado negro suave abajo para el contraste.
+// centrado a 330 px del borde inferior (más arriba que en CAPRI, a petición de la persona), con una línea fina blanca encima y un degradado negro suave abajo para el contraste.
 // Texto: Whisper medium sobre la voz de "SPOT 335 VIDEO". Pendiente de confirmar por la persona: "Bombinhas", "garantizas", "12.000 dólares".
 export const FPS = 30;
 const T = (s: number) => Math.round(s * FPS);
@@ -43,9 +43,9 @@ export const Subtitulos: React.FC<{ total: number }> = ({ total }) => {
   const grad = Math.min(clamp01(f / 10), clamp01((total - f) / 10));
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 420, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)", opacity: grad }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 640, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%)", opacity: grad }} />
       {op > 0 && (
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 175, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 330, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
           <div style={{ width: 56, height: 1.5, background: "rgba(255,255,255,0.8)", marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.5)" }} />
           <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 30, letterSpacing: 1.2, color: "#FFFFFF", textShadow: "0 1px 3px rgba(0,0,0,0.75), 0 2px 12px rgba(0,0,0,0.7), 0 0 2px rgba(0,0,0,0.5)", textAlign: "center", whiteSpace: "nowrap" }}>{text}</div>
         </div>

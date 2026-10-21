@@ -1,6 +1,7 @@
 import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Freeze, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { useBebas } from "../Playa/Video41Playa";
+import { ModoTarjeta, OscurecerFondo, TarjetaFotos, fondoBlur } from "./TarjetaFotos";
 
 // Edit nuevo de SPOT 335 ("SPOT 335 VIDEO.mov", 34,13 s, 30 fps). Seis cortes con transición propia, medidos con ffmpeg (fotograma = primer fotograma de la toma nueva):
 //   294 edificio → ella · 436 ella → calle · 578 calle → ella sentada · 687 ella → dron · 775 dron → ella · 865 calle → playa
@@ -173,7 +174,7 @@ const IrisAbre: React.FC<{ v: number }> = ({ v }) => {
   );
 };
 
-export const SpotNuevo: React.FC = () => {
+export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta }> = ({ tarjeta = "ninguna" }) => {
   useBebas();
   const f = useCurrentFrame();
   const x = efecto(f);
@@ -200,7 +201,7 @@ export const SpotNuevo: React.FC = () => {
     <AbsoluteFill style={{ background: x.bg ?? "#000", overflow: "hidden" }}>
       {especial ?? (
         <>
-      <AbsoluteFill style={{ ...(activo ? capa(0) : {}), filter: x.blur > 0.3 ? `blur(${x.blur}px)` : undefined }}>
+      <AbsoluteFill style={{ ...(activo ? capa(0) : {}), filter: x.blur + fondoBlur(f, tarjeta) > 0.3 ? `blur(${x.blur + fondoBlur(f, tarjeta)}px)` : undefined }}>
         <Clip />
       </AbsoluteFill>
       {copias.map((k) => (
@@ -208,6 +209,10 @@ export const SpotNuevo: React.FC = () => {
           <Clip />
         </AbsoluteFill>
       ))}
+      <OscurecerFondo modo={tarjeta} />
+      <AbsoluteFill style={{ ...(activo ? capa(0) : {}), filter: x.blur > 0.3 ? `blur(${x.blur}px)` : undefined }}>
+        <TarjetaFotos modo={tarjeta} />
+      </AbsoluteFill>
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
         </>
       )}

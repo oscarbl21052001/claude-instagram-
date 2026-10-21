@@ -2,6 +2,7 @@ import { Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { useKitFonts } from "../kit";
 import { TEXTO_H, TEXTO_M, TEXTO_W } from "./datos";
+import { SubeConfig, SubeTexto } from "./SubeTexto";
 
 // Video de dron con la calle principal pintada de mostaza dorado y un texto pegado al suelo.
 // El texto sigue el giro de la cámara (matriz por fotograma, tools/calle/) y solo se ve sobre la calle pintada.
@@ -13,16 +14,20 @@ export type CalleConfig = {
   texW: number;
   texH: number;
   frames: number;
+  mapa?: number[]; // fotograma de salida -> fotograma del clip original (si el clip está retemporizado)
   pintura: { desde: number; hasta: number }; // barrido de la pintura hacia el mar (fotogramas)
   texto: { desde: number; hasta: number }; // aparición del texto en el sentido de lectura
   finEntra: { desde: number; hasta: number }; // la calle vuelve a entrar al final del giro (sin texto)
   lineas: string[];
+  sombra?: string; // sombra del texto (por defecto un halo suave)
+  fontSize?: number; // por defecto 420 (textura de 1800 px)
+  sube?: SubeConfig; // opcional: el texto se despega del suelo y sube al cielo en 3D
 };
 
 export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) => {
   useKitFonts();
   const frame = useCurrentFrame();
-  const n = String(Math.min(frame, c.frames - 1)).padStart(4, "0");
+  const n = String(c.mapa ? c.mapa[Math.min(frame, c.mapa.length - 1)] : Math.min(frame, c.frames - 1)).padStart(4, "0");
   const capa = staticFile(`${c.capas}/p_${n}.webp`);
   const ease = Easing.bezier(0.16, 1, 0.3, 1);
 
@@ -34,6 +39,7 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
   });
   const entraFin = interpolate(frame, [c.finEntra.desde, c.finEntra.hasta], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const final = frame >= c.finEntra.desde;
+  const sueloOp = c.sube ? interpolate(frame, [c.sube.desde, c.sube.desde + 6], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 1;
   const paintStyle: React.CSSProperties = final
     ? { opacity: entraFin }
     : {
@@ -50,11 +56,12 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
     <AbsoluteFill style={{ background: "#000" }}>
       <Video src={staticFile(c.video)} objectFit="cover" style={{ width: "100%", height: "100%" }} />
       <Img src={capa} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", ...paintStyle }} />
-      {!final && (
+      {!final && sueloOp > 0 && (
         <div
           style={{
             position: "absolute",
             inset: 0,
+            opacity: sueloOp,
             WebkitMaskImage: `url(${capa})`,
             maskImage: `url(${capa})`,
             WebkitMaskSize: "100% 100%",
@@ -76,12 +83,12 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
               alignItems: "center",
               justifyContent: "center",
               fontFamily: "Bebas Neue",
-              fontSize: 420,
+              fontSize: c.fontSize ?? 420,
               whiteSpace: "nowrap",
               lineHeight: 0.9,
               letterSpacing: 6,
               color: "#FFF8E7",
-              textShadow: "0 0 30px rgba(60,40,0,0.45)",
+              textShadow: c.sombra ?? "0 0 30px rgba(60,40,0,0.45)",
               opacity: 0.96,
             }}
           >
@@ -91,6 +98,7 @@ export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) =>
           </div>
         </div>
       )}
+      {c.sube && <SubeTexto sube={c.sube} matrices={c.matrices} texW={c.texW} texH={c.texH} lineas={c.lineas} fontSize={c.fontSize ?? 420} />}
     </AbsoluteFill>
   );
 };

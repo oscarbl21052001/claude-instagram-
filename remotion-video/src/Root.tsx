@@ -10,9 +10,14 @@ import { CONS_DURATION, CONS_FPS, CONS_H, CONS_W, Constructora } from "./Constru
 import { AMEN_DURATION, AMEN_FPS, AMEN_H, AMEN_W, Amenities } from "./Amenities/Amenities";
 import { ESQ_DURATION, ESQ_FPS, EsquemaPlusvalia } from "./Casa/EsquemaPlusvalia";
 import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
+import { FINAL_DURATION, FINAL_FPS, S3_DURATION, SpotFinal, SpotFrase3 } from "./Final/SpotFinal";
+import { NUEVO_DURATION, NUEVO_FPS, SpotNuevo } from "./Nuevo/SpotNuevo";
+import { CalleRua, RUA_DURATION, RUA_FPS } from "./Calle/CalleRua";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
 import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
 import { EDIT_DURATION, EDIT_FPS, EsquemaPip } from "./Edit/EsquemaPip";
+import { PLAYA_DURATION, PLAYA_FPS, PLAYA_H, PLAYA_W, PlayaTexto } from "./Playa/PlayaTexto";
+import { V41_DURATION, V41_FPS, V41_H, V41_W, Video41Playa } from "./Playa/Video41Playa";
 import { KitDemo } from "./KitDemo/KitDemo";
 import { TOUR_DURATION, TOUR_FPS, TourApto } from "./Tour/TourApto";
 import { UNIDAD_DURATION, UNIDAD_FPS, UnidadFlotante } from "./Unidad/UnidadFlotante";
@@ -22,6 +27,8 @@ export const RemotionRoot: React.FC = () => {
   return (
     <>
       <MyComposition />
+      <Composition id="Video41Playa" component={Video41Playa} durationInFrames={V41_DURATION} fps={V41_FPS} width={V41_W} height={V41_H} />
+      <Composition id="PlayaTexto" component={PlayaTexto} durationInFrames={PLAYA_DURATION} fps={PLAYA_FPS} width={PLAYA_W} height={PLAYA_H} />
       <Composition
         id="KitDemo"
         component={KitDemo}
@@ -46,6 +53,14 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
       />
+      <Composition id="SpotFrase3" component={SpotFrase3} durationInFrames={S3_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevo" component={SpotNuevo} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevoLateral" component={SpotNuevo} defaultProps={{ tarjeta: "lateral" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevoFinal" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevoDos" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true, dos: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
+      <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />
       <Composition
         id="CalleRail"
         component={CalleRail}

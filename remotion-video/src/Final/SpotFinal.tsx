@@ -204,3 +204,18 @@ export const SpotFinal: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// Solo la frase 3 (ella caminando → dron de la playa con las letras → ella), sin la transición de salida, para verla suelta.
+export const S3_DURATION = D(S3);
+export const SpotFrase3: React.FC = () => {
+  useFuente();
+  return (
+    <AbsoluteFill style={{ background: "#000" }}>
+      <Tramo rango={S3} muted={false}>
+        {BLOQUES.map((b) => (
+          <TextoFlotante key={b.lineas[0].texto} b={b} base={S3[0] / FINAL_FPS} />
+        ))}
+      </Tramo>
+    </AbsoluteFill>
+  );
+};

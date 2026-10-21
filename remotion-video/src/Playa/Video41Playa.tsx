@@ -18,19 +18,19 @@ export const V41_H = 1920;
 const SPOT_T0 = 5.55;
 const SPOT_OUT = 6.75;
 
-export const LogoSpot: React.FC<{ base?: number }> = ({ base = 0 }) => {
+export const LogoSpot: React.FC<{ base?: number; t0?: number; out?: number; top?: number }> = ({ base = 0, t0 = SPOT_T0, out = SPOT_OUT, top = 330 }) => {
   const frame = useCurrentFrame();
   const s = frame / V41_FPS + base;
   const ease = (k: number) => 1 - Math.pow(1 - Math.min(Math.max(k, 0), 1), 3);
   const subida = (t: number) => ease((s - t) / 0.7);
-  const sale = interpolate(s, [SPOT_OUT, SPOT_OUT + 0.3], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  if (s < SPOT_T0 || sale <= 0) return null;
+  const sale = interpolate(s, [out, out + 0.3], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  if (s < t0 || sale <= 0) return null;
   const lineas = [
-    { t: "SPOT", t0: SPOT_T0 + 0.3, size: 250, tracking: 5 },
-    { t: "335", t0: SPOT_T0 + 0.55, size: 250, tracking: 46 },
+    { t: "SPOT", t0: t0 + 0.3, size: 250, tracking: 5 },
+    { t: "335", t0: t0 + 0.55, size: 250, tracking: 46 },
   ];
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, top: 330, display: "flex", flexDirection: "column", alignItems: "center", opacity: sale }}>
+    <div style={{ position: "absolute", left: 0, right: 0, top, display: "flex", flexDirection: "column", alignItems: "center", opacity: sale }}>
       {lineas.map((l) => (
         <div key={l.t} style={{ overflow: "hidden", height: l.size * 0.84, lineHeight: 1 }}>
           <div

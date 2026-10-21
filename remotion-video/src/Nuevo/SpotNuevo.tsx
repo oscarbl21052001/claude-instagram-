@@ -1,6 +1,6 @@
 import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Freeze, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { useBebas } from "../Playa/Video41Playa";
+import { LogoSpot, useBebas } from "../Playa/Video41Playa";
 import { useKitFonts } from "../kit";
 import { CierreCta } from "./CierreCta";
 import { Subtitulos } from "./Subtitulos";
@@ -177,7 +177,7 @@ const IrisAbre: React.FC<{ v: number }> = ({ v }) => {
   );
 };
 
-export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: boolean }> = ({ tarjeta = "ninguna", cta = false, subs = false }) => {
+export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: boolean; logo?: boolean }> = ({ tarjeta = "ninguna", cta = false, subs = false, logo = false }) => {
   useBebas();
   useKitFonts();
   const f = useCurrentFrame();
@@ -220,6 +220,8 @@ export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: 
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
         </>
       )}
+      {/* logo SPOT 335 gris plano sobre el edificio: "Spot" 8,30 s · "335" 8,60 s (la voz dice "Te presento el SPOT 335") */}
+      {logo && <LogoSpot t0={7.88} out={9.2} top={110} />}
       {cta && <CierreCta />}
       {subs && <Subtitulos total={NUEVO_DURATION} />}
       {HOLD > 0 ? (

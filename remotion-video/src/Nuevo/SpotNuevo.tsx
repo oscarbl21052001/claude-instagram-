@@ -44,6 +44,12 @@ const cortes: Corte[] = [
     entra: { len: 10, fx: (s) => ({ scale: 1 + 0.35 * s, tx: 0, ty: 0, blur: 8 * s, origin: "50% 25%" }) },
   },
   {
+    // 4. Ella → dron: blur con zoom (empuje hacia ella al salir, zoom-out hasta enfocar el dron); la voz sigue
+    c: 687 + HOLD,
+    sale: { len: 8, fx: (s) => ({ scale: 1 + 0.4 * s, tx: 0, ty: 0, blur: 20 * s, origin: "50% 36%" }) },
+    entra: { len: 10, fx: (s) => ({ scale: 1 + 0.4 * s, tx: 0, ty: 0, blur: 20 * s, origin: "50% 50%" }) },
+  },
+  {
     // 5. Dron → ella: crash zoom al monumento del sol, entra con el monumento arriba y baja hacia ella
     c: 775 + HOLD,
     sale: { len: 10, fx: (s) => ({ scale: 1 + 2.2 * s, tx: 0, ty: 0, blur: 20 * s, origin: "42% 53%" }) },
@@ -67,12 +73,11 @@ const C_IRIS = 687 + HOLD;
 const IRIS_LEN = 14;
 const easeIO = Easing.inOut(Easing.cubic);
 const enLetras = (f: number) => f >= C_LETRAS && f < C_LETRAS + LETRAS_LEN;
-const enIris = (f: number) => f >= C_IRIS && f < C_IRIS + IRIS_LEN;
+const enIris = (_f: number) => false; // el iris se sustituyó por un blur normal (ver cortes)
 
 const efecto = (f: number): Fx => {
   // anticipación: ligero empuje a las letras / a su cara justo antes del corte
   if (f >= C_LETRAS - 8 && f < C_LETRAS) return { scale: 1 + 0.08 * Math.pow((f - (C_LETRAS - 8) + 1) / 8, 2), tx: 0, ty: 0, blur: 0, origin: "50% 31%" };
-  if (f >= C_IRIS - 6 && f < C_IRIS) return { scale: 1 + 0.05 * Math.pow((f - (C_IRIS - 6) + 1) / 6, 2), tx: 0, ty: 0, blur: 0, origin: "50% 31%" };
   for (const k of cortes) {
     if (f < k.c && f >= k.c - k.sale.len) return k.sale.fx(Math.pow((f - (k.c - k.sale.len) + 1) / k.sale.len, 2));
     if (f >= k.c && f < k.c + k.entra.len) return k.entra.fx(1 - easeOut((f - k.c) / k.entra.len));

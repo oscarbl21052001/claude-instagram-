@@ -30,7 +30,7 @@ def whoosh(t0, t_peak, t_end, amp, f0=300, f1=5000):
 whoosh(9.40, 9.80, 10.15, 0.060)                 # 1 edificio → ella (pausa 9,70–9,80)
 whoosh(14.28, 14.53, 14.85, 0.045, 400, 4500)    # 2 ella → calle (match cut, más sutil)
 whoosh(19.00, 19.27, 19.45, 0.055, 500, 6500)    # 3 calle → ella (whip pan; cae antes de que hable, 19,3)
-whoosh(22.62, 22.90, 23.20, 0.035, 500, 5500)    # 4 ella → dron (la voz sigue: muy bajo)
+# 4 ella → dron (22,9 s): corte limpio, sin sonido añadido
 whoosh(25.40, 25.83, 25.92, 0.060, 200, 6000)    # 5 dron → ella (crash zoom; hueco 25,6–25,85)
 # 6 ola/brisa bajo la voz al entrar en la playa
 n = int(1.5 * SR); t = np.arange(n) / SR

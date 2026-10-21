@@ -43,12 +43,7 @@ const cortes: Corte[] = [
     sale: { len: 8, fx: (s) => ({ scale: 1 + 0.35 * s, tx: 0, ty: 0, blur: 8 * s, origin: "50% 30%" }) },
     entra: { len: 10, fx: (s) => ({ scale: 1 + 0.35 * s, tx: 0, ty: 0, blur: 8 * s, origin: "50% 25%" }) },
   },
-  {
-    // 4. Ella → dron: blur con zoom (empuje hacia ella al salir, zoom-out hasta enfocar el dron); la voz sigue
-    c: 687 + HOLD,
-    sale: { len: 8, fx: (s) => ({ scale: 1 + 0.4 * s, tx: 0, ty: 0, blur: 20 * s, origin: "50% 36%" }) },
-    entra: { len: 10, fx: (s) => ({ scale: 1 + 0.4 * s, tx: 0, ty: 0, blur: 20 * s, origin: "50% 50%" }) },
-  },
+  // 4. Ella → dron (687): corte limpio, sin transición ni whoosh; la voz sigue
   {
     // 5. Dron → ella: crash zoom al monumento del sol, entra con el monumento arriba y baja hacia ella
     c: 775 + HOLD,

@@ -109,13 +109,13 @@ const Clip: React.FC = () => (
 );
 
 // ---- 3. letras que se abren ----
-const LX = 545; // centro del texto en el plano de la calle
-const LINEAS = [{ t: "350 METROS", y: 585 }, { t: "DEL MAR", y: 765 }];
+// x inicial, ancho y línea base medidos en el fotograma 577; textLength fuerza el ancho exacto de las letras de la calle
+const LINEAS = [{ t: "350 METROS", x: 130, w: 830, y: 585 }, { t: "DEL MAR", x: 262, w: 568, y: 765 }];
 const OX = 462; // punto dentro del trazo de la "M": la ampliación termina llenando la pantalla
 const OY = 505;
 const LetrasAbren: React.FC<{ v: number }> = ({ v }) => {
   const k = Math.exp(Math.log(34) * easeIO(v));
-  const calleOp = 1 - clamp01((v - 0.55) / 0.35);
+  const calleOp = 1 - clamp01((v - 0.4) / 0.3);
   const mt = `translate(${OX}px, ${OY}px) scale(${k}) translate(${-OX}px, ${-OY}px)`;
   return (
     <AbsoluteFill style={{ background: "#000" }}>
@@ -124,12 +124,15 @@ const LetrasAbren: React.FC<{ v: number }> = ({ v }) => {
           <Pleno desde={C_LETRAS - HOLD - 1} />
         </Freeze>
       </AbsoluteFill>
+      <AbsoluteFill style={{ opacity: clamp01((v - 0.55) / 0.3) }}>
+        <Pleno desde={C_LETRAS - HOLD} />
+      </AbsoluteFill>
       <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
         <defs>
           <mask id="letrasMask" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
             <g style={{ transform: mt }}>
               {LINEAS.map((l) => (
-                <text key={l.t} x={LX} y={l.y} textAnchor="middle" fontFamily="Bebas Neue" fontSize={232} fill="#fff" stroke="#fff" strokeWidth={4}>
+                <text key={l.t} x={l.x} y={l.y} textLength={l.w} lengthAdjust="spacingAndGlyphs" fontFamily="Bebas Neue" fontSize={228} fill="#fff" stroke="#fff" strokeWidth={4}>
                   {l.t}
                 </text>
               ))}

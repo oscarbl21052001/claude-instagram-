@@ -20,7 +20,7 @@ const GEOM = {
 };
 
 // cuánto se desenfoca y oscurece el fondo (solo modo "centro")
-export const fondoBlur = (f: number, modo: ModoTarjeta) => (modo === "centro" ? 14 * Easing.out(Easing.cubic)(clamp01((f - T_START) / 14)) : 0);
+export const fondoBlur = (f: number, modo: ModoTarjeta) => (modo === "centro" && f < T_END ? 14 * Easing.out(Easing.cubic)(clamp01((f - T_START) / 14)) : 0);
 export const fondoOscuro = (f: number, modo: ModoTarjeta) => (modo === "centro" ? 0.3 * clamp01((f - T_START) / 14) : 0);
 
 export const TarjetaFotos: React.FC<{ modo: ModoTarjeta }> = ({ modo }) => {

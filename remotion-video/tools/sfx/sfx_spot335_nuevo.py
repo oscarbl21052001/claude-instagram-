@@ -2,7 +2,7 @@
 import numpy as np, wave
 SR = 44100
 rng = np.random.default_rng(335)
-HOLD = 24 / 30  # el edificio se alarga 0,8 s: todo lo posterior al corte 1 se desplaza
+HOLD = 0 / 30  # segundos que se alarga el edificio (0 = sin alargar); todo lo posterior al corte 1 se desplaza
 N = int((34.2 + HOLD) * SR)
 out = np.zeros(N)
 
@@ -41,9 +41,10 @@ n = int(0.25 * SR); t = np.arange(n) / SR
 thump = np.sin(2 * np.pi * 60 * t * np.exp(-t * 6)) * np.exp(-t * 14)
 i0 = int((25.83 + HOLD) * SR); out[i0:i0 + n] += thump * 0.07
 # lecho de aire en la pausa alargada (evita silencio digital)
-n = int((HOLD + 0.1) * SR); t = np.arange(n) / SR
-lecho = sweep(pink(n), 500, 900) * np.minimum(1, np.minimum(t / 0.1, (n / SR - t) / 0.1)); lecho /= np.abs(lecho).max()
-i0 = int(9.75 * SR); out[i0:i0 + n] += lecho * 0.012
+if HOLD > 0:
+  n = int((HOLD + 0.1) * SR); t = np.arange(n) / SR
+  lecho = sweep(pink(n), 500, 900) * np.minimum(1, np.minimum(t / 0.1, (n / SR - t) / 0.1)); lecho /= np.abs(lecho).max()
+  i0 = int(9.75 * SR); out[i0:i0 + n] += lecho * 0.012
 out = np.clip(out, -0.9, 0.9)
 with wave.open("public/nuevo/sfx.wav", "wb") as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((out * 32767).astype("<i2").tobytes())

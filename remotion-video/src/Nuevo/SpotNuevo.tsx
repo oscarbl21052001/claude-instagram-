@@ -8,7 +8,7 @@ import { useBebas } from "../Playa/Video41Playa";
 
 export const NUEVO_FPS = 30;
 // El edificio (fotogramas 223–293) se alarga HOLD fotogramas: se mantiene el último fotograma con un empuje lento y la voz hace la pausa natural que ya tenía en 9,70–9,80 s.
-const HOLD = 24;
+const HOLD = 0; // 0 = sin alargar (la versión con 24 sonaba mal: se cortaba la voz)
 const C_EDIF = 294;
 export const NUEVO_DURATION = 1024 + HOLD;
 const W = 1080;
@@ -99,9 +99,11 @@ const Clip: React.FC = () => (
     <Sequence from={0} durationInFrames={C_EDIF} layout="none">
       <Pleno desde={0} />
     </Sequence>
-    <Sequence from={C_EDIF} durationInFrames={HOLD} layout="none">
-      <Alarga />
-    </Sequence>
+    {HOLD > 0 && (
+      <Sequence from={C_EDIF} durationInFrames={HOLD} layout="none">
+        <Alarga />
+      </Sequence>
+    )}
     <Sequence from={C_EDIF + HOLD} layout="none">
       <Pleno desde={C_EDIF} />
     </Sequence>
@@ -209,12 +211,18 @@ export const SpotNuevo: React.FC = () => {
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
         </>
       )}
-      <Sequence from={0} durationInFrames={C_EDIF - 1} layout="none">
-        <Audio src={staticFile("nuevo/voz.m4a")} volume={(f) => Math.min(1, (C_EDIF - 2 - f) / 2 + 0.0001)} />
-      </Sequence>
-      <Sequence from={C_EDIF - 1 + HOLD} layout="none">
-        <Audio src={staticFile("nuevo/voz.m4a")} trimBefore={C_EDIF - 1} volume={(f) => Math.min(1, f / 2)} />
-      </Sequence>
+      {HOLD > 0 ? (
+        <>
+          <Sequence from={0} durationInFrames={C_EDIF - 1} layout="none">
+            <Audio src={staticFile("nuevo/voz.m4a")} volume={(f) => Math.min(1, (C_EDIF - 2 - f) / 2 + 0.0001)} />
+          </Sequence>
+          <Sequence from={C_EDIF - 1 + HOLD} layout="none">
+            <Audio src={staticFile("nuevo/voz.m4a")} trimBefore={C_EDIF - 1} volume={(f) => Math.min(1, f / 2)} />
+          </Sequence>
+        </>
+      ) : (
+        <Audio src={staticFile("nuevo/voz.m4a")} />
+      )}
       <Audio src={staticFile("nuevo/sfx.m4a")} />
     </AbsoluteFill>
   );

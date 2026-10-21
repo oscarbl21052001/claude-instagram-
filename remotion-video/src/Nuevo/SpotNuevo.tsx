@@ -4,6 +4,7 @@ import { LogoSpot, useBebas } from "../Playa/Video41Playa";
 import { useKitFonts } from "../kit";
 import { CierreCta } from "./CierreCta";
 import { Subtitulos } from "./Subtitulos";
+import { DosTarjetas } from "./DosTarjetas";
 import { ModoTarjeta, OscurecerFondo, TarjetaFotos, fondoBlur } from "./TarjetaFotos";
 
 // Edit nuevo de SPOT 335 ("SPOT 335 VIDEO.mov", 34,13 s, 30 fps). Seis cortes con transición propia, medidos con ffmpeg (fotograma = primer fotograma de la toma nueva):
@@ -177,7 +178,7 @@ const IrisAbre: React.FC<{ v: number }> = ({ v }) => {
   );
 };
 
-export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: boolean; logo?: boolean }> = ({ tarjeta = "ninguna", cta = false, subs = false, logo = false }) => {
+export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: boolean; logo?: boolean; dos?: boolean }> = ({ tarjeta = "ninguna", cta = false, subs = false, logo = false, dos = false }) => {
   useBebas();
   useKitFonts();
   const f = useCurrentFrame();
@@ -216,6 +217,7 @@ export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: 
       <OscurecerFondo modo={tarjeta} />
       <AbsoluteFill style={{ ...(activo ? capa(0) : {}), filter: x.blur > 0.3 ? `blur(${x.blur}px)` : undefined }}>
         <TarjetaFotos modo={tarjeta} />
+        {dos && <DosTarjetas />}
       </AbsoluteFill>
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
         </>

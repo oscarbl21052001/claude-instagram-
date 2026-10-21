@@ -57,6 +57,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SpotNuevo" component={SpotNuevo} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotNuevoLateral" component={SpotNuevo} defaultProps={{ tarjeta: "lateral" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotNuevoFinal" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SpotNuevoDos" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true, dos: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />

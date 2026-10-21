@@ -10,6 +10,7 @@ export type SubeConfig = {
   destino: { x: number; y: number; w: number; h: number }; // rectángulo de la textura en pantalla (px de 1080x1920)
   capas: number; // capas del volumen
   paso: [number, number]; // desplazamiento en pantalla entre capas (px)
+  atraviesa?: { desde: number; hasta: number; centro: [number, number]; escala: number }; // al final la cámara atraviesa el texto (crece y se funde)
 };
 
 type P = [number, number];
@@ -52,8 +53,9 @@ export const SubeTexto: React.FC<{
   texH: number;
   lineas: string[];
   fontSize: number;
-}> = ({ sube, matrices, texW, texH, lineas, fontSize }) => {
-  const frame = useCurrentFrame();
+  frameOffset?: number; // para continuar el texto en la secuencia siguiente
+}> = ({ sube, matrices, texW, texH, lineas, fontSize, frameOffset = 0 }) => {
+  const frame = useCurrentFrame() + frameOffset;
   if (frame < sube.desde - 1) return null;
   const m = matrices[Math.min(frame, matrices.length - 1)];
   const p = interpolate(frame, [sube.desde, sube.hasta], [0, 1], {
@@ -118,5 +120,22 @@ export const SubeTexto: React.FC<{
       </div>
     );
   });
-  return <div style={{ position: "absolute", inset: 0, opacity: entra }}>{capas}</div>;
+  // la cámara atraviesa el texto: crece alrededor del centro de la vista, se desenfoca y se funde
+  const a = sube.atraviesa;
+  const k = a ? Math.pow(interpolate(frame, [a.desde, a.hasta], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }), 1.8) : 0;
+  const escala = 1 + (a ? (a.escala - 1) * k : 0);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity: entra * (1 - Math.min(1, Math.max(0, (k - 0.55) / 0.45))),
+        transform: a ? `scale(${escala})` : undefined,
+        transformOrigin: a ? `${a.centro[0]}px ${a.centro[1]}px` : undefined,
+        filter: k > 0.05 ? `blur(${k * 14}px)` : undefined,
+      }}
+    >
+      {capas}
+    </div>
+  );
 };

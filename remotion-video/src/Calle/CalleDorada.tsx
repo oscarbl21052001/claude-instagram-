@@ -14,6 +14,7 @@ export type CalleConfig = {
   texW: number;
   texH: number;
   frames: number;
+  mapa?: number[]; // fotograma de salida -> fotograma del clip original (si el clip está retemporizado)
   pintura: { desde: number; hasta: number }; // barrido de la pintura hacia el mar (fotogramas)
   texto: { desde: number; hasta: number }; // aparición del texto en el sentido de lectura
   finEntra: { desde: number; hasta: number }; // la calle vuelve a entrar al final del giro (sin texto)
@@ -26,7 +27,7 @@ export type CalleConfig = {
 export const CalleEscena: React.FC<{ config: CalleConfig }> = ({ config: c }) => {
   useKitFonts();
   const frame = useCurrentFrame();
-  const n = String(Math.min(frame, c.frames - 1)).padStart(4, "0");
+  const n = String(c.mapa ? c.mapa[Math.min(frame, c.mapa.length - 1)] : Math.min(frame, c.frames - 1)).padStart(4, "0");
   const capa = staticFile(`${c.capas}/p_${n}.webp`);
   const ease = Easing.bezier(0.16, 1, 0.3, 1);
 

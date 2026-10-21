@@ -118,9 +118,9 @@ const Linea3D: React.FC<{ l: Linea; i: number }> = ({ l, i }) => {
   );
 };
 
-export const TextoFlotante: React.FC<{ b: Bloque }> = ({ b }) => {
+export const TextoFlotante: React.FC<{ b: Bloque; base?: number }> = ({ b, base = 0 }) => {
   const frame = useCurrentFrame();
-  const s = frame / PLAYA_FPS;
+  const s = frame / PLAYA_FPS + base; // base: segundo del vídeo origen en que empieza la secuencia
   if (s < b.t0 || s > b.t1 + 0.02) return null;
   const k = (s - b.t0) / (b.t1 - b.t0);
   const z = Z0 + (Z1 - Z0) * k; // velocidad constante

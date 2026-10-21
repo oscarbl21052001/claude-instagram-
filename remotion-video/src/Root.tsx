@@ -10,6 +10,7 @@ import { CONS_DURATION, CONS_FPS, CONS_H, CONS_W, Constructora } from "./Constru
 import { AMEN_DURATION, AMEN_FPS, AMEN_H, AMEN_W, Amenities } from "./Amenities/Amenities";
 import { ESQ_DURATION, ESQ_FPS, EsquemaPlusvalia } from "./Casa/EsquemaPlusvalia";
 import { CASA_DURATION, CASA_FPS, CasaPlusvalia } from "./Casa/CasaPlusvalia";
+import { FINAL_DURATION, FINAL_FPS, SpotFinal } from "./Final/SpotFinal";
 import { CalleRua, RUA_DURATION, RUA_FPS } from "./Calle/CalleRua";
 import { CalleRail, RAIL_DURATION, RAIL_FPS } from "./Calle/CalleRail";
 import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
@@ -51,6 +52,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
       />
+      <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />
       <Composition
         id="CalleRail"

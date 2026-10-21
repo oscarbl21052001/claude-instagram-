@@ -1,5 +1,6 @@
 import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Freeze, Sequence, staticFile, useCurrentFrame } from "remotion";
+import { useBebas } from "../Playa/Video41Playa";
 
 // Edit nuevo de SPOT 335 ("SPOT 335 VIDEO.mov", 34,13 s, 30 fps). Seis cortes con transición propia, medidos con ffmpeg (fotograma = primer fotograma de la toma nueva):
 //   294 edificio → ella · 436 ella → calle · 578 calle → ella sentada · 687 ella → dron · 775 dron → ella · 865 calle → playa
@@ -43,18 +44,6 @@ const cortes: Corte[] = [
     entra: { len: 10, fx: (s) => ({ scale: 1 + 0.35 * s, tx: 0, ty: 0, blur: 8 * s, origin: "50% 25%" }) },
   },
   {
-    // 3. Calle → ella: whip pan horizontal con arrastre de amarillo
-    c: 578 + HOLD,
-    sale: { len: 8, fx: (s) => ({ scale: 1, tx: -0.95 * W * s, ty: 0, blur: 10 * s, origin: "50% 50%", trail: [150 * s, 0], overlay: { color: "#f0b41e", o: 0.6 * s }, bg: "#c8921a" }) },
-    entra: { len: 9, fx: (s) => ({ scale: 1, tx: 0.95 * W * s, ty: 0, blur: 10 * s, origin: "50% 50%", trail: [150 * s, 0], overlay: { color: "#f0b41e", o: 0.6 * s }, bg: "#c8921a" }) },
-  },
-  {
-    // 4. Ella → dron: whip tilt hacia arriba, la voz sigue
-    c: 687 + HOLD,
-    sale: { len: 7, fx: (s) => ({ scale: 1, tx: 0, ty: -0.9 * H * s, blur: 10 * s, origin: "50% 50%", trail: [0, 200 * s], bg: "#6fb0ea" }) },
-    entra: { len: 9, fx: (s) => ({ scale: 1, tx: 0, ty: 0.9 * H * s, blur: 10 * s, origin: "50% 50%", trail: [0, 200 * s], bg: "#6fb0ea" }) },
-  },
-  {
     // 5. Dron → ella: crash zoom al monumento del sol, entra con el monumento arriba y baja hacia ella
     c: 775 + HOLD,
     sale: { len: 10, fx: (s) => ({ scale: 1 + 2.2 * s, tx: 0, ty: 0, blur: 20 * s, origin: "42% 53%" }) },
@@ -70,7 +59,20 @@ const cortes: Corte[] = [
 
 const NEUTRO: Fx = { scale: 1, tx: 0, ty: 0, blur: 0, origin: "50% 50%" };
 
+// 3. Calle → ella sentada: las letras "350 METROS DEL MAR" se abren y ella aparece a través de ellas (entrada = LETRAS_LEN fotogramas).
+// 4. Ella → dron: iris circular que se abre desde su cara y revela el dron (entrada = IRIS_LEN fotogramas); ella queda congelada durante el iris.
+const C_LETRAS = 578 + HOLD;
+const LETRAS_LEN = 16;
+const C_IRIS = 687 + HOLD;
+const IRIS_LEN = 14;
+const easeIO = Easing.inOut(Easing.cubic);
+const enLetras = (f: number) => f >= C_LETRAS && f < C_LETRAS + LETRAS_LEN;
+const enIris = (f: number) => f >= C_IRIS && f < C_IRIS + IRIS_LEN;
+
 const efecto = (f: number): Fx => {
+  // anticipación: ligero empuje a las letras / a su cara justo antes del corte
+  if (f >= C_LETRAS - 8 && f < C_LETRAS) return { scale: 1 + 0.08 * Math.pow((f - (C_LETRAS - 8) + 1) / 8, 2), tx: 0, ty: 0, blur: 0, origin: "50% 31%" };
+  if (f >= C_IRIS - 6 && f < C_IRIS) return { scale: 1 + 0.05 * Math.pow((f - (C_IRIS - 6) + 1) / 6, 2), tx: 0, ty: 0, blur: 0, origin: "50% 31%" };
   for (const k of cortes) {
     if (f < k.c && f >= k.c - k.sale.len) return k.sale.fx(Math.pow((f - (k.c - k.sale.len) + 1) / k.sale.len, 2));
     if (f >= k.c && f < k.c + k.entra.len) return k.entra.fx(1 - easeOut((f - k.c) / k.entra.len));
@@ -106,9 +108,79 @@ const Clip: React.FC = () => (
   </AbsoluteFill>
 );
 
+// ---- 3. letras que se abren ----
+const LX = 545; // centro del texto en el plano de la calle
+const LINEAS = [{ t: "350 METROS", y: 585 }, { t: "DEL MAR", y: 765 }];
+const OX = 462; // punto dentro del trazo de la "M": la ampliación termina llenando la pantalla
+const OY = 505;
+const LetrasAbren: React.FC<{ v: number }> = ({ v }) => {
+  const k = Math.exp(Math.log(34) * easeIO(v));
+  const calleOp = 1 - clamp01((v - 0.55) / 0.35);
+  const mt = `translate(${OX}px, ${OY}px) scale(${k}) translate(${-OX}px, ${-OY}px)`;
+  return (
+    <AbsoluteFill style={{ background: "#000" }}>
+      <AbsoluteFill style={{ opacity: calleOp, transform: `scale(${k})`, transformOrigin: `${OX}px ${OY}px` }}>
+        <Freeze frame={0}>
+          <Pleno desde={C_LETRAS - HOLD - 1} />
+        </Freeze>
+      </AbsoluteFill>
+      <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
+        <defs>
+          <mask id="letrasMask" maskUnits="userSpaceOnUse" x={0} y={0} width={W} height={H}>
+            <g style={{ transform: mt }}>
+              {LINEAS.map((l) => (
+                <text key={l.t} x={LX} y={l.y} textAnchor="middle" fontFamily="Bebas Neue" fontSize={232} fill="#fff" stroke="#fff" strokeWidth={4}>
+                  {l.t}
+                </text>
+              ))}
+            </g>
+          </mask>
+        </defs>
+        <foreignObject x={0} y={0} width={W} height={H} mask="url(#letrasMask)">
+          <div style={{ width: W, height: H, position: "relative" }}>
+            <Pleno desde={C_LETRAS - HOLD} />
+          </div>
+        </foreignObject>
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
+// ---- 4. iris ----
+const IrisAbre: React.FC<{ v: number }> = ({ v }) => {
+  const r = 1500 * easeIO(v);
+  const cx = 0.5 * W;
+  const cy = 0.31 * H;
+  return (
+    <AbsoluteFill style={{ background: "#000" }}>
+      <AbsoluteFill style={{ transform: `scale(${1.05 + 0.04 * v})`, transformOrigin: "50% 31%", filter: `blur(${3 * v}px)` }}>
+        <Freeze frame={0}>
+          <Pleno desde={C_IRIS - HOLD - 1} />
+        </Freeze>
+      </AbsoluteFill>
+      <AbsoluteFill style={{ clipPath: `circle(${r}px at ${cx}px ${cy}px)` }}>
+        <Pleno desde={C_IRIS - HOLD} />
+      </AbsoluteFill>
+      <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#fff" strokeWidth={5} opacity={0.75 * (1 - clamp01((v - 0.6) / 0.4))} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
 export const SpotNuevo: React.FC = () => {
+  useBebas();
   const f = useCurrentFrame();
   const x = efecto(f);
+  const especial = enLetras(f) ? (
+    <Sequence from={C_LETRAS} layout="none">
+      <LetrasAbren v={(f - C_LETRAS) / LETRAS_LEN} />
+    </Sequence>
+  ) : enIris(f) ? (
+    <Sequence from={C_IRIS} layout="none">
+      <IrisAbre v={(f - C_IRIS) / IRIS_LEN} />
+    </Sequence>
+  ) : null;
   const activo = x !== NEUTRO;
   const copias = x.blur > 0.5 ? [1, 2, 3, 4] : [];
   const tr = x.trail ?? [0, 0];
@@ -121,6 +193,8 @@ export const SpotNuevo: React.FC = () => {
   };
   return (
     <AbsoluteFill style={{ background: x.bg ?? "#000", overflow: "hidden" }}>
+      {especial ?? (
+        <>
       <AbsoluteFill style={{ ...(activo ? capa(0) : {}), filter: x.blur > 0.3 ? `blur(${x.blur}px)` : undefined }}>
         <Clip />
       </AbsoluteFill>
@@ -130,6 +204,8 @@ export const SpotNuevo: React.FC = () => {
         </AbsoluteFill>
       ))}
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
+        </>
+      )}
       <Sequence from={0} durationInFrames={C_EDIF - 1} layout="none">
         <Audio src={staticFile("nuevo/voz.m4a")} volume={(f) => Math.min(1, (C_EDIF - 2 - f) / 2 + 0.0001)} />
       </Sequence>

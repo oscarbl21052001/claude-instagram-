@@ -45,6 +45,16 @@ if HOLD > 0:
   n = int((HOLD + 0.1) * SR); t = np.arange(n) / SR
   lecho = sweep(pink(n), 500, 900) * np.minimum(1, np.minimum(t / 0.1, (n / SR - t) / 0.1)); lecho /= np.abs(lecho).max()
   i0 = int(9.75 * SR); out[i0:i0 + n] += lecho * 0.012
+# CTA final: teclas suaves mientras se teclea "INVERTÍ AHORA" (29,05–30,0 s), clic al pulsar ENVIAR (31,5 s) y campanita al pasar a ENVIADO
+def tick(t0, amp, ms=14):
+    n = int(ms / 1000 * SR); x = rng.standard_normal(n) * np.exp(-np.arange(n) / (n / 4)); x = x - sweep(x, 900, 900)
+    i0 = int((t0 + HOLD) * SR); out[i0:i0 + n] += x / (np.abs(x).max() + 1e-9) * amp
+for k in range(13):
+    tick(29.05 + k * (0.95 / 13), 0.028)
+tick(31.5, 0.07, 22)
+n = int(0.5 * SR); t = np.arange(n) / SR
+camp = (np.sin(2 * np.pi * 1320 * t) + 0.5 * np.sin(2 * np.pi * 1980 * t)) * np.exp(-t * 7)
+i0 = int((31.55 + HOLD) * SR); out[i0:i0 + n] += camp / 1.5 * 0.035
 out = np.clip(out, -0.9, 0.9)
 with wave.open("public/nuevo/sfx.wav", "wb") as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((out * 32767).astype("<i2").tobytes())

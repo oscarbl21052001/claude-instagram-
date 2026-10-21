@@ -1,6 +1,9 @@
 import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, Easing, Freeze, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { useBebas } from "../Playa/Video41Playa";
+import { useKitFonts } from "../kit";
+import { CierreCta } from "./CierreCta";
+import { Subtitulos } from "./Subtitulos";
 import { ModoTarjeta, OscurecerFondo, TarjetaFotos, fondoBlur } from "./TarjetaFotos";
 
 // Edit nuevo de SPOT 335 ("SPOT 335 VIDEO.mov", 34,13 s, 30 fps). Seis cortes con transición propia, medidos con ffmpeg (fotograma = primer fotograma de la toma nueva):
@@ -174,8 +177,9 @@ const IrisAbre: React.FC<{ v: number }> = ({ v }) => {
   );
 };
 
-export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta }> = ({ tarjeta = "ninguna" }) => {
+export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta; cta?: boolean; subs?: boolean }> = ({ tarjeta = "ninguna", cta = false, subs = false }) => {
   useBebas();
+  useKitFonts();
   const f = useCurrentFrame();
   const x = efecto(f);
   const especial = enLetras(f) ? (
@@ -216,6 +220,8 @@ export const SpotNuevo: React.FC<{ tarjeta?: ModoTarjeta }> = ({ tarjeta = "ning
       {x.overlay && x.overlay.o > 0.01 && <AbsoluteFill style={{ background: x.overlay.color, opacity: x.overlay.o }} />}
         </>
       )}
+      {cta && <CierreCta />}
+      {subs && <Subtitulos total={NUEVO_DURATION} />}
       {HOLD > 0 ? (
         <>
           <Sequence from={0} durationInFrames={C_EDIF - 1} layout="none">

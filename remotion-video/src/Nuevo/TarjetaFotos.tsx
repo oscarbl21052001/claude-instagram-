@@ -16,7 +16,7 @@ export const T_END = 865; // corte a la playa (28,83 s): la tarjeta sale con el 
 
 const GEOM = {
   lateral: { x: 650, y: 90, w: 390, h: 650, rotY: -8, rotZ: 0.5, radius: 44, gap: 14, pad: 22 },
-  centro: { x: 110, y: 230, w: 860, h: 1460, rotY: -8, rotZ: 0.5, radius: 64, gap: 22, pad: 22 },
+  centro: { x: 110, y: 205, w: 860, h: 1460, rotY: -8, rotZ: 0.5, radius: 64, gap: 22, pad: 22 },
 };
 
 // cuánto se desenfoca y oscurece el fondo (solo modo "centro")

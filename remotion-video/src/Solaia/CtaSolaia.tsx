@@ -30,7 +30,7 @@ export const CtaSolaia: React.FC = () => {
   if (f < T(CTA.entra)) return null;
   return (
     <AbsoluteFill>
-      <div style={{ position: "absolute", left: 60, top: 880, width: 960, height: 230, opacity: clamp01(p * 2), transform: `translateY(${(1 - p) * 34}px)`, filter: `blur(${(1 - p) * 10}px)` }}>
+      <div style={{ position: "absolute", left: 60, top: 250, width: 960, height: 190, opacity: clamp01(p * 2), transform: `translateY(${(1 - p) * 34}px)`, filter: `blur(${(1 - p) * 10}px)` }}>
         <div
           style={{
             boxSizing: "border-box",
@@ -40,16 +40,16 @@ export const CtaSolaia: React.FC = () => {
             height: "100%",
             borderRadius: 44,
             border: "6px solid transparent",
-            background: `linear-gradient(180deg, #2B2B2B 0%, ${INK} 100%) padding-box, ${GOLD} border-box`,
-            boxShadow: "0 30px 70px rgba(70,44,18,0.45)",
+            background: `linear-gradient(180deg, #d0663a 0%, #a8431f 100%) padding-box, ${GOLD} border-box`,
+            boxShadow: "0 20px 50px rgba(70,44,18,0.4)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#C7AE6A" }}>{CTA.eyebrow}</div>
-          <div style={{ fontFamily: "Bebas Neue", fontSize: 92, letterSpacing: 5, lineHeight: 1, color: "#F4EAD3", marginTop: 8, whiteSpace: "nowrap" }}>
+          <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, letterSpacing: 7, color: "#F3EBB6" }}>{CTA.eyebrow}</div>
+          <div style={{ fontFamily: "Bebas Neue", fontSize: 92, letterSpacing: 5, lineHeight: 1, color: "#FFF6E4", marginTop: 4, whiteSpace: "nowrap" }}>
             <span>{CTA.texto.slice(0, n)}</span>
             <span style={{ display: "inline-block", width: 6, height: 76, marginLeft: 2, marginRight: -9, transform: "translateY(10px)", background: "#E2A826", opacity: n >= CTA.texto.length && f > T(CTA.tecleaB) + 20 ? 0 : Math.sin((f / FPS) * 14) > -0.3 ? 1 : 0 }} />
             <span style={{ opacity: 0 }}>{CTA.texto.slice(n)}</span>
@@ -64,14 +64,14 @@ export const CtaSolaia: React.FC = () => {
           style={{
             position: "absolute",
             left: 540 - 260,
-            top: 1150,
+            top: 1560,
             width: 520,
             height: 78,
             opacity: clamp01(q * 2),
             transform: `translateY(${(1 - q) * 24}px) scale(${1 - 0.06 * press})`,
             borderRadius: 39,
             border: "4px solid #C7AE6A",
-            background: sent > 0.5 ? GOLD : INK,
+            background: sent > 0.5 ? GOLD : "linear-gradient(180deg, #d0663a 0%, #a8431f 100%)",
             color: sent > 0.5 ? INK : "#F4EAD3",
             display: "flex",
             alignItems: "center",

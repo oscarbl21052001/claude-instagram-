@@ -61,6 +61,8 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SpotNuevoDos" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true, dos: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SolaiaA" component={SolaiaIntro} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SolaiaB" component={SolaiaIntro} defaultProps={{ calendario: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSerif" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "serif" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBPoppins" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />

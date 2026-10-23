@@ -1,5 +1,7 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, Easing, Img, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { loadFont } from "@remotion/fonts";
+import { useEffect, useState } from "react";
+import { AbsoluteFill, Easing, Img, continueRender, delayRender, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { useBebas } from "../Playa/Video41Playa";
 import { useKitFonts } from "../kit";
 
@@ -14,6 +16,26 @@ export const SOLAIA_DURATION = Math.round(27.34 * FPS);
 const GOLD = "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)";
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const easeOut = Easing.out(Easing.cubic);
+
+export type EstiloSolaia = "base" | "serif" | "poppins";
+// tipografía y color del texto de las tarjetas y del sello (prueba de Oscar: otra tipografía y otro color)
+const ESTILOS = {
+  base: { num: "Bebas Neue", numW: 400, numSize: 150, numStyle: "normal", lab: "Bebas Neue", labW: 400, labSize: 54, labLs: 8, ink: "#4a2e1a", acento: "#9a7a2e", sello: GOLD, selloInk: "#2a1d08" },
+  serif: { num: "Playfair Display", numW: 500, numSize: 132, numStyle: "italic", lab: "Playfair Display", labW: 500, labSize: 34, labLs: 6, ink: "#14455c", acento: "#b08a3a", sello: GOLD, selloInk: "#14455c" },
+  poppins: { num: "Poppins", numW: 800, numSize: 118, numStyle: "normal", lab: "Poppins", labW: 800, labSize: 28, labLs: 7, ink: "#c2562f", acento: "#8a5a2b", sello: "linear-gradient(135deg,#c2562f,#e07a4d)", selloInk: "#FFF6E4" },
+} as const;
+const EstiloCtx = { actual: "base" as EstiloSolaia };
+const useEstilo = () => ESTILOS[EstiloCtx.actual];
+
+const useFuentesSolaia = () => {
+  const [handle] = useState(() => delayRender("Cargando tipografías de SOLAIA"));
+  useEffect(() => {
+    Promise.all([
+      loadFont({ family: "Playfair Display", url: staticFile("fonts/PlayfairDisplay-MediumItalic.woff2"), weight: "500", style: "italic" }),
+      loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-ExtraBold.woff2"), weight: "800" }),
+    ]).then(() => continueRender(handle));
+  }, [handle]);
+};
 
 const A = { izq: 0.8, der: 2.45, sello: 4.15, sale: 5.72 }; // segundos
 const W = 440;
@@ -44,7 +66,7 @@ const Placa: React.FC<{ lado: "izq" | "der"; desde: number; children: React.Reac
             boxShadow: "0 22px 54px rgba(60,40,15,0.38)",
             overflow: "hidden",
             position: "relative",
-            color: "#4a2e1a",
+            color: useEstilo().ink,
             padding: "22px 26px",
           }}
         >
@@ -59,14 +81,15 @@ const Cifra: React.FC<{ desde: number; hasta: number; objetivo: number; sufijo?:
   const f = useCurrentFrame();
   const k = clamp01((f - T(desde)) / (T(hasta) - T(desde))); // lineal: cada número se ve
   const kk = easeOut(clamp01((f - T(desde) - 4) / 12));
+  const e = useEstilo();
   return (
     <>
-      <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 22, letterSpacing: 7, color: "#9a7a2e", opacity: kk }}>{chico}</div>
-      <div style={{ fontFamily: "Bebas Neue", fontSize: 150, lineHeight: 1, letterSpacing: 2, marginTop: 4, display: "flex", alignItems: "baseline", gap: 6, opacity: kk }}>
+      <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 22, letterSpacing: 7, color: e.acento, opacity: kk }}>{chico}</div>
+      <div style={{ fontFamily: e.num, fontWeight: e.numW, fontStyle: e.numStyle, fontSize: e.numSize, lineHeight: 1.05, letterSpacing: 2, marginTop: 4, display: "flex", alignItems: "baseline", gap: 6, opacity: kk }}>
         <span style={{ fontVariantNumeric: "tabular-nums" }}>{Math.round(objetivo * k)}</span>
-        {sufijo && <span style={{ color: "#9a7a2e", fontSize: 100 }}>{sufijo}</span>}
+        {sufijo && <span style={{ color: e.acento, fontSize: e.numSize * 0.66 }}>{sufijo}</span>}
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 16, textAlign: "center", fontFamily: "Bebas Neue", fontSize: 54, letterSpacing: 8, lineHeight: 1, opacity: kk }}>{etiqueta}</div>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 16, textAlign: "center", fontFamily: e.lab, fontWeight: e.labW, fontStyle: e.numStyle, fontSize: e.labSize, letterSpacing: e.labLs, lineHeight: 1, opacity: kk }}>{etiqueta}</div>
     </>
   );
 };
@@ -77,17 +100,18 @@ const Sello: React.FC<{ top: number }> = ({ top }) => {
   const fin = T(A.sale);
   if (f < T(A.sello) || f >= fin + 12) return null;
   const p = Math.min(spring({ frame: f - T(A.sello), fps, config: { damping: 14, stiffness: 140 } }), 1.15);
+  const e = useEstilo();
   const out = easeOut(clamp01((f - fin) / 9));
   return (
     <div style={{ position: "absolute", left: 0, right: 0, top, display: "flex", justifyContent: "center", opacity: clamp01(p * 2) * (1 - out), transform: `translateY(${out * 40}px) scale(${0.8 + 0.2 * p})` }}>
-      <div style={{ padding: "12px 36px", borderRadius: 999, background: GOLD, color: "#2a1d08", fontFamily: "Bebas Neue", fontSize: 50, letterSpacing: 6, lineHeight: 1.1, boxShadow: "0 12px 34px rgba(0,0,0,0.45)" }}>✓ UNIDAD ASEGURADA</div>
+      <div style={{ padding: "12px 36px", borderRadius: 999, background: e.sello, color: e.selloInk, fontFamily: e.lab, fontWeight: e.labW, fontStyle: e.numStyle, fontSize: e.lab === "Bebas Neue" ? 50 : 34, letterSpacing: e.labLs, lineHeight: 1.25, boxShadow: "0 12px 34px rgba(0,0,0,0.45)" }}>✓ UNIDAD ASEGURADA</div>
     </div>
   );
 };
 
 // barra de pago en 3D: un tramo corto para el anticipo (12 %) y 6 bloques de 12 cuotas (72); inclinada hacia atrás, con grosor y sombra.
 // Va detrás de ella: la persona recortada se pinta encima.
-const BARRA_TOP = 790;
+const BARRA_TOP = 700;
 const Barra: React.FC = () => {
   const f = useCurrentFrame();
   const fin = T(A.sale);
@@ -144,9 +168,11 @@ const Recorte: React.FC = () => {
   return <Img src={staticFile(`solaia/cut/c${String(f).padStart(4, "0")}.png`)} style={{ position: "absolute", left: 0, top: 560, width: 1080, height: 1360 }} />;
 };
 
-export const SolaiaIntro: React.FC<{ calendario?: boolean }> = ({ calendario = false }) => {
+export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia }> = ({ calendario = false, estilo = "base" }) => {
+  EstiloCtx.actual = estilo;
   useBebas();
   useKitFonts();
+  useFuentesSolaia();
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <Video src={staticFile("solaia/solaia.mp4")} />

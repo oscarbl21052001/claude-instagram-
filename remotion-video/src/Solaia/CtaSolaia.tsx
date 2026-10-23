@@ -30,7 +30,7 @@ export const CtaSolaia: React.FC = () => {
   if (f < T(CTA.entra)) return null;
   return (
     <AbsoluteFill>
-      <div style={{ position: "absolute", left: 60, top: 250, width: 960, height: 230, opacity: clamp01(p * 2), transform: `translateY(${(1 - p) * 34}px)`, filter: `blur(${(1 - p) * 10}px)` }}>
+      <div style={{ position: "absolute", left: 60, top: 880, width: 960, height: 230, opacity: clamp01(p * 2), transform: `translateY(${(1 - p) * 34}px)`, filter: `blur(${(1 - p) * 10}px)` }}>
         <div
           style={{
             boxSizing: "border-box",
@@ -64,7 +64,7 @@ export const CtaSolaia: React.FC = () => {
           style={{
             position: "absolute",
             left: 540 - 260,
-            top: 520,
+            top: 1150,
             width: 520,
             height: 78,
             opacity: clamp01(q * 2),

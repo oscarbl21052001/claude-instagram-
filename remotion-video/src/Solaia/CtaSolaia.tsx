@@ -9,7 +9,7 @@ const T = (s: number) => Math.round(s * FPS);
 const GOLD = "linear-gradient(135deg, #8f7138 0%, #C7AE6A 28%, #F3EBB6 50%, #C7AE6A 72%, #8f7138 100%)";
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
-export const CTA = { entra: 23.95, tecleaA: 24.1, tecleaB: 25.5, llega: 25.6, pulsa: 26.6, texto: "TU LUGAR EN BOMBINHAS", eyebrow: "SOLAIA" };
+export const CTA = { entra: 23.95, tecleaA: 24.1, tecleaB: 25.5, llega: 25.3, pulsa: 26.2, texto: "TU LUGAR EN BOMBINHAS", eyebrow: "SOLAIA" };
 
 const useSpr = (startS: number, damping = 20, stiffness = 90) => {
   const f = useCurrentFrame();

@@ -21,6 +21,9 @@ Todos son públicos y están en la cuenta `oscarbl21052001`. Para leerlos: `GIT_
 | `VisionDepth3D` | Suite para convertir vídeo 2D a 3D con profundidad por IA (VR/estéreo). | Idea: versiones 3D o con profundidad. Programa de escritorio, no se ejecuta aquí. |
 | `tribev2` | Modelo (Meta) que predice la respuesta cerebral a vídeo, audio y texto. | Licencia CC BY-NC (no comercial). No lo he ejecutado; valorar antes de prometer nada con él. |
 | `Agent-Reach` | Herramienta para dar a un agente acceso a internet y redes sociales. | Útil para investigar tendencias y referencias. README en chino, hay versión en inglés en `docs/README_en.md`. |
+| `motion-skills` | Índice de 55 skills de motion graphics en 18 packs (TikTok/Reels, anuncios, e-commerce, datos, tipografía en movimiento, lower thirds, b-roll, mapas...). | Solo trae el índice: los packs viven en `iart-ai/<pack>` (fuera de esta cuenta). Los más útiles: tiktok-video-skills, ad-video-skills, b-roll-skills. |
+| `lottie` | Skill `text-to-lottie`: genera animaciones Lottie desde texto, con reproductor en vivo. | Para iconos, logos y trazos animados ligeros; no para montaje con footage. Leer `skills/text-to-lottie/SKILL.md`. |
+| `motion-canvas` | Librería TypeScript para programar animaciones vectoriales con editor de vista previa y sincronía con locución. | Para explainers y diagramas; para los edits de SPOT 335 seguimos con Remotion. |
 | `blender`, `TripoSR`, `Trellis-3D`, `Meshy-guide` | Blender y herramientas de imagen a 3D. | Ideas con elementos 3D. |
 
 No incluidos por no tratar de vídeo: `WEB`, `WEB-1`, `humanizer`.

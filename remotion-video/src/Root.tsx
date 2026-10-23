@@ -63,6 +63,12 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SolaiaB" component={SolaiaIntro} defaultProps={{ calendario: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SolaiaBSerif" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "serif" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SolaiaBPoppins" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaASin" component={SolaiaIntro} defaultProps={{ estilo: "poppins" as const, sinTarjeta: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSin" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSombra" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "sombra" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBContorno" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "contorno" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBHalo" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "halo" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBValla" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "valla" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />

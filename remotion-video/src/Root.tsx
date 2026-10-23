@@ -1,3 +1,6 @@
+import { PalabrasClave, KW_DURATION } from "./Solaia/PalabrasClave";
+import { SolaiaCompleto } from "./Solaia/SolaiaCompleto";
+import { SolaiaIntro, SOLAIA_DURATION } from "./Solaia/SolaiaIntro";
 import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
 import { CONTACTAR_DURATION, CONTACTAR_FPS, Contactanos } from "./Contactar/Contactanos";
@@ -58,6 +61,23 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SpotNuevoLateral" component={SpotNuevo} defaultProps={{ tarjeta: "lateral" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotNuevoFinal" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotNuevoDos" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const, cta: true, subs: true, logo: true, dos: true }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
+      <Composition id="SolaiaA" component={SolaiaIntro} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaB" component={SolaiaIntro} defaultProps={{ calendario: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSerif" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "serif" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBPoppins" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaASin" component={SolaiaIntro} defaultProps={{ estilo: "poppins" as const, sinTarjeta: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSin" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBSombra" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "sombra" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBContorno" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "contorno" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBHalo" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "halo" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBValla" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "valla" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBLineaContorno" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "contorno" as const, enLinea: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaBLineaHalo" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "halo" as const, enLinea: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw1" component={PalabrasClave} defaultProps={{ estilo: 1 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw2" component={PalabrasClave} defaultProps={{ estilo: 2 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw3" component={PalabrasClave} defaultProps={{ estilo: 3 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw4" component={PalabrasClave} defaultProps={{ estilo: 4 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaCompleto" component={SolaiaCompleto} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />

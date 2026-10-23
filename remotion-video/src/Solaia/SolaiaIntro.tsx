@@ -46,7 +46,7 @@ const contorno = (r: number) =>
   `, 0 ${r * 1.6}px ${r * 3.5}px rgba(50,25,8,0.5)`;
 const useEstilo = () => ESTILOS[EstiloCtx.actual];
 
-const useFuentesSolaia = () => {
+export const useFuentesSolaia = () => {
   const [handle] = useState(() => delayRender("Cargando tipografías de SOLAIA"));
   useEffect(() => {
     Promise.all([

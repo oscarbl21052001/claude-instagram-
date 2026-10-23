@@ -1,3 +1,4 @@
+import { PalabrasClave, KW_DURATION } from "./Solaia/PalabrasClave";
 import { SolaiaIntro, SOLAIA_DURATION } from "./Solaia/SolaiaIntro";
 import { Composition } from "remotion";
 import { MyComposition } from "./Composition";
@@ -71,6 +72,10 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SolaiaBValla" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "valla" as const }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SolaiaBLineaContorno" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "contorno" as const, enLinea: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SolaiaBLineaHalo" component={SolaiaIntro} defaultProps={{ calendario: true, estilo: "poppins" as const, sinTarjeta: true, variante: "halo" as const, enLinea: true }} durationInFrames={SOLAIA_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw1" component={PalabrasClave} defaultProps={{ estilo: 1 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw2" component={PalabrasClave} defaultProps={{ estilo: 2 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw3" component={PalabrasClave} defaultProps={{ estilo: 3 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="SolaiaKw4" component={PalabrasClave} defaultProps={{ estilo: 4 as const }} durationInFrames={KW_DURATION} fps={30} width={1080} height={1920} />
       <Composition id="SpotNuevoCentro" component={SpotNuevo} defaultProps={{ tarjeta: "centro" as const }} durationInFrames={NUEVO_DURATION} fps={NUEVO_FPS} width={1080} height={1920} />
       <Composition id="SpotFinal" component={SpotFinal} durationInFrames={FINAL_DURATION} fps={FINAL_FPS} width={1080} height={1920} />
       <Composition id="CalleRua" component={CalleRua} durationInFrames={RUA_DURATION} fps={RUA_FPS} width={1080} height={1920} />

@@ -187,7 +187,47 @@ const Recorte: React.FC = () => {
   return <Img src={staticFile(`solaia/cut/c${String(f).padStart(4, "0")}.png`)} style={{ position: "absolute", left: 0, top: 560, width: 1080, height: 1360 }} />;
 };
 
-export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia; sinTarjeta?: boolean; variante?: VarianteTexto }> = ({ calendario = false, estilo = "base", sinTarjeta = false, variante = "contorno" }) => {
+// formato en línea: "12 % ANTICIPO" y, al decir "72 veces", sube y se añade "HASTA 72 CUOTAS" debajo; palabras grandes, sin tarjeta.
+const Linea: React.FC = () => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const fin = T(A.sale);
+  if (f < T(A.izq) || f >= fin + 12) return null;
+  const e = useEstilo();
+  const out = easeOut(clamp01((f - fin) / 9));
+  const e1 = Math.min(spring({ frame: f - T(A.izq), fps, config: { damping: 18, stiffness: 80 } }), 1);
+  const e2 = Math.min(spring({ frame: f - T(A.der), fps, config: { damping: 18, stiffness: 80 } }), 1);
+  const sube = easeOut(clamp01((f - T(2.4)) / T(0.5)));
+  const k12 = clamp01((f - T(0.9)) / T(0.8));
+  const k72 = clamp01((f - T(2.6)) / T(1.4));
+  const fila = (top: number, lado: -1 | 1, ent: number, hijos: React.ReactNode) => (
+    <div style={{ position: "absolute", left: 0, right: 0, top, display: "flex", justifyContent: "center", perspective: 1800, opacity: clamp01(ent * 2.2) * (1 - out) }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap", fontFamily: e.num, fontWeight: e.numW, color: e.ink, lineHeight: 1.05, transform: `translateX(${lado * ((1 - ent) * 700 + out * 700)}px) rotateY(${-lado * 8 * (1 - ent)}deg)` }}>{hijos}</div>
+    </div>
+  );
+  const grande = { fontSize: 136, letterSpacing: 2, fontVariantNumeric: "tabular-nums" as const, textShadow: legible(6) };
+  const palabra = { fontSize: 92, letterSpacing: 5, textShadow: legible(4.5) };
+  return (
+    <>
+      {fila(330 - 80 * sube, -1, e1, (
+        <>
+          <span style={grande}>{Math.round(12 * k12)}</span>
+          <span style={{ ...palabra, fontSize: 90, color: e.acento }}>%</span>
+          <span style={palabra}>ANTICIPO</span>
+        </>
+      ))}
+      {fila(400, 1, e2, (
+        <>
+          <span style={{ ...palabra, fontSize: 50, color: e.acento }}>HASTA</span>
+          <span style={grande}>{Math.round(72 * k72)}</span>
+          <span style={palabra}>CUOTAS</span>
+        </>
+      ))}
+    </>
+  );
+};
+
+export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia; sinTarjeta?: boolean; variante?: VarianteTexto; enLinea?: boolean }> = ({ calendario = false, estilo = "base", sinTarjeta = false, variante = "contorno", enLinea = false }) => {
   EstiloCtx.vari = variante;
   EstiloCtx.actual = estilo;
   EstiloCtx.sin = sinTarjeta;
@@ -199,12 +239,18 @@ export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia
       <Video src={staticFile("solaia/solaia.mp4")} />
       {calendario && <Barra />}
       {calendario && <Recorte />}
+      {enLinea ? (
+        <Linea />
+      ) : (
+        <>
       <Placa lado="izq" desde={A.izq}>
         <Cifra desde={A.izq + 0.1} hasta={1.7} objetivo={12} sufijo="%" etiqueta="ANTICIPO" chico="SOLAIA" />
       </Placa>
       <Placa lado="der" desde={A.der}>
         <Cifra desde={A.der + 0.1} hasta={4.0} objetivo={72} etiqueta="CUOTAS" chico="HASTA" />
       </Placa>
+        </>
+      )}
       <Sello top={590} />
     </AbsoluteFill>
   );

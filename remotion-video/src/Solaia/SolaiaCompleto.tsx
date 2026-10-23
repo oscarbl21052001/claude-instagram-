@@ -1,5 +1,6 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, Sequence, staticFile } from "remotion";
+import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
+import { CtaSolaia } from "./CtaSolaia";
 import { KW_DURATION, PalabrasClave } from "./PalabrasClave";
 import { SOLAIA_DURATION, SolaiaIntro } from "./SolaiaIntro";
 
@@ -12,5 +13,7 @@ export const SolaiaCompleto: React.FC = () => (
     <Sequence from={Math.round(11.5 * 30)} durationInFrames={KW_DURATION} layout="none">
       <PalabrasClave estilo={4} sinVideo />
     </Sequence>
+    <CtaSolaia />
+    <Audio src={staticFile("solaia/sfx_cta.wav")} />
   </AbsoluteFill>
 );

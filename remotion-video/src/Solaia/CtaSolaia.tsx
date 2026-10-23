@@ -18,7 +18,9 @@ const useSpr = (startS: number, damping = 20, stiffness = 90) => {
   return spring({ frame: f - T(startS), fps, config: { damping, stiffness } });
 };
 
-export const CtaSolaia: React.FC = () => {
+const BOTON_POS = { 1: { left: 280, top: 462 }, 2: { left: 280, top: 401 }, 3: { left: 500, top: 462 } } as const;
+
+export const CtaSolaia: React.FC<{ opcion?: 1 | 2 | 3 }> = ({ opcion }) => {
   useBebas();
   const f = useCurrentFrame();
   const p = Math.min(useSpr(CTA.entra, 22, 100), 1);
@@ -63,8 +65,8 @@ export const CtaSolaia: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: 540 - 260,
-            top: 1560,
+            left: opcion ? BOTON_POS[opcion].left : 540 - 260,
+            top: opcion ? BOTON_POS[opcion].top : 1560,
             width: 520,
             height: 78,
             opacity: clamp01(q * 2),

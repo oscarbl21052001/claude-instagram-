@@ -1,10 +1,11 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, Easing, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, Img, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { useBebas } from "../Playa/Video41Playa";
 import { useKitFonts } from "../kit";
 
 // SOLAIA: ella dice "Con tan solo un 12 % de anticipo y hasta 72 veces podés asegurar tu unidad en este paraíso" (0–6,2 s; corte al dron a 6,18 s).
-// Versión A: dos tarjetas laterales (12 % ANTICIPO · 72 CUOTAS) + sello UNIDAD ASEGURADA. Versión B: lo mismo + calendario de 72 casillas.
+// Versión A: dos tarjetas laterales claras (12 % ANTICIPO · 72 CUOTAS) + sello UNIDAD ASEGURADA. Versión B: lo mismo + barra de pago en 3D detrás de ella
+// (recorte de la persona con u2net_human_seg en public/solaia/cut/cNNNN.png, uno por fotograma, desde y=560).
 // Tiempos de la voz (Whisper): "12 %" 0,88 · "anticipo" 1,78 · "72 veces" 2,60 · "asegurar tu unidad" 4,18 · "paraíso" 5,58.
 
 const FPS = 30;
@@ -39,11 +40,11 @@ const Placa: React.FC<{ lado: "izq" | "der"; desde: number; children: React.Reac
             height: "100%",
             border: "8px solid transparent",
             borderRadius: 40,
-            background: `linear-gradient(180deg, #1c150c 0%, #0d0a06 100%) padding-box, ${GOLD} border-box`,
-            boxShadow: "0 26px 64px rgba(0,0,0,0.5)",
+            background: `linear-gradient(180deg, #FFFCF4 0%, #F1E6CD 100%) padding-box, ${GOLD} border-box`,
+            boxShadow: "0 22px 54px rgba(60,40,15,0.38)",
             overflow: "hidden",
             position: "relative",
-            color: "#F4EAD3",
+            color: "#4a2e1a",
             padding: "22px 26px",
           }}
         >
@@ -56,14 +57,14 @@ const Placa: React.FC<{ lado: "izq" | "der"; desde: number; children: React.Reac
 
 const Cifra: React.FC<{ desde: number; hasta: number; objetivo: number; sufijo?: string; etiqueta: string; chico: string }> = ({ desde, hasta, objetivo, sufijo, etiqueta, chico }) => {
   const f = useCurrentFrame();
-  const k = easeOut(clamp01((f - T(desde)) / (T(hasta) - T(desde))));
+  const k = clamp01((f - T(desde)) / (T(hasta) - T(desde))); // lineal: cada número se ve
   const kk = easeOut(clamp01((f - T(desde) - 4) / 12));
   return (
     <>
-      <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 22, letterSpacing: 7, color: "#C7AE6A", opacity: kk }}>{chico}</div>
+      <div style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 22, letterSpacing: 7, color: "#9a7a2e", opacity: kk }}>{chico}</div>
       <div style={{ fontFamily: "Bebas Neue", fontSize: 150, lineHeight: 1, letterSpacing: 2, marginTop: 4, display: "flex", alignItems: "baseline", gap: 6, opacity: kk }}>
         <span style={{ fontVariantNumeric: "tabular-nums" }}>{Math.round(objetivo * k)}</span>
-        {sufijo && <span style={{ color: "#C7AE6A", fontSize: 100 }}>{sufijo}</span>}
+        {sufijo && <span style={{ color: "#9a7a2e", fontSize: 100 }}>{sufijo}</span>}
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 16, textAlign: "center", fontFamily: "Bebas Neue", fontSize: 54, letterSpacing: 8, lineHeight: 1, opacity: kk }}>{etiqueta}</div>
     </>
@@ -84,47 +85,63 @@ const Sello: React.FC<{ top: number }> = ({ top }) => {
   );
 };
 
-// calendario: 12 columnas × 6 filas = 72 cuotas (si son mensuales, una fila por año); la barra superior es el anticipo
-const Calendario: React.FC<{ top: number }> = ({ top }) => {
+// barra de pago en 3D: un tramo corto para el anticipo (12 %) y 6 bloques de 12 cuotas (72); inclinada hacia atrás, con grosor y sombra.
+// Va detrás de ella: la persona recortada se pinta encima.
+const BARRA_TOP = 790;
+const Barra: React.FC = () => {
   const f = useCurrentFrame();
   const fin = T(A.sale);
-  const t0 = T(2.6);
-  const t1 = T(3.8);
   if (f < T(0.9) || f >= fin + 12) return null;
-  const cell = 41;
-  const gap = 6;
-  const w = 12 * cell + 11 * gap;
+  const entra = easeOut(clamp01((f - T(0.9)) / 12));
   const out = easeOut(clamp01((f - fin) / 9));
-  const entra = easeOut(clamp01((f - T(0.9)) / 10));
-  const anticipo = easeOut(clamp01((f - T(0.9)) / 22));
-  const brillo = clamp01(Math.sin(clamp01((f - T(A.sello)) / 22) * Math.PI));
+  const anticipo = clamp01((f - T(0.9)) / T(0.8));
+  const t0 = T(2.6);
+  const t1 = T(3.95);
+  const brillo = clamp01(Math.sin(clamp01((f - T(A.sello)) / 24) * Math.PI));
+  const wAnt = 150;
+  const wBloque = 112;
+  const gap = 12;
+  const total = wAnt + gap + 6 * wBloque + 5 * 6 + 24;
+  const alto = 86;
+  const cara = (frac: number, ant: boolean): React.CSSProperties => ({
+    position: "absolute",
+    inset: 0,
+    borderRadius: 14,
+    background: ant ? "linear-gradient(180deg,#FFFFFF,#EADFC4)" : GOLD,
+    transformOrigin: "left center",
+    transform: `scaleX(${frac})`,
+    boxShadow: frac > 0 ? "0 0 18px rgba(243,235,182,0.55)" : undefined,
+  });
+  const pieza = (w: number, frac: number, ant = false, key?: number) => (
+    <div key={key} style={{ position: "relative", width: w, height: alto, borderRadius: 18, background: "rgba(255,255,255,0.28)", border: "2px solid rgba(255,255,255,0.55)", boxSizing: "border-box", overflow: "hidden" }}>
+      <div style={cara(frac, ant)} />
+    </div>
+  );
   return (
-    <div style={{ position: "absolute", left: (1080 - w) / 2, top, width: w, opacity: entra * (1 - out), transform: `translateY(${out * 60}px)` }}>
-      <div style={{ height: 16, borderRadius: 8, background: "rgba(20,14,8,0.55)", marginBottom: 10, overflow: "hidden" }}>
-        <div style={{ width: `${anticipo * 100}%`, height: "100%", background: "#F3EBB6", boxShadow: "0 0 14px rgba(243,235,182,0.8)" }} />
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(12, ${cell}px)`, gap, padding: 12, borderRadius: 24, background: "rgba(20,14,8,0.5)", boxShadow: `0 0 ${brillo * 36}px rgba(243,235,182,${brillo * 0.8})` }}>
-        {Array.from({ length: 72 }).map((_, i) => {
-          const ti = t0 + ((t1 - t0) * i) / 72;
-          const a = easeOut(clamp01((f - ti) / 5));
-          return (
-            <div
-              key={i}
-              style={{
-                width: cell,
-                height: cell,
-                borderRadius: 9,
-                background: a > 0 ? GOLD : "rgba(255,255,255,0.12)",
-                opacity: a > 0 ? 0.35 + 0.65 * a : 1,
-                transform: `scale(${0.7 + 0.3 * a})`,
-                boxShadow: a > 0.6 ? "0 2px 8px rgba(0,0,0,0.35)" : undefined,
-              }}
-            />
-          );
-        })}
+    <div style={{ position: "absolute", left: (1080 - total) / 2, top: BARRA_TOP, width: total, perspective: 1400, opacity: entra * (1 - out), transform: `translateY(${out * 70}px)` }}>
+      <div style={{ transform: "rotateX(36deg) rotateZ(-2deg)", transformStyle: "preserve-3d", transformOrigin: "50% 100%" }}>
+        {/* grosor y sombra */}
+        <div style={{ position: "absolute", left: 6, right: 6, top: alto + 8, height: 30, borderRadius: 14, background: "rgba(40,26,10,0.45)", filter: "blur(10px)" }} />
+        <div style={{ position: "absolute", left: 0, right: 0, top: 14, height: alto + 18, borderRadius: 18, background: "rgba(90,62,24,0.75)", filter: `drop-shadow(0 0 ${brillo * 26}px rgba(243,235,182,${brillo}))` }} />
+        <div style={{ position: "relative", display: "flex", gap, padding: 12, alignItems: "center" }}>
+          {pieza(wAnt, anticipo, true)}
+          <div style={{ display: "flex", gap: 6 }}>
+            {Array.from({ length: 6 }).map((_, i) => {
+              const a = easeOut(clamp01((f - (t0 + ((t1 - t0) * i) / 6)) / ((t1 - t0) / 6)));
+              return pieza(wBloque, clamp01((f - (t0 + ((t1 - t0) * i) / 6)) / ((t1 - t0) / 6)) * (a > 0 ? 1 : 1), false, i);
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
+};
+
+// persona recortada (por encima de la barra)
+const Recorte: React.FC = () => {
+  const f = useCurrentFrame();
+  if (f < T(0.9) || f >= T(A.sale) + 12 || f > 186) return null;
+  return <Img src={staticFile(`solaia/cut/c${String(f).padStart(4, "0")}.png`)} style={{ position: "absolute", left: 0, top: 560, width: 1080, height: 1360 }} />;
 };
 
 export const SolaiaIntro: React.FC<{ calendario?: boolean }> = ({ calendario = false }) => {
@@ -133,14 +150,15 @@ export const SolaiaIntro: React.FC<{ calendario?: boolean }> = ({ calendario = f
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       <Video src={staticFile("solaia/solaia.mp4")} />
+      {calendario && <Barra />}
+      {calendario && <Recorte />}
       <Placa lado="izq" desde={A.izq}>
-        <Cifra desde={A.izq + 0.1} hasta={A.izq + 0.9} objetivo={12} sufijo="%" etiqueta="ANTICIPO" chico="SOLAIA" />
+        <Cifra desde={A.izq + 0.1} hasta={1.7} objetivo={12} sufijo="%" etiqueta="ANTICIPO" chico="SOLAIA" />
       </Placa>
       <Placa lado="der" desde={A.der}>
-        <Cifra desde={A.der + 0.1} hasta={3.8} objetivo={72} etiqueta="CUOTAS" chico="HASTA" />
+        <Cifra desde={A.der + 0.1} hasta={4.0} objetivo={72} etiqueta="CUOTAS" chico="HASTA" />
       </Placa>
-      <Sello top={calendario ? 560 : 590} />
-      {calendario && <Calendario top={650} />}
+      <Sello top={590} />
     </AbsoluteFill>
   );
 };

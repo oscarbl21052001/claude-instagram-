@@ -20,7 +20,6 @@ type Grupo = { a: number; b: number; lineas: Linea[]; icono: string };
 // a/b: aparece y sale (s). Cortes: 14,58 · 17,10 · 18,54 · 19,48 · 20,38 · 21,38
 const GRUPOS: Grupo[] = [
   { a: 12.2, b: 14.35, icono: "cama", lineas: [{ txt: "DEPARTAMENTOS", t: 12.24 }, { txt: "MODERNOS", t: 12.8, clave: true }] },
-  { a: 14.8, b: 15.85, icono: "estrella", lineas: [{ txt: "AMENITIES", t: 14.84, clave: true }] },
   { a: 15.9, b: 16.95, icono: "copa", lineas: [{ txt: "SALÓN DE FIESTAS", t: 15.94, clave: true }] },
   { a: 17.3, b: 18.4, icono: "olas", lineas: [{ txt: "PISCINAS", t: 17.36 }, { txt: "CLIMATIZADAS", t: 17.64, clave: true }] },
   { a: 18.72, b: 19.4, icono: "lavadora", lineas: [{ txt: "LAVANDERÍA", t: 18.78, clave: true }] },
@@ -142,13 +141,13 @@ const Estilo4: React.FC = () => {
   );
 };
 
-export const PalabrasClave: React.FC<{ estilo: 1 | 2 | 3 | 4 }> = ({ estilo }) => {
+export const PalabrasClave: React.FC<{ estilo: 1 | 2 | 3 | 4; sinVideo?: boolean }> = ({ estilo, sinVideo = false }) => {
   useBebas();
   useKitFonts();
   useFuentesSolaia();
   return (
-    <AbsoluteFill style={{ background: "#000" }}>
-      <Video src={staticFile("solaia/solaia.mp4")} trimBefore={Math.round(T0 * FPS)} />
+    <AbsoluteFill style={{ background: sinVideo ? "transparent" : "#000" }}>
+      {!sinVideo && <Video src={staticFile("solaia/solaia.mp4")} trimBefore={Math.round(T0 * FPS)} />}
       {estilo === 1 && <Estilo1 />}
       {estilo === 2 && <Estilo2 />}
       {estilo === 3 && <Estilo3 />}

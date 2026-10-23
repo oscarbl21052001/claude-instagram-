@@ -227,7 +227,7 @@ const Linea: React.FC = () => {
   );
 };
 
-export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia; sinTarjeta?: boolean; variante?: VarianteTexto; enLinea?: boolean }> = ({ calendario = false, estilo = "base", sinTarjeta = false, variante = "contorno", enLinea = false }) => {
+export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia; sinTarjeta?: boolean; variante?: VarianteTexto; enLinea?: boolean; sinVideo?: boolean }> = ({ calendario = false, estilo = "base", sinTarjeta = false, variante = "contorno", enLinea = false, sinVideo = false }) => {
   EstiloCtx.vari = variante;
   EstiloCtx.actual = estilo;
   EstiloCtx.sin = sinTarjeta;
@@ -235,8 +235,8 @@ export const SolaiaIntro: React.FC<{ calendario?: boolean; estilo?: EstiloSolaia
   useKitFonts();
   useFuentesSolaia();
   return (
-    <AbsoluteFill style={{ background: "#000" }}>
-      <Video src={staticFile("solaia/solaia.mp4")} />
+    <AbsoluteFill style={{ background: sinVideo ? "transparent" : "#000" }}>
+      {!sinVideo && <Video src={staticFile("solaia/solaia.mp4")} />}
       {calendario && <Barra />}
       {calendario && <Recorte />}
       {enLinea ? (

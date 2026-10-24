@@ -1,6 +1,6 @@
 import { loadFont } from "@remotion/fonts";
 import { useEffect, useState } from "react";
-import { AbsoluteFill, Easing, Freeze, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, Freeze, Img, OffthreadVideo, Sequence, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 
 // OFICIOS: gancho "PARA MIS CLIENTES SOY / MULTIUSOS" + 5 emojis, y por cada cambio de oficio una etiqueta con su emoji.
 // `completo` suma el flash con zoom en cada corte, el contador 1/5 y el detalle animado sobre cada fondo. El cierre va siempre.
@@ -10,6 +10,8 @@ const VIDEO_FRAMES = 340; // 11,33 s
 const TAIL = 40; // fotograma final congelado para que se lea el cierre
 export const OFICIOS_DURATION = VIDEO_FRAMES + TAIL;
 export const OFICIOS_DURATION_SIN_CIERRE = VIDEO_FRAMES;
+const FOTO = 70; // foto final con CTA (2,3 s)
+export const OFICIOS_DURATION_FOTO = VIDEO_FRAMES + FOTO;
 
 const INK = "#1b1208";
 const GOLD = "#F2C044";
@@ -137,6 +139,25 @@ const Detalle: React.FC<{ i: number }> = ({ i }) => {
   );
 };
 
+const FotoCta: React.FC = () => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const eSmall = easeOut(clamp01((f - 6) / 12));
+  const eBig = easeOut(clamp01((f - 14) / 16));
+  const sc = interpolate(spring({ frame: f - 14, fps, config: { damping: 12, stiffness: 140 } }), [0, 1], [1.4, 1]);
+  return (
+    <AbsoluteFill>
+      <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
+      <div style={{ ...POP, position: "absolute", left: 66, top: 150, fontSize: 72, color: CREAM, WebkitTextStroke: `10px ${INK}`, opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
+        SOMOS TODO ESO
+      </div>
+      <div style={{ ...POP, position: "absolute", left: 50, top: 215, fontSize: 200, letterSpacing: -4, color: GOLD, WebkitTextStroke: `14px ${INK}`, opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
+        Y MÁS
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 const Cierre: React.FC = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -157,15 +178,15 @@ const Cierre: React.FC = () => {
   );
 };
 
-export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true }) => {
+export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean; foto?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true, foto = false }) => {
   useFonts();
   const f = useCurrentFrame();
   // zoom corto + flash en cada corte (solo completo)
   let zoom = 1;
   let flash = 0;
   if (conFlash) {
-    for (const of of OFICIOS) {
-      const d = f - s(of.cut);
+    for (const cut of [...OFICIOS.map((o) => s(o.cut)), ...(foto ? [VIDEO_FRAMES] : [])]) {
+      const d = f - cut;
       if (d >= 0 && d < 8) {
         zoom = 1 + 0.07 * (1 - easeOut(d / 8));
         flash = 0.75 * (1 - easeOut(clamp01(d / 6)));
@@ -192,6 +213,11 @@ export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: bo
         <Etiqueta key={i} i={i} completo={completo} cierre={cierre} />
       ))}
       {cierre && <Cierre />}
+      {foto && (
+        <Sequence from={VIDEO_FRAMES}>
+          <FotoCta />
+        </Sequence>
+      )}
       <AbsoluteFill style={{ background: "#fff", opacity: flash, pointerEvents: "none" }} />
     </AbsoluteFill>
   );

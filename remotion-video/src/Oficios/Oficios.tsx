@@ -69,6 +69,7 @@ const Gancho: React.FC = () => {
   const ent = (a: number, d = 14) => easeOut(clamp01((f - s(a)) / d));
   const eSmall = ent(0.12, 12);
   const eBig = ent(0.25, 18);
+  const eBox = easeOut(ent(0.75, 12));
   const sc = interpolate(spring({ frame: f - s(0.25), fps, config: { damping: 12, stiffness: 140 } }), [0, 1], [1.4, 1]);
   const centers = [140, 340, 540, 740, 940];
   return (
@@ -76,6 +77,9 @@ const Gancho: React.FC = () => {
       <div style={{ ...POP, position: "absolute", left: 66, top: 150, fontSize: 64, color: CREAM, WebkitTextStroke: `10px ${INK}`, opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
         PARA MIS CLIENTES SOY
       </div>
+      <div style={{ position: "absolute", left: 30, top: 225, width: 1020, height: 235, transform: `scaleX(${eBox})`, transformOrigin: "0 50%", opacity: eBox > 0 ? 1 : 0, background: "rgba(242,192,68,.26)", borderLeft: `5px solid ${GOLD}`, borderRight: `5px solid ${GOLD}`, boxShadow: "0 8px 30px rgba(0,0,0,.25)" }} />
+      <div style={{ position: "absolute", left: 18, top: 213, width: 22, height: 22, borderRadius: 11, background: GOLD, border: `4px solid ${INK}`, transform: `scale(${eBox > 0.9 ? 1 : 0})` }} />
+      <div style={{ position: "absolute", left: 1028, top: 448, width: 22, height: 22, borderRadius: 11, background: GOLD, border: `4px solid ${INK}`, transform: `scale(${eBox > 0.9 ? 1 : 0})` }} />
       <div style={{ ...POP, position: "absolute", left: 50, top: 205, fontSize: 175, letterSpacing: -4, color: GOLD, WebkitTextStroke: `14px ${INK}`, opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
         MULTIUSOS
       </div>

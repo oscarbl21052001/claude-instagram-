@@ -18,7 +18,7 @@ import { CALLE_DURATION, CALLE_FPS, CalleDorada } from "./Calle/CalleDorada";
 import { EDIT_DURATION, EDIT_FPS, EsquemaPip } from "./Edit/EsquemaPip";
 import { PLAYA_DURATION, PLAYA_FPS, PLAYA_H, PLAYA_W, PlayaTexto } from "./Playa/PlayaTexto";
 import { V41_DURATION, V41_FPS, V41_H, V41_W, Video41Playa } from "./Playa/Video41Playa";
-import { OFICIOS_DURATION, OFICIOS_FPS, Oficios } from "./Oficios/Oficios";
+import { OFICIOS_DURATION, OFICIOS_DURATION_SIN_CIERRE, OFICIOS_FPS, Oficios } from "./Oficios/Oficios";
 import { KitDemo } from "./KitDemo/KitDemo";
 import { TOUR_DURATION, TOUR_FPS, TourApto } from "./Tour/TourApto";
 import { UNIDAD_DURATION, UNIDAD_FPS, UnidadFlotante } from "./Unidad/UnidadFlotante";
@@ -29,6 +29,7 @@ export const RemotionRoot: React.FC = () => {
     <>
       <MyComposition />
       <Composition id="OficiosCompleto" component={Oficios} durationInFrames={OFICIOS_DURATION} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: true }} />
+      <Composition id="OficiosFlash" component={Oficios} durationInFrames={OFICIOS_DURATION_SIN_CIERRE} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false, flash: true, cierre: false }} />
       <Composition id="OficiosBasico" component={Oficios} durationInFrames={OFICIOS_DURATION} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false }} />
       <Composition id="Video41Playa" component={Video41Playa} durationInFrames={V41_DURATION} fps={V41_FPS} width={V41_W} height={V41_H} />
       <Composition id="PlayaTexto" component={PlayaTexto} durationInFrames={PLAYA_DURATION} fps={PLAYA_FPS} width={PLAYA_W} height={PLAYA_H} />

@@ -9,6 +9,7 @@ export const OFICIOS_FPS = 30;
 const VIDEO_FRAMES = 340; // 11,33 s
 const TAIL = 40; // fotograma final congelado para que se lea el cierre
 export const OFICIOS_DURATION = VIDEO_FRAMES + TAIL;
+export const OFICIOS_DURATION_SIN_CIERRE = VIDEO_FRAMES;
 
 const INK = "#1b1208";
 const GOLD = "#F2C044";
@@ -88,22 +89,22 @@ const Gancho: React.FC = () => {
   );
 };
 
-const Etiqueta: React.FC<{ i: number; completo: boolean }> = ({ i, completo }) => {
+const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean }> = ({ i, completo, cierre }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const of = OFICIOS[i];
   const start = s(of.cut) + 2;
-  const end = i < OFICIOS.length - 1 ? s(OFICIOS[i + 1].cut) - 3 : s(CIERRE);
+  const end = i < OFICIOS.length - 1 ? s(OFICIOS[i + 1].cut) - 3 : cierre ? s(CIERRE) : VIDEO_FRAMES;
   if (f < start || f > end + 12) return null;
   const p = spring({ frame: f - start, fps, config: { damping: 10, stiffness: 150 } });
   const out = easeIn(clamp01((f - end) / 10));
   const pulse = 1 + Math.sin((f - start) / 5) * 0.025 * clamp01((f - start) / 20);
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 600, opacity: (1 - out) * clamp01(p * 2), transform: `translateY(${-out * 40}px)` }}>
-      <div style={{ position: "absolute", left: 60, top: 190, transform: `scale(${p * pulse})`, transformOrigin: "50% 50%" }}>
+      <div style={{ position: "absolute", left: 60, top: 310, transform: `scale(${p * pulse})`, transformOrigin: "50% 50%" }}>
         <Sticker emoji={of.emoji} size={200} rot={-6} />
       </div>
-      <div style={{ position: "absolute", left: 292, top: 190, height: 200, display: "flex", flexDirection: "column", justifyContent: "center", transform: `translateX(${(1 - p) * 60}px)` }}>
+      <div style={{ position: "absolute", left: 292, top: 310, height: 200, display: "flex", flexDirection: "column", justifyContent: "center", transform: `translateX(${(1 - p) * 60}px)` }}>
         {of.lines.map((l) => (
           <div key={l} style={{ ...POP, fontSize: of.lines.length > 1 ? 74 : 94, lineHeight: 1.05, color: GOLD, WebkitTextStroke: `12px ${INK}`, textShadow: "0 8px 0 rgba(27,18,8,.9), 0 16px 34px rgba(0,0,0,.4)" }}>
             {l}
@@ -156,13 +157,13 @@ const Cierre: React.FC = () => {
   );
 };
 
-export const Oficios: React.FC<{ completo: boolean }> = ({ completo }) => {
+export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true }) => {
   useFonts();
   const f = useCurrentFrame();
   // zoom corto + flash en cada corte (solo completo)
   let zoom = 1;
   let flash = 0;
-  if (completo) {
+  if (conFlash) {
     for (const of of OFICIOS) {
       const d = f - s(of.cut);
       if (d >= 0 && d < 8) {
@@ -177,18 +178,20 @@ export const Oficios: React.FC<{ completo: boolean }> = ({ completo }) => {
         <Sequence durationInFrames={VIDEO_FRAMES}>
           <OffthreadVideo src={staticFile("oficios/oficios_1080.mp4")} />
         </Sequence>
-        <Sequence from={VIDEO_FRAMES}>
-          <Freeze frame={VIDEO_FRAMES - 2}>
-            <OffthreadVideo src={staticFile("oficios/oficios_1080.mp4")} startFrom={VIDEO_FRAMES - 2} muted />
-          </Freeze>
-        </Sequence>
+        {cierre && (
+          <Sequence from={VIDEO_FRAMES}>
+            <Freeze frame={VIDEO_FRAMES - 2}>
+              <OffthreadVideo src={staticFile("oficios/oficios_1080.mp4")} startFrom={VIDEO_FRAMES - 2} muted />
+            </Freeze>
+          </Sequence>
+        )}
       </AbsoluteFill>
       {completo && OFICIOS.map((_, i) => <Detalle key={i} i={i} />)}
       <Gancho />
       {OFICIOS.map((_, i) => (
-        <Etiqueta key={i} i={i} completo={completo} />
+        <Etiqueta key={i} i={i} completo={completo} cierre={cierre} />
       ))}
-      <Cierre />
+      {cierre && <Cierre />}
       <AbsoluteFill style={{ background: "#fff", opacity: flash, pointerEvents: "none" }} />
     </AbsoluteFill>
   );

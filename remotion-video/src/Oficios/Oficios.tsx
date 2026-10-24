@@ -10,8 +10,9 @@ const VIDEO_FRAMES = 340; // 11,33 s
 const TAIL = 40; // fotograma final congelado para que se lea el cierre
 export const OFICIOS_DURATION = VIDEO_FRAMES + TAIL;
 export const OFICIOS_DURATION_SIN_CIERRE = VIDEO_FRAMES;
-const FOTO = 70; // foto final con CTA (2,3 s)
-export const OFICIOS_DURATION_FOTO = VIDEO_FRAMES + FOTO;
+const FOTO = 75; // foto de Lucía con texto (2,5 s)
+const CLIP = 90; // 3 s de 1024.mov con el CTA
+export const OFICIOS_DURATION_FOTO = VIDEO_FRAMES + FOTO + CLIP;
 
 const INK = "#1b1208";
 const GOLD = "#F2C044";
@@ -100,10 +101,10 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean }> = ({
   const { fps } = useVideoConfig();
   const of = OFICIOS[i];
   const start = s(of.cut) + 2;
-  const end = i < OFICIOS.length - 1 ? s(OFICIOS[i + 1].cut) - 3 : cierre ? s(CIERRE) : VIDEO_FRAMES;
-  if (f < start || f > end + 12) return null;
+  const end = i < OFICIOS.length - 1 ? s(OFICIOS[i + 1].cut) - 8 : cierre ? s(CIERRE) : VIDEO_FRAMES - 8;
+  if (f < start || f > end + 8) return null;
   const p = spring({ frame: f - start, fps, config: { damping: 10, stiffness: 150 } });
-  const out = easeIn(clamp01((f - end) / 10));
+  const out = easeIn(clamp01((f - end) / 8));
   const pulse = 1 + Math.sin((f - start) / 5) * 0.025 * clamp01((f - start) / 20);
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 600, opacity: (1 - out) * clamp01(p * 2), transform: `translateY(${-out * 40}px)` }}>
@@ -143,24 +144,47 @@ const Detalle: React.FC<{ i: number }> = ({ i }) => {
   );
 };
 
-const FotoCta: React.FC = () => {
+// Bloque de texto "pequeño + palabra grande dorada con caja de selección", como el del gancho.
+const TextoCaja: React.FC<{ small: string; big: string[]; bigSize: number; bigTop: number; boxTop: number; boxW: number; boxH: number }> = ({ small, big, bigSize, bigTop, boxTop, boxW, boxH }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const eSmall = easeOut(clamp01((f - 6) / 12));
   const eBig = easeOut(clamp01((f - 14) / 16));
+  const eBox = easeOut(clamp01((f - 30) / 12));
   const sc = interpolate(spring({ frame: f - 14, fps, config: { damping: 12, stiffness: 140 } }), [0, 1], [1.4, 1]);
   return (
     <AbsoluteFill>
-      <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <div style={{ ...POP, position: "absolute", left: 66, top: 150, fontSize: 72, color: CREAM, WebkitTextStroke: `10px ${INK}`, opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
-        SOMOS TODO ESO
+      <div style={{ ...POP, position: "absolute", left: 66, top: 150, fontSize: 64, color: CREAM, WebkitTextStroke: `10px ${INK}`, opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
+        {small}
       </div>
-      <div style={{ ...POP, position: "absolute", left: 50, top: 215, fontSize: 200, letterSpacing: -4, color: GOLD, WebkitTextStroke: `14px ${INK}`, opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
-        Y MÁS
+      <div style={{ position: "absolute", left: 30, top: boxTop, width: boxW, height: boxH, transform: `scaleX(${eBox})`, transformOrigin: "0 50%", opacity: eBox > 0 ? 1 : 0, background: "rgba(242,192,68,.26)", borderLeft: `5px solid ${GOLD}`, borderRight: `5px solid ${GOLD}`, boxShadow: "0 8px 30px rgba(0,0,0,.25)" }} />
+      <div style={{ position: "absolute", left: 18, top: boxTop - 12, width: 22, height: 22, borderRadius: 11, background: GOLD, border: `4px solid ${INK}`, transform: `scale(${eBox > 0.9 ? 1 : 0})` }} />
+      <div style={{ position: "absolute", left: 30 + boxW - 12, top: boxTop + boxH - 14, width: 22, height: 22, borderRadius: 11, background: GOLD, border: `4px solid ${INK}`, transform: `scale(${eBox > 0.9 ? 1 : 0})` }} />
+      <div style={{ ...POP, position: "absolute", left: 50, top: bigTop, fontSize: bigSize, lineHeight: 1.05, letterSpacing: -3, color: GOLD, WebkitTextStroke: `14px ${INK}`, opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
+        {big.map((l) => (
+          <div key={l}>{l}</div>
+        ))}
       </div>
     </AbsoluteFill>
   );
 };
+
+const FotoLucia: React.FC = () => {
+  const f = useCurrentFrame();
+  return (
+    <AbsoluteFill>
+      <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
+      <TextoCaja small="SOY LUCÍA RODRÍGUEZ," big={["Y PARA NUESTROS", "CLIENTES..."]} bigSize={104} bigTop={246} boxTop={239} boxW={1020} boxH={232} />
+    </AbsoluteFill>
+  );
+};
+
+const ClipCta: React.FC = () => (
+  <AbsoluteFill>
+    <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
+    <TextoCaja small="SOMOS TODO ESO" big={["Y MÁS"]} bigSize={200} bigTop={228} boxTop={238} boxW={740} boxH={190} />
+  </AbsoluteFill>
+);
 
 const Cierre: React.FC = () => {
   const f = useCurrentFrame();
@@ -189,7 +213,7 @@ export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: bo
   let zoom = 1;
   let flash = 0;
   if (conFlash) {
-    for (const cut of [...OFICIOS.map((o) => s(o.cut)), ...(foto ? [VIDEO_FRAMES] : [])]) {
+    for (const cut of [...OFICIOS.map((o) => s(o.cut)), ...(foto ? [VIDEO_FRAMES, VIDEO_FRAMES + FOTO] : [])]) {
       const d = f - cut;
       if (d >= 0 && d < 8) {
         zoom = 1 + 0.07 * (1 - easeOut(d / 8));
@@ -218,9 +242,14 @@ export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: bo
       ))}
       {cierre && <Cierre />}
       {foto && (
-        <Sequence from={VIDEO_FRAMES}>
-          <FotoCta />
-        </Sequence>
+        <>
+          <Sequence from={VIDEO_FRAMES} durationInFrames={FOTO}>
+            <FotoLucia />
+          </Sequence>
+          <Sequence from={VIDEO_FRAMES + FOTO} durationInFrames={CLIP}>
+            <ClipCta />
+          </Sequence>
+        </>
       )}
       <AbsoluteFill style={{ background: "#fff", opacity: flash, pointerEvents: "none" }} />
     </AbsoluteFill>

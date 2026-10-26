@@ -94,11 +94,12 @@ const Seleccion: React.FC<{ left: number; top: number; w: number; h: number; sta
 };
 
 // Intro "Lo que soy / Como los clientes me ven": serif blanca con contorno negro, centrada. Los emojis de los oficios entran con la segunda frase.
-const SERIF: React.CSSProperties = { fontFamily: "Playfair Display", fontWeight: 600, textAlign: "center", color: "#fff", WebkitTextStroke: "11px #000", paintOrder: "stroke fill", letterSpacing: "-0.03em", lineHeight: 1.0, textShadow: "0 8px 26px rgba(0,0,0,.35)" };
+const SERIF: React.CSSProperties = { fontFamily: "Playfair Display", fontWeight: 600, textAlign: "center", color: "#fff", WebkitTextStroke: "9px #000", paintOrder: "stroke fill", letterSpacing: "-0.03em", lineHeight: 1.0, textShadow: "0 8px 26px rgba(0,0,0,.35)" };
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
-const FRASE_B_OUT = s(3.5);
+const FRASE_B_OUT = s(3.5); // salen los emojis
+const FRASE_B2_OUT = s(5.2); // sale la frase, ya sobre la primera imagen de IA
 
 const Frase: React.FC<{ lines: string[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
   const f = useCurrentFrame();
@@ -122,8 +123,8 @@ const IntroLucia: React.FC = () => {
   const centers = [140, 340, 540, 740, 940];
   return (
     <AbsoluteFill>
-      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={124} top={160} a={FRASE_A} out={FRASE_A_OUT} />
-      <Frase lines={["Como los clientes", "me ven"]} size={112} top={200} a={FRASE_B} out={FRASE_B_OUT} />
+      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={92} top={240} a={FRASE_A} out={FRASE_A_OUT} />
+      <Frase lines={["Como los clientes", "me ven"]} size={84} top={190} a={FRASE_B} out={FRASE_B2_OUT} />
       <AbsoluteFill style={{ opacity: 1 - o, transform: `translateY(${-o * 50}px)`, filter: o > 0.02 ? `blur(${o * 10}px)` : undefined }}>
         {OFICIOS.map((of, i) => {
           const p = spring({ frame: f - (FRASE_B + 12 + i * 4), fps, config: { damping: 9, stiffness: 160 } });
@@ -180,10 +181,10 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean }> = ({
   const pulse = 1 + Math.sin((f - start) / 5) * 0.025 * clamp01((f - start) / 20);
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 600, opacity: (1 - out) * clamp01(p * 2), transform: `translateY(${-out * 40}px)` }}>
-      <div style={{ position: "absolute", left: 60, top: 310, transform: `scale(${p * pulse})`, transformOrigin: "50% 50%" }}>
+      <div style={{ position: "absolute", left: 60, top: 380, transform: `scale(${p * pulse})`, transformOrigin: "50% 50%" }}>
         <Sticker emoji={of.emoji} size={200} rot={-6} />
       </div>
-      <div style={{ position: "absolute", left: 292, top: 310, height: 200, display: "flex", flexDirection: "column", justifyContent: "center", transform: `translateX(${(1 - p) * 60}px)` }}>
+      <div style={{ position: "absolute", left: 292, top: 380, height: 200, display: "flex", flexDirection: "column", justifyContent: "center", transform: `translateX(${(1 - p) * 60}px)` }}>
         {of.lines.map((l) => (
           <div key={l} style={{ ...POP, fontSize: of.lines.length > 1 ? 74 : 94, lineHeight: 1.05, color: GOLD, WebkitTextStroke: `12px ${INK}`, textShadow: "0 8px 0 rgba(27,18,8,.9), 0 16px 34px rgba(0,0,0,.4)" }}>
             {l}

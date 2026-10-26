@@ -98,7 +98,7 @@ const SERIF: React.CSSProperties = { fontFamily: "Playfair Display", fontWeight:
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
-const FRASE_B2_OUT = s(5.2); // sale la frase, ya sobre la primera imagen de IA
+const FRASE_B2_OUT = s(3.87) - 10; // sale justo cuando aparece la primera imagen de IA (corte a los 3,87 s)
 
 const Frase: React.FC<{ lines: string[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
   const f = useCurrentFrame();
@@ -169,9 +169,9 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean; minima
     const nombre = of.lines.join(" ").toLowerCase().replace(/^./, (c) => c.toUpperCase());
     const q = easeOut(clamp01((f - start) / 14));
     return (
-      <div style={{ position: "absolute", left: 0, top: 600, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
-        <span style={{ fontFamily: "Noto Color Emoji", fontSize: 46, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
-        <span style={{ ...SERIF, fontSize: 46, WebkitTextStroke: "6px #000" }}>{nombre}</span>
+      <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
+        <span style={{ fontFamily: "Noto Color Emoji", fontSize: 50, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
+        <span style={{ ...SERIF, fontSize: 52, WebkitTextStroke: "8px #000" }}>{nombre}</span>
       </div>
     );
   }
@@ -225,10 +225,10 @@ const TextoCaja: React.FC<{ small: string; big: string[]; bigSize: number; small
   return (
     <AbsoluteFill>
       <Seleccion left={boxLeft} top={boxTop} w={boxW} h={boxH} start={30} />
-      <div style={{ ...POP, position: "absolute", ...(centrado ? { left: 0, width: 1080, textAlign: "center" } : { left: 66 }), top: smallTop, fontSize: 64, color: CREAM, WebkitTextStroke: `10px ${INK}`, opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
+      <div style={{ ...SERIF, position: "absolute", ...(centrado ? { left: 0, width: 1080, textAlign: "center" } : { left: 66 }), top: smallTop, fontSize: 60, color: CREAM, WebkitTextStroke: `9px ${INK}`, whiteSpace: "nowrap", opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
         {small}
       </div>
-      <div style={{ ...POP, position: "absolute", ...pos, top: bigTop, fontSize: bigSize, lineHeight: 1.05, letterSpacing: -3, color: GOLD, WebkitTextStroke: `14px ${INK}`, opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: centrado ? "50% 60%" : "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
+      <div style={{ ...SERIF, position: "absolute", ...pos, top: bigTop, fontSize: bigSize, lineHeight: 1.05, color: GOLD, WebkitTextStroke: `12px ${INK}`, whiteSpace: "nowrap", opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: centrado ? "50% 60%" : "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
         {big.map((l) => (
           <div key={l}>{l}</div>
         ))}
@@ -242,7 +242,7 @@ const FotoLucia: React.FC = () => {
   return (
     <AbsoluteFill>
       <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <TextoCaja small="SOY LUCÍA RODRÍGUEZ," big={["Y PARA NUESTROS", "CLIENTES..."]} bigSize={104} smallTop={215} bigTop={311} boxTop={304} boxW={1020} boxH={232} />
+      <TextoCaja small="Soy Lucía Rodríguez," big={["y para nuestros", "clientes..."]} bigSize={110} smallTop={215} bigTop={311} boxTop={304} boxW={800} boxH={232} />
     </AbsoluteFill>
   );
 };
@@ -250,7 +250,7 @@ const FotoLucia: React.FC = () => {
 const ClipCta: React.FC = () => (
   <AbsoluteFill>
     <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
-    <TextoCaja small="SOMOS TODO ESO" big={["Y MÁS"]} bigSize={200} bigTop={270} boxTop={262} boxW={760} boxH={225} centrado />
+    <TextoCaja small="Somos todo eso" big={["y más"]} bigSize={190} bigTop={270} boxTop={262} boxW={540} boxH={225} centrado />
   </AbsoluteFill>
 );
 

@@ -32,6 +32,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="OficiosFlash" component={Oficios} durationInFrames={OFICIOS_DURATION_SIN_CIERRE} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false, flash: true, cierre: false }} />
       <Composition id="OficiosFoto" component={Oficios} durationInFrames={OFICIOS_DURATION_FOTO} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false, flash: true, cierre: false, foto: true }} />
       <Composition id="OficiosV7" component={Oficios} durationInFrames={OFICIOS_DURATION_FOTO} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false, flash: true, cierre: false, foto: true, intro: true }} />
+      <Composition id="OficiosV7Corto" component={Oficios} durationInFrames={OFICIOS_DURATION_SIN_CIERRE} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false, flash: true, cierre: false, foto: false, intro: true }} />
       <Composition id="OficiosBasico" component={Oficios} durationInFrames={OFICIOS_DURATION} fps={OFICIOS_FPS} width={1080} height={1920} defaultProps={{ completo: false }} />
       <Composition id="Video41Playa" component={Video41Playa} durationInFrames={V41_DURATION} fps={V41_FPS} width={V41_W} height={V41_H} />
       <Composition id="PlayaTexto" component={PlayaTexto} durationInFrames={PLAYA_DURATION} fps={PLAYA_FPS} width={PLAYA_W} height={PLAYA_H} />

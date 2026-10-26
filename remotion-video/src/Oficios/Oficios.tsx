@@ -213,36 +213,12 @@ const Detalle: React.FC<{ i: number }> = ({ i }) => {
   );
 };
 
-// Bloque de texto "pequeño + palabra grande dorada con texto seleccionado", como el del gancho.
-const TextoCaja: React.FC<{ small: string; big: string[]; bigSize: number; smallTop?: number; bigTop: number; boxTop: number; boxW: number; boxH: number; centrado?: boolean }> = ({ small, big, bigSize, smallTop = 150, bigTop, boxTop, boxW, boxH, centrado = false }) => {
-  const f = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const eSmall = easeOut(clamp01((f - 6) / 12));
-  const eBig = easeOut(clamp01((f - 14) / 16));
-  const sc = interpolate(spring({ frame: f - 14, fps, config: { damping: 12, stiffness: 140 } }), [0, 1], [1.4, 1]);
-  const boxLeft = centrado ? (1080 - boxW) / 2 : 30;
-  const pos = centrado ? { left: 0, width: 1080, textAlign: "center" as const } : { left: 50 };
-  return (
-    <AbsoluteFill>
-      <Seleccion left={boxLeft} top={boxTop} w={boxW} h={boxH} start={30} />
-      <div style={{ ...SERIF, position: "absolute", ...(centrado ? { left: 0, width: 1080, textAlign: "center" } : { left: 66 }), top: smallTop, fontSize: 60, color: CREAM, WebkitTextStroke: `9px ${INK}`, whiteSpace: "nowrap", opacity: eSmall, transform: `translateY(${(1 - eSmall) * -24}px)`, textShadow: "0 6px 0 rgba(27,18,8,.9), 0 12px 28px rgba(0,0,0,.4)" }}>
-        {small}
-      </div>
-      <div style={{ ...SERIF, position: "absolute", ...pos, top: bigTop, fontSize: bigSize, lineHeight: 1.05, color: GOLD, WebkitTextStroke: `12px ${INK}`, whiteSpace: "nowrap", opacity: clamp01(eBig * 3), transform: `scale(${sc})`, transformOrigin: centrado ? "50% 60%" : "0 60%", filter: eBig < 1 ? `blur(${(1 - eBig) * 10}px)` : undefined, textShadow: "0 10px 0 rgba(27,18,8,.9), 0 20px 40px rgba(0,0,0,.45)" }}>
-        {big.map((l) => (
-          <div key={l}>{l}</div>
-        ))}
-      </div>
-    </AbsoluteFill>
-  );
-};
-
 const FotoLucia: React.FC = () => {
   const f = useCurrentFrame();
   return (
     <AbsoluteFill>
       <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <TextoCaja small="Soy Lucía Rodríguez," big={["y para nuestros", "clientes..."]} bigSize={110} smallTop={215} bigTop={311} boxTop={304} boxW={800} boxH={232} />
+      <Frase lines={["Soy Lucía Rodríguez,", "y para nuestros", "clientes..."]} size={92} top={400} a={6} out={9999} />
     </AbsoluteFill>
   );
 };
@@ -250,7 +226,7 @@ const FotoLucia: React.FC = () => {
 const ClipCta: React.FC = () => (
   <AbsoluteFill>
     <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
-    <TextoCaja small="Somos todo eso" big={["y más"]} bigSize={190} bigTop={270} boxTop={262} boxW={540} boxH={225} centrado />
+    <Frase lines={["Somos todo eso", "y más"]} size={100} top={380} a={6} out={9999} />
   </AbsoluteFill>
 );
 

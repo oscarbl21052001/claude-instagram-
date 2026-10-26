@@ -100,7 +100,7 @@ const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
 const FRASE_B2_OUT = s(3.87) - 10; // sale justo cuando aparece la primera imagen de IA (corte a los 3,87 s)
 
-const Frase: React.FC<{ lines: string[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
+const Frase: React.FC<{ lines: React.ReactNode[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   if (f < a || f > out + 10) return null;
@@ -108,8 +108,8 @@ const Frase: React.FC<{ lines: string[]; size: number; top: number; a: number; o
   const o = easeIn(clamp01((f - out) / 8));
   return (
     <div style={{ ...SERIF, position: "absolute", left: 0, width: 1080, top, fontSize: size, opacity: clamp01(p * 2) * (1 - o), transform: `translateY(${(1 - p) * 40 - o * 50}px) scale(${interpolate(p, [0, 1], [0.92, 1])})`, filter: `blur(${(1 - clamp01(p)) * 8 + o * 10}px)` }}>
-      {lines.map((l) => (
-        <div key={l}>{l}</div>
+      {lines.map((l, i) => (
+        <div key={i}>{l}</div>
       ))}
     </div>
   );
@@ -218,7 +218,7 @@ const FotoLucia: React.FC = () => {
   return (
     <AbsoluteFill>
       <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <Frase lines={["Soy Lucía Rodríguez,", "y para nuestros", "clientes..."]} size={92} top={400} a={6} out={9999} />
+      <Frase lines={[<>Soy <span style={{ color: GOLD }}>Lucía Rodríguez,</span></>, "y para nuestros", "clientes..."]} size={92} top={400} a={6} out={9999} />
     </AbsoluteFill>
   );
 };
@@ -226,7 +226,7 @@ const FotoLucia: React.FC = () => {
 const ClipCta: React.FC = () => (
   <AbsoluteFill>
     <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
-    <Frase lines={["Somos todo eso", "y más"]} size={100} top={380} a={6} out={9999} />
+    <Frase lines={["Somos todo eso", <>y <span style={{ color: GOLD }}>MÁS</span></>]} size={100} top={380} a={6} out={9999} />
   </AbsoluteFill>
 );
 

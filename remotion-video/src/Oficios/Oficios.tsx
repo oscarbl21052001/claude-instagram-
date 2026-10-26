@@ -39,6 +39,13 @@ const useFonts = () => {
   }, [handle]);
 };
 
+const useSerifFont = () => {
+  const [handle] = useState(() => delayRender("Cargando Playfair Display"));
+  useEffect(() => {
+    loadFont({ family: "Playfair Display", url: staticFile("fonts/PlayfairDisplay-Variable.ttf"), weight: "600" }).then(() => continueRender(handle));
+  }, [handle]);
+};
+
 const POP: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 800, whiteSpace: "nowrap", paintOrder: "stroke fill", letterSpacing: -2 };
 
 const Sticker: React.FC<{ emoji: string; size: number; rot: number; shadow?: number }> = ({ emoji, size, rot, shadow = 10 }) => (
@@ -83,6 +90,51 @@ const Seleccion: React.FC<{ left: number; top: number; w: number; h: number; sta
       <div style={{ ...dot, left: left - 16, top: top - 30, transform: `scale(${knob * pulse})` }} />
       <div style={{ ...dot, left: left + w * p - 17, top: top + h - 4, transform: `scale(${knobEnd * pulse})` }} />
     </>
+  );
+};
+
+// Intro "Lo que soy / Como los clientes me ven": serif blanca con contorno negro, centrada. Los emojis de los oficios entran con la segunda frase.
+const SERIF: React.CSSProperties = { fontFamily: "Playfair Display", fontWeight: 600, textAlign: "center", color: "#fff", WebkitTextStroke: "11px #000", paintOrder: "stroke fill", letterSpacing: "-0.03em", lineHeight: 1.0, textShadow: "0 8px 26px rgba(0,0,0,.35)" };
+const FRASE_A = s(0.15);
+const FRASE_A_OUT = s(1.85);
+const FRASE_B = s(2.0);
+const FRASE_B_OUT = s(3.5);
+
+const Frase: React.FC<{ lines: string[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (f < a || f > out + 10) return null;
+  const p = spring({ frame: f - a, fps, config: { damping: 14, stiffness: 120 } });
+  const o = easeIn(clamp01((f - out) / 8));
+  return (
+    <div style={{ ...SERIF, position: "absolute", left: 0, width: 1080, top, fontSize: size, opacity: clamp01(p * 2) * (1 - o), transform: `translateY(${(1 - p) * 40 - o * 50}px) scale(${interpolate(p, [0, 1], [0.92, 1])})`, filter: `blur(${(1 - clamp01(p)) * 8 + o * 10}px)` }}>
+      {lines.map((l) => (
+        <div key={l}>{l}</div>
+      ))}
+    </div>
+  );
+};
+
+const IntroLucia: React.FC = () => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const o = easeIn(clamp01((f - FRASE_B_OUT) / 8));
+  const centers = [140, 340, 540, 740, 940];
+  return (
+    <AbsoluteFill>
+      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={124} top={160} a={FRASE_A} out={FRASE_A_OUT} />
+      <Frase lines={["Como los clientes", "me ven"]} size={112} top={200} a={FRASE_B} out={FRASE_B_OUT} />
+      <AbsoluteFill style={{ opacity: 1 - o, transform: `translateY(${-o * 50}px)`, filter: o > 0.02 ? `blur(${o * 10}px)` : undefined }}>
+        {OFICIOS.map((of, i) => {
+          const p = spring({ frame: f - (FRASE_B + 12 + i * 4), fps, config: { damping: 9, stiffness: 160 } });
+          return (
+            <div key={of.emoji} style={{ position: "absolute", left: centers[i] - 85, top: 520, opacity: clamp01(p * 2), transform: `scale(${p}) translateY(${(1 - p) * 40}px)` }}>
+              <Sticker emoji={of.emoji} size={170} rot={[-6, 5, -4, 6, -5][i]} />
+            </div>
+          );
+        })}
+      </AbsoluteFill>
+    </AbsoluteFill>
   );
 };
 
@@ -225,8 +277,9 @@ const Cierre: React.FC = () => {
   );
 };
 
-export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean; foto?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true, foto = false }) => {
+export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean; foto?: boolean; intro?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true, foto = false, intro = false }) => {
   useFonts();
+  useSerifFont();
   const f = useCurrentFrame();
   // zoom corto + flash en cada corte (solo completo)
   let zoom = 1;
@@ -255,7 +308,7 @@ export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: bo
         )}
       </AbsoluteFill>
       {completo && OFICIOS.map((_, i) => <Detalle key={i} i={i} />)}
-      <Gancho />
+      {intro ? <IntroLucia /> : <Gancho />}
       {OFICIOS.map((_, i) => (
         <Etiqueta key={i} i={i} completo={completo} cierre={cierre} />
       ))}

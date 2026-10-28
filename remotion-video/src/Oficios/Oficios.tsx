@@ -39,10 +39,10 @@ const useFonts = () => {
   }, [handle]);
 };
 
-const useSerifFont = () => {
-  const [handle] = useState(() => delayRender("Cargando Playfair Display"));
+const useTextoFont = () => {
+  const [handle] = useState(() => delayRender("Cargando Poppins Medium"));
   useEffect(() => {
-    loadFont({ family: "Playfair Display", url: staticFile("fonts/PlayfairDisplay-Variable.ttf"), weight: "600" }).then(() => continueRender(handle));
+    loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-Medium.ttf"), weight: "500" }).then(() => continueRender(handle));
   }, [handle]);
 };
 
@@ -94,7 +94,7 @@ const Seleccion: React.FC<{ left: number; top: number; w: number; h: number; sta
 };
 
 // Intro "Lo que soy / Como los clientes me ven": serif blanca con contorno negro, centrada.
-const SERIF: React.CSSProperties = { fontFamily: "Playfair Display", fontWeight: 600, textAlign: "center", color: "#fff", WebkitTextStroke: "9px #000", paintOrder: "stroke fill", letterSpacing: "-0.03em", lineHeight: 1.0, textShadow: "0 8px 26px rgba(0,0,0,.35)" };
+const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 500, textAlign: "center", color: "#fff", WebkitTextStroke: "6px #000", paintOrder: "stroke fill", letterSpacing: "-0.01em", lineHeight: 1.12, textShadow: "0 4px 18px rgba(0,0,0,.3)" };
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
@@ -107,7 +107,7 @@ const Frase: React.FC<{ lines: React.ReactNode[]; size: number; top: number; a: 
   const p = spring({ frame: f - a, fps, config: { damping: 14, stiffness: 120 } });
   const o = easeIn(clamp01((f - out) / 8));
   return (
-    <div style={{ ...SERIF, position: "absolute", left: 0, width: 1080, top, fontSize: size, opacity: clamp01(p * 2) * (1 - o), transform: `translateY(${(1 - p) * 40 - o * 50}px) scale(${interpolate(p, [0, 1], [0.92, 1])})`, filter: `blur(${(1 - clamp01(p)) * 8 + o * 10}px)` }}>
+    <div style={{ ...TEXTO, position: "absolute", left: 0, width: 1080, top, fontSize: size, opacity: clamp01(p * 2) * (1 - o), transform: `translateY(${(1 - p) * 40 - o * 50}px) scale(${interpolate(p, [0, 1], [0.92, 1])})`, filter: `blur(${(1 - clamp01(p)) * 8 + o * 10}px)` }}>
       {lines.map((l, i) => (
         <div key={i}>{l}</div>
       ))}
@@ -118,8 +118,8 @@ const Frase: React.FC<{ lines: React.ReactNode[]; size: number; top: number; a: 
 const IntroLucia: React.FC = () => {
   return (
     <AbsoluteFill>
-      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={92} top={400} a={FRASE_A} out={FRASE_A_OUT} />
-      <Frase lines={["Como los clientes", "me ven"]} size={84} top={360} a={FRASE_B} out={FRASE_B2_OUT} />
+      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={76} top={400} a={FRASE_A} out={FRASE_A_OUT} />
+      <Frase lines={["Como los clientes", "me ven"]} size={70} top={370} a={FRASE_B} out={FRASE_B2_OUT} />
     </AbsoluteFill>
   );
 };
@@ -171,7 +171,7 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean; minima
     return (
       <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
         <span style={{ fontFamily: "Noto Color Emoji", fontSize: 50, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
-        <span style={{ ...SERIF, fontSize: 52, WebkitTextStroke: "8px #000" }}>{nombre}</span>
+        <span style={{ ...TEXTO, fontSize: 46, WebkitTextStroke: "6px #000" }}>{nombre}</span>
       </div>
     );
   }
@@ -218,7 +218,7 @@ const FotoLucia: React.FC = () => {
   return (
     <AbsoluteFill>
       <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <Frase lines={[<>Soy <span style={{ color: GOLD }}>Lucía Rodríguez,</span></>, "y para nuestros", "clientes..."]} size={92} top={400} a={6} out={9999} />
+      <Frase lines={[<>Soy <span style={{ color: GOLD }}>Lucía Rodríguez,</span></>, "y para nuestros", "clientes..."]} size={76} top={400} a={6} out={9999} />
     </AbsoluteFill>
   );
 };
@@ -226,7 +226,7 @@ const FotoLucia: React.FC = () => {
 const ClipCta: React.FC = () => (
   <AbsoluteFill>
     <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
-    <Frase lines={["Somos todo eso", <>y <span style={{ color: GOLD }}>MÁS</span></>]} size={100} top={380} a={6} out={9999} />
+    <Frase lines={["Somos todo eso", <>y <span style={{ color: GOLD }}>MÁS</span></>]} size={84} top={380} a={6} out={9999} />
   </AbsoluteFill>
 );
 
@@ -252,7 +252,7 @@ const Cierre: React.FC = () => {
 
 export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: boolean; foto?: boolean; intro?: boolean }> = ({ completo, flash: conFlash = completo, cierre = true, foto = false, intro = false }) => {
   useFonts();
-  useSerifFont();
+  useTextoFont();
   const f = useCurrentFrame();
   // zoom corto + flash en cada corte (solo completo)
   let zoom = 1;

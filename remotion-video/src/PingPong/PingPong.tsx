@@ -173,6 +173,32 @@ const paginas: Pagina[] = (() => {
 
 const ROJO = "#EF4444";
 
+// Título del adelanto: titular condensado, palabra a palabra; "estafar" en rojo (como en la v3).
+const TituloAdelanto: React.FC<{ s: number }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = paginas.find((x) => x.ini < 1.5);
+  if (!p) return null;
+  const sale = interpolate(s, [p.fin + 0.2, p.fin + 0.45], [1, 0], clamp);
+  if (sale <= 0) return null;
+  const f0 = Math.round(p.ini * fps);
+  return (
+    <div style={{ position: "absolute", left: 60, right: 60, top: 470, textAlign: "center", opacity: sale }}>
+      <div style={{ fontFamily: "Bebas Neue", fontSize: 150, lineHeight: 0.98, letterSpacing: 4, color: T.ink, textShadow: "0 6px 30px rgba(0,0,0,0.6)" }}>
+        {p.palabras.map((w, i) => {
+          const k = spring({ frame: frame - f0 - i * 2, fps, config: { damping: 14, stiffness: 170, mass: 0.6 } });
+          const rojo = /estafar/i.test(w.w);
+          return (
+            <span key={i} style={{ display: "inline-block", marginRight: 24, color: rojo ? ROJO : T.ink, opacity: Math.min(1, k * 1.6), transform: `translateY(${(1 - k) * 30}px)` }}>
+              {w.w.replace(/[.,]$/, "").toUpperCase()}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // Subtítulos minimalistas del taller (mismos que SOLAIA / SPOT 335): Inter Medium blanca, una línea, línea fina encima y degradado negro suave abajo.
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const Subtitulos: React.FC<{ s: number }> = ({ s }) => {
@@ -180,6 +206,7 @@ const Subtitulos: React.FC<{ s: number }> = ({ s }) => {
   let op = 0;
   let texto = "";
   for (const p of paginas) {
+    if (p.ini < 1.5) continue; // el adelanto lleva su propio título
     const a = Math.round(p.ini * PP_FPS) - 2;
     const b = Math.round((p.fin + 0.15) * PP_FPS);
     const o = Math.min(clamp01((frame - a) / 5), clamp01((b + 6 - frame) / 6));
@@ -300,6 +327,7 @@ export const PingPong: React.FC = () => {
       <Plano s={s} />
       <Capas s={s} />
       <Subtitulos s={s} />
+      <TituloAdelanto s={s} />
       <LowerThird s={s} />
       <Cierre s={s} />
       <Aviso s={s} />

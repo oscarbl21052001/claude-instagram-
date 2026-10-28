@@ -214,6 +214,10 @@ const Base: React.FC<{ b: boolean }> = ({ b }) => {
           <Grafico s={s} />
           <Cierre s={s} />
           {sfx("whoosh", 0.05, 0.4)}
+          <Sequence from={Math.round(2.9 * DO_FPS)} durationInFrames={Math.round(1.5 * DO_FPS)}>
+            <Audio src={staticFile("dolar/contador.wav")} volume={0.7} />
+          </Sequence>
+          {sfx("ding", 4.05, 0.3)}
           {sfx("whoosh", 4.45, 0.4)}
           {sfx("ding", 7.0, 0.3)}
           {sfx("whoosh", 15.4, 0.4)}

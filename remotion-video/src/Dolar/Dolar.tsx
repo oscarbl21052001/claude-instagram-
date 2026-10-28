@@ -92,35 +92,41 @@ const Subtitulos: React.FC = () => {
   );
 };
 
-// Titular del gancho: palabra a palabra, "MÁS" en verde.
-const Gancho: React.FC<{ s: number }> = ({ s }) => {
+// Datos reales (Valor Econômico, Reuters y BBC Brasil, 26/10/2026): el dólar cerró el viernes 23 cerca de R$ 4,99 y el lunes 26, tras la reelección de Lula, en R$ 5,40 (+8,2 %, mayor alza diaria desde 1999).
+const VIERNES = 4.99;
+const LUNES = 5.4;
+const miles = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+// Gancho interactivo: conversor de US$ 1.000 a reales; la cifra sube cuando dice "valgan más".
+const Conversor: React.FC<{ s: number }> = ({ s }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t0 = 0.15;
   const t1 = 4.3;
   if (s > t1 + 0.4) return null;
-  const sale = interpolate(s, [t1, t1 + 0.3], [1, 0], { ...clamp, easing: ease.in });
-  const lineas = [["TU", "DÓLAR"], ["VALE", "MÁS"]];
-  let n = 0;
+  const e = spring({ frame: frame - Math.round(t0 * fps), fps, config: { damping: 16, stiffness: 140, mass: 0.7 } });
+  const sale = interpolate(s, [t1, t1 + 0.3], [0, 1], { ...clamp, easing: ease.in });
+  const k = interpolate(s, [2.9, 4.1], [0, 1], { ...clamp, easing: ease.inOut });
+  const valor = VIERNES * 1000 + (LUNES - VIERNES) * 1000 * k;
+  const gana = spring({ frame: frame - Math.round(4.0 * fps), fps, config: { damping: 12, stiffness: 160, mass: 0.6 } });
+  const sube = k > 0.02;
   return (
-    <div style={{ position: "absolute", left: 60, right: 60, top: 300, textAlign: "center", opacity: sale }}>
-      {lineas.map((l, li) => (
-        <div key={li} style={{ fontFamily: "Bebas Neue", fontSize: 190, lineHeight: 0.98, letterSpacing: 4, textShadow: "0 6px 30px rgba(0,0,0,0.6)" }}>
-          {l.map((w) => {
-            const k = spring({ frame: frame - Math.round(t0 * fps) - n++ * 4, fps, config: { damping: 14, stiffness: 170, mass: 0.6 } });
-            return (
-              <span key={w} style={{ display: "inline-block", marginRight: 28, color: w === "MÁS" ? T.hero : T.ink, opacity: Math.min(1, k * 1.6), transform: `translateY(${(1 - k) * 36}px)` }}>
-                {w}
-              </span>
-            );
-          })}
+    <div style={{ position: "absolute", left: 60, right: 60, top: 270, display: "flex", justifyContent: "center", opacity: Math.min(1, e * 1.4) * (1 - sale), transform: `translateY(${(1 - e) * -60 - sale * -40}px) scale(${0.92 + 0.08 * e})` }}>
+      <div style={{ background: T.card, borderRadius: 40, padding: "30px 48px 34px", boxShadow: "0 20px 60px rgba(0,0,0,0.45)", border: "1.5px solid rgba(255,255,255,0.14)", width: 800, textAlign: "center" }}>
+        <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: 30, letterSpacing: 6, color: "rgba(248,250,252,0.62)" }}>US$ 1.000 EN REALES</div>
+        <div style={{ fontFamily: "Bebas Neue", fontSize: 200, lineHeight: 1.05, letterSpacing: 3, color: sube ? T.hero : T.ink, fontVariantNumeric: "tabular-nums", textShadow: sube ? `0 0 40px ${T.hero}55` : "none" }}>R$ {miles(valor)}</div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 18, height: 56 }}>
+          <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: 32, letterSpacing: 4, color: "rgba(248,250,252,0.62)" }}>{k < 0.02 ? "VIERNES" : "LUNES"}</span>
+          {gana > 0.02 ? (
+            <span style={{ fontFamily: T.font, fontWeight: 800, fontSize: 40, color: "#04130d", background: T.hero, borderRadius: 999, padding: "4px 24px", opacity: Math.min(1, gana * 1.5), transform: `scale(${0.8 + 0.2 * Math.min(1, gana)})` }}>+R$ {miles((LUNES - VIERNES) * 1000)}</span>
+          ) : null}
         </div>
-      ))}
+      </div>
     </div>
   );
 };
 
-// Gráfico sin cifras: USD sube frente a BRL, la línea se dibuja cuando dice "el dólar subió".
+// Gráfico con datos reales: viernes R$ 4,99 → lunes R$ 5,40; la línea se dibuja cuando dice "el dólar subió".
 const Grafico: React.FC<{ s: number }> = ({ s }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -131,16 +137,27 @@ const Grafico: React.FC<{ s: number }> = ({ s }) => {
   const sale = interpolate(s, [t1, t1 + 0.3], [0, 1], { ...clamp, easing: ease.in });
   const o = Math.min(1, e * 1.4) * (1 - sale);
   const trazo = interpolate(s, [6.4, 7.5], [0, 1], { ...clamp, easing: ease.out });
-  const L = 520;
+  const pct = (((LUNES / VIERNES) - 1) * 100) * trazo;
+  const precio = VIERNES + (LUNES - VIERNES) * trazo;
+  const coma = (n: number, d: number) => n.toFixed(d).replace(".", ",");
+  const x1 = 90, y1 = 205, x2 = 590, y2 = 50;
   return (
-    <div style={{ position: "absolute", left: 60, right: 60, top: 260, display: "flex", justifyContent: "center", opacity: o, transform: `translateY(${(1 - e) * -50}px) scale(${0.94 + 0.06 * e})` }}>
-      <div style={{ background: T.card, borderRadius: 36, padding: "28px 40px 30px", boxShadow: "0 20px 60px rgba(0,0,0,0.45)", border: "1.5px solid rgba(255,255,255,0.14)", width: 760 }}>
-        <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: 30, letterSpacing: 6, color: "rgba(248,250,252,0.62)", marginBottom: 6 }}>USD / BRL</div>
-        <svg width="680" height="300" viewBox="0 0 680 300">
-          <line x1="10" y1="280" x2="670" y2="280" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
-          <path d="M20 230 L150 210 L260 225 L370 175 L500 110 L640 40" fill="none" stroke={T.hero} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray={L + 200} strokeDashoffset={(L + 200) * (1 - trazo)} />
-          <circle cx="640" cy="40" r="13" fill={T.hero} opacity={clamp01((trazo - 0.9) * 10)} />
+    <div style={{ position: "absolute", left: 60, right: 60, top: 250, display: "flex", justifyContent: "center", opacity: o, transform: `translateY(${(1 - e) * -50}px) scale(${0.94 + 0.06 * e})` }}>
+      <div style={{ background: T.card, borderRadius: 36, padding: "26px 40px 24px", boxShadow: "0 20px 60px rgba(0,0,0,0.45)", border: "1.5px solid rgba(255,255,255,0.14)", width: 800 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: 30, letterSpacing: 6, color: "rgba(248,250,252,0.62)" }}>DÓLAR / REAL</span>
+          <span style={{ fontFamily: T.font, fontWeight: 800, fontSize: 64, color: T.hero, fontVariantNumeric: "tabular-nums" }}>+{coma(pct, 1)}%</span>
+        </div>
+        <svg width="720" height="290" viewBox="0 0 720 290">
+          <line x1="20" y1="270" x2="700" y2="270" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
+          <line x1={x1} y1={y1} x2={x1 + (x2 - x1) * trazo} y2={y1 + (y2 - y1) * trazo} stroke={T.hero} strokeWidth="10" strokeLinecap="round" />
+          <circle cx={x1} cy={y1} r="12" fill={T.ink} />
+          <circle cx={x1 + (x2 - x1) * trazo} cy={y1 + (y2 - y1) * trazo} r="14" fill={T.hero} opacity={trazo > 0.02 ? 1 : 0} />
+          <text x={x1} y={y1 + 46} textAnchor="middle" fontFamily={T.font} fontWeight="700" fontSize="30" fill="rgba(248,250,252,0.8)">VIE R$ {coma(VIERNES, 2)}</text>
+          <text x={x2 - 20} y={y2 - 24} textAnchor="middle" fontFamily={T.font} fontWeight="800" fontSize="34" fill={T.hero} opacity={trazo > 0.02 ? 1 : 0}>LUN R$ {coma(precio, 2)}</text>
         </svg>
+        <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: 28, color: "rgba(248,250,252,0.7)", textAlign: "center" }}>Mayor subida en un día desde 1999</div>
+        <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 22, color: "rgba(248,250,252,0.45)", textAlign: "center", marginTop: 6 }}>Cierre 23 y 26 oct 2026 · Valor Econômico, BBC Brasil</div>
       </div>
     </div>
   );
@@ -194,7 +211,7 @@ const Base: React.FC<{ b: boolean }> = ({ b }) => {
       <Subtitulos />
       {b ? (
         <>
-          <Gancho s={s} />
+          <Conversor s={s} />
           <Grafico s={s} />
           <Cierre s={s} />
           {sfx("whoosh", 0.05, 0.4)}

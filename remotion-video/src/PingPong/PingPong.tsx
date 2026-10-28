@@ -62,6 +62,8 @@ const useFuente = () => {
     Promise.all([
       loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-ExtraBold.woff2"), weight: "800" }),
       loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-Bold.woff2"), weight: "700" }),
+      loadFont({ family: "Bebas Neue", url: staticFile("fonts/BebasNeue-Regular.woff2") }),
+      loadFont({ family: "Inter", url: staticFile("fonts/Inter-Medium.woff2"), weight: "500" }),
       loadFont({ family: "Playfair Display", url: staticFile("fonts/PlayfairDisplay-MediumItalic.woff2"), weight: "500", style: "italic" }),
     ]).then(() => continueRender(handle));
   }, [handle]);
@@ -168,6 +170,8 @@ const paginas: Pagina[] = (() => {
   return out;
 })();
 
+const ROJO = "#EF4444";
+
 const Subtitulos: React.FC<{ s: number }> = ({ s }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -178,11 +182,76 @@ const Subtitulos: React.FC<{ s: number }> = ({ s }) => {
   const f0 = Math.round(p.ini * fps);
   const entra = interpolate(frame - f0, [0, 6], [0, 1], { ...clamp, easing: ease.out });
   const sale = interpolate(s, [p.fin + 0.2, p.fin + 0.45], [1, 0], clamp);
+  if (hook) {
+    // adelanto: titular condensado, palabra a palabra; "estafar" en rojo
+    return (
+      <div style={{ position: "absolute", left: 60, right: 60, top: 470, textAlign: "center", opacity: sale }}>
+        <div style={{ fontFamily: "Bebas Neue", fontSize: 150, lineHeight: 0.98, letterSpacing: 4, color: T.ink, textShadow: "0 6px 30px rgba(0,0,0,0.6)" }}>
+          {p.palabras.map((w, i) => {
+            const k = spring({ frame: frame - f0 - i * 2, fps, config: { damping: 14, stiffness: 170, mass: 0.6 } });
+            const rojo = /estafar/i.test(w.w);
+            return (
+              <span key={i} style={{ display: "inline-block", marginRight: 24, color: rojo ? ROJO : T.ink, opacity: Math.min(1, k * 1.6), transform: `translateY(${(1 - k) * 30}px)` }}>
+                {w.w.replace(/[.,]$/, "").toUpperCase()}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
   const texto = p.palabras.map((w) => w.w).join(" ");
   return (
-    <div style={{ position: "absolute", left: 90, right: 90, top: hook ? 560 : 1390, textAlign: "center", opacity: entra * sale, transform: `translateY(${(1 - entra) * 10}px)` }}>
-      <div style={{ fontFamily: T.font, fontWeight: 700, fontSize: hook ? 66 : 46, lineHeight: 1.2, letterSpacing: -0.3, color: "rgba(248,250,252,0.96)", textShadow: "0 2px 14px rgba(0,0,0,0.65)" }}>{texto}</div>
+    <div style={{ position: "absolute", left: 70, right: 70, top: 1370, display: "flex", justifyContent: "center", opacity: entra * sale, transform: `translateY(${(1 - entra) * 12}px)` }}>
+      <div style={{ background: "rgba(8,20,28,0.74)", borderRadius: 24, padding: "14px 32px 16px", fontFamily: "Inter", fontWeight: 500, fontSize: 46, lineHeight: 1.2, color: T.ink, border: "1.5px solid rgba(255,255,255,0.12)" }}>{texto}</div>
     </div>
+  );
+};
+
+// Animaciones sobre la estafa: sello en el adelanto, alerta con "estafen" y escudo con "confianza".
+const Aviso: React.FC<{ s: number }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const mostrar = (t0: number, t1: number) => {
+    const e = spring({ frame: frame - Math.round(t0 * fps), fps, config: { damping: 11, stiffness: 170, mass: 0.7 } });
+    const sale = interpolate(s, [t1, t1 + 0.25], [0, 1], { ...clamp, easing: ease.in });
+    return { e, o: Math.min(1, e * 2) * (1 - sale), vis: s >= t0 && s < t1 + 0.3 };
+  };
+  const sello = mostrar(0.75, 1.5);
+  const alerta = mostrar(60.9, 65.6);
+  const escudo = mostrar(73.0, 75.8);
+  const sacude = (t: number) => Math.sin((s - t) * 70) * 6 * interpolate(s, [t, t + 0.35], [1, 0], clamp);
+  const trazo = (t0: number, dur: number) => interpolate(s, [t0, t0 + dur], [0, 1], { ...clamp, easing: ease.out });
+  return (
+    <>
+      {sello.vis ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 250, display: "flex", justifyContent: "center", opacity: sello.o, transform: `scale(${2.2 - 1.2 * Math.min(1, sello.e)}) rotate(${-7}deg) translateX(${sacude(0.75)}px)` }}>
+          <div style={{ border: `10px solid ${ROJO}`, borderRadius: 18, padding: "6px 36px 0", background: "rgba(255,255,255,0.9)", fontFamily: "Bebas Neue", fontSize: 170, letterSpacing: 6, color: ROJO, lineHeight: 1.1 }}>¿ESTAFA?</div>
+        </div>
+      ) : null}
+      {alerta.vis ? (
+        <div style={{ position: "absolute", right: 60, top: 250, display: "flex", alignItems: "center", gap: 20, background: "rgba(8,20,28,0.8)", border: `3px solid ${ROJO}`, borderRadius: 28, padding: "18px 34px 18px 22px", opacity: alerta.o, transform: `scale(${0.8 + 0.2 * Math.min(1, alerta.e)}) translateX(${sacude(60.9)}px)` }}>
+          <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: `scale(${1 + 0.08 * Math.sin((s - 60.9) * 9)})` }}>
+            <path d="M36 6 L68 62 H4 Z" fill="none" stroke={ROJO} strokeWidth="6" strokeLinejoin="round" strokeDasharray="190" strokeDashoffset={190 * (1 - trazo(60.95, 0.5))} />
+            <rect x="32.5" y="24" width="7" height="20" rx="3.5" fill={ROJO} opacity={trazo(61.3, 0.2)} />
+            <circle cx="36" cy="52" r="4" fill={ROJO} opacity={trazo(61.4, 0.2)} />
+          </svg>
+          <div>
+            <div style={{ fontFamily: "Bebas Neue", fontSize: 64, letterSpacing: 4, color: ROJO, lineHeight: 1 }}>RIESGO DE ESTAFA</div>
+            <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 28, color: "rgba(248,250,252,0.75)", marginTop: 2 }}>país extranjero · todo virtual</div>
+          </div>
+        </div>
+      ) : null}
+      {escudo.vis ? (
+        <div style={{ position: "absolute", right: 60, top: 250, display: "flex", alignItems: "center", gap: 20, background: "rgba(8,20,28,0.8)", border: `3px solid ${T.hero}`, borderRadius: 28, padding: "18px 34px 18px 22px", opacity: escudo.o, transform: `scale(${0.85 + 0.15 * Math.min(1, escudo.e)})` }}>
+          <svg width="72" height="80" viewBox="0 0 72 80">
+            <path d="M36 4 L66 16 V40 C66 58 52 70 36 76 C20 70 6 58 6 40 V16 Z" fill="none" stroke={T.hero} strokeWidth="6" strokeLinejoin="round" strokeDasharray="260" strokeDashoffset={260 * (1 - trazo(73.0, 0.6))} />
+            <path d="M22 40 L32 50 L50 28" fill="none" stroke={T.hero} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="50" strokeDashoffset={50 * (1 - trazo(73.5, 0.4))} />
+          </svg>
+          <div style={{ fontFamily: "Bebas Neue", fontSize: 64, letterSpacing: 4, color: T.hero, lineHeight: 1 }}>CONFIANZA</div>
+        </div>
+      ) : null}
+    </>
   );
 };
 
@@ -253,6 +322,7 @@ export const PingPong: React.FC = () => {
       <Subtitulos s={s} />
       <LowerThird s={s} />
       <Cierre s={s} />
+      <Aviso s={s} />
       {PREGUNTAS.map((q) => (
         <TarjetaPregunta key={q.n} s={s} q={q} />
       ))}
@@ -261,6 +331,8 @@ export const PingPong: React.FC = () => {
       {sfx("ding", 2.9, 0.35)}
       {sfx("hit", 60.9, 0.7)}
       {sfx("ding", 76.2, 0.3)}
+      {sfx("hit", 0.75, 0.55)}
+      {sfx("ding", 73.0, 0.3)}
       {sfx("whoosh", 83.2, 0.4)}
     </AbsoluteFill>
   );

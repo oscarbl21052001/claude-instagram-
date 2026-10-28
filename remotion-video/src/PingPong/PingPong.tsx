@@ -163,7 +163,8 @@ const paginas: Pagina[] = (() => {
       if (cur.length && w.s - cur[cur.length - 1].e > 0.45) flush();
       cur.push(w);
       const fuerte = /[.,?!]$/.test(w.w);
-      if (a > 0 && (cur.length >= 5 || fuerte)) flush(); // el hook (a = 0) va en una sola página
+      const largo = cur.map((x) => x.w).join(" ").length >= 34;
+      if (a > 0 && (cur.length >= 7 || largo || fuerte)) flush(); // el hook (a = 0) va en una sola página
       if (i === ws.length - 1) flush();
     });
   }
@@ -172,39 +173,32 @@ const paginas: Pagina[] = (() => {
 
 const ROJO = "#EF4444";
 
+// Subtítulos minimalistas del taller (mismos que SOLAIA / SPOT 335): Inter Medium blanca, una línea, línea fina encima y degradado negro suave abajo.
+const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const Subtitulos: React.FC<{ s: number }> = ({ s }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const idx = paginas.findIndex((p, i) => s >= p.ini - 0.04 && s < p.fin + 0.45 && (i === paginas.length - 1 || s < paginas[i + 1].ini - 0.04));
-  if (idx < 0) return null;
-  const p = paginas[idx];
-  const hook = p.ini < 1.5;
-  const f0 = Math.round(p.ini * fps);
-  const entra = interpolate(frame - f0, [0, 6], [0, 1], { ...clamp, easing: ease.out });
-  const sale = interpolate(s, [p.fin + 0.2, p.fin + 0.45], [1, 0], clamp);
-  if (hook) {
-    // adelanto: titular condensado, palabra a palabra; "estafar" en rojo
-    return (
-      <div style={{ position: "absolute", left: 60, right: 60, top: 470, textAlign: "center", opacity: sale }}>
-        <div style={{ fontFamily: "Bebas Neue", fontSize: 150, lineHeight: 0.98, letterSpacing: 4, color: T.ink, textShadow: "0 6px 30px rgba(0,0,0,0.6)" }}>
-          {p.palabras.map((w, i) => {
-            const k = spring({ frame: frame - f0 - i * 2, fps, config: { damping: 14, stiffness: 170, mass: 0.6 } });
-            const rojo = /estafar/i.test(w.w);
-            return (
-              <span key={i} style={{ display: "inline-block", marginRight: 24, color: rojo ? ROJO : T.ink, opacity: Math.min(1, k * 1.6), transform: `translateY(${(1 - k) * 30}px)` }}>
-                {w.w.replace(/[.,]$/, "").toUpperCase()}
-              </span>
-            );
-          })}
-        </div>
-      </div>
-    );
+  let op = 0;
+  let texto = "";
+  for (const p of paginas) {
+    const a = Math.round(p.ini * PP_FPS) - 2;
+    const b = Math.round((p.fin + 0.15) * PP_FPS);
+    const o = Math.min(clamp01((frame - a) / 5), clamp01((b + 6 - frame) / 6));
+    if (o > op) {
+      op = o;
+      texto = p.palabras.map((w) => w.w).join(" ");
+    }
   }
-  const texto = p.palabras.map((w) => w.w).join(" ");
+  const grad = Math.min(clamp01(frame / 10), clamp01((PP_DURATION - frame) / 10));
   return (
-    <div style={{ position: "absolute", left: 70, right: 70, top: 1370, display: "flex", justifyContent: "center", opacity: entra * sale, transform: `translateY(${(1 - entra) * 12}px)` }}>
-      <div style={{ background: "rgba(8,20,28,0.74)", borderRadius: 24, padding: "14px 32px 16px", fontFamily: "Inter", fontWeight: 500, fontSize: 46, lineHeight: 1.2, color: T.ink, border: "1.5px solid rgba(255,255,255,0.12)" }}>{texto}</div>
-    </div>
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 560, background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%)", opacity: grad }} />
+      {op > 0 && (
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 330, display: "flex", flexDirection: "column", alignItems: "center", opacity: op }}>
+          <div style={{ width: 56, height: 1.5, background: "rgba(255,255,255,0.8)", marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.5)" }} />
+          <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 34, letterSpacing: 1.2, color: "#FFFFFF", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 2px 14px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.5)", textAlign: "center", whiteSpace: "nowrap" }}>{texto}</div>
+        </div>
+      )}
+    </AbsoluteFill>
   );
 };
 
@@ -218,7 +212,6 @@ const Aviso: React.FC<{ s: number }> = ({ s }) => {
     return { e, o: Math.min(1, e * 2) * (1 - sale), vis: s >= t0 && s < t1 + 0.3 };
   };
   const sello = mostrar(0.75, 1.5);
-  const alerta = mostrar(60.9, 65.6);
   const escudo = mostrar(73.0, 75.8);
   const sacude = (t: number) => Math.sin((s - t) * 70) * 6 * interpolate(s, [t, t + 0.35], [1, 0], clamp);
   const trazo = (t0: number, dur: number) => interpolate(s, [t0, t0 + dur], [0, 1], { ...clamp, easing: ease.out });
@@ -227,19 +220,6 @@ const Aviso: React.FC<{ s: number }> = ({ s }) => {
       {sello.vis ? (
         <div style={{ position: "absolute", left: 0, right: 0, top: 250, display: "flex", justifyContent: "center", opacity: sello.o, transform: `scale(${2.2 - 1.2 * Math.min(1, sello.e)}) rotate(${-7}deg) translateX(${sacude(0.75)}px)` }}>
           <div style={{ border: `10px solid ${ROJO}`, borderRadius: 18, padding: "6px 36px 0", background: "rgba(255,255,255,0.9)", fontFamily: "Bebas Neue", fontSize: 170, letterSpacing: 6, color: ROJO, lineHeight: 1.1 }}>¿ESTAFA?</div>
-        </div>
-      ) : null}
-      {alerta.vis ? (
-        <div style={{ position: "absolute", right: 60, top: 250, display: "flex", alignItems: "center", gap: 20, background: "rgba(8,20,28,0.8)", border: `3px solid ${ROJO}`, borderRadius: 28, padding: "18px 34px 18px 22px", opacity: alerta.o, transform: `scale(${0.8 + 0.2 * Math.min(1, alerta.e)}) translateX(${sacude(60.9)}px)` }}>
-          <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: `scale(${1 + 0.08 * Math.sin((s - 60.9) * 9)})` }}>
-            <path d="M36 6 L68 62 H4 Z" fill="none" stroke={ROJO} strokeWidth="6" strokeLinejoin="round" strokeDasharray="190" strokeDashoffset={190 * (1 - trazo(60.95, 0.5))} />
-            <rect x="32.5" y="24" width="7" height="20" rx="3.5" fill={ROJO} opacity={trazo(61.3, 0.2)} />
-            <circle cx="36" cy="52" r="4" fill={ROJO} opacity={trazo(61.4, 0.2)} />
-          </svg>
-          <div>
-            <div style={{ fontFamily: "Bebas Neue", fontSize: 64, letterSpacing: 4, color: ROJO, lineHeight: 1 }}>RIESGO DE ESTAFA</div>
-            <div style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 28, color: "rgba(248,250,252,0.75)", marginTop: 2 }}>país extranjero · todo virtual</div>
-          </div>
         </div>
       ) : null}
       {escudo.vis ? (
@@ -329,7 +309,6 @@ export const PingPong: React.FC = () => {
       <AbsoluteFill style={{ background: "#000", opacity: 1 - fadeOut }} />
       {PREGUNTAS.map((q) => sfx("whoosh", q.t0 - 0.13, 0.5))}
       {sfx("ding", 2.9, 0.35)}
-      {sfx("hit", 60.9, 0.7)}
       {sfx("ding", 76.2, 0.3)}
       {sfx("hit", 0.75, 0.55)}
       {sfx("ding", 73.0, 0.3)}

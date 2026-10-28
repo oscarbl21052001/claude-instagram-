@@ -2,6 +2,7 @@ import { PalabrasClave, KW_DURATION } from "./Solaia/PalabrasClave";
 import { SolaiaCompleto } from "./Solaia/SolaiaCompleto";
 import { SolaiaIntro, SOLAIA_DURATION } from "./Solaia/SolaiaIntro";
 import { Composition } from "remotion";
+import { DO_DURATION, DO_FPS, DO_H, DO_W, DolarA, DolarB } from "./Dolar/Dolar";
 import { PP_DURATION, PP_FPS, PP_H, PP_W, PingPong } from "./PingPong/PingPong";
 import { MyComposition } from "./Composition";
 import { CONTACTAR_DURATION, CONTACTAR_FPS, Contactanos } from "./Contactar/Contactanos";
@@ -31,6 +32,8 @@ export const RemotionRoot: React.FC = () => {
   return (
     <>
       <MyComposition />
+      <Composition id="DolarA" component={DolarA} durationInFrames={DO_DURATION} fps={DO_FPS} width={DO_W} height={DO_H} />
+      <Composition id="DolarB" component={DolarB} durationInFrames={DO_DURATION} fps={DO_FPS} width={DO_W} height={DO_H} />
       <Composition id="PingPong" component={PingPong} durationInFrames={PP_DURATION} fps={PP_FPS} width={PP_W} height={PP_H} />
       <Composition id="Video41Playa" component={Video41Playa} durationInFrames={V41_DURATION} fps={V41_FPS} width={V41_W} height={V41_H} />
       <Composition id="PlayaTexto" component={PlayaTexto} durationInFrames={PLAYA_DURATION} fps={PLAYA_FPS} width={PLAYA_W} height={PLAYA_H} />

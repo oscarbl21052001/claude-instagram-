@@ -24,11 +24,11 @@ const easeIn = Easing.in(Easing.cubic);
 const s = (sec: number) => Math.round(sec * OFICIOS_FPS);
 
 const OFICIOS = [
-  { cut: 3.87, emoji: "⚖️", lines: ["ABOGADA"], ring: { x: 40, y: 200, w: 760, h: 440 } },
-  { cut: 5.33, emoji: "📋", lines: ["GESTORA DE", "PROYECTOS"], ring: { x: 40, y: 540, w: 760, h: 330 } },
-  { cut: 6.77, emoji: "📊", lines: ["FINANZAS"], ring: { x: 740, y: 730, w: 330, h: 220 } },
-  { cut: 8.23, emoji: "🛋️", lines: ["INTERIORISTA"], ring: { x: 100, y: 470, w: 830, h: 280 } },
-  { cut: 9.7, emoji: "📐", lines: ["ARQUITECTA"], ring: { x: 700, y: 490, w: 340, h: 420 } },
+  { cut: 3.6, emoji: "⚖️", lines: ["ABOGADA"], ring: { x: 40, y: 200, w: 760, h: 440 } },
+  { cut: 5.533, emoji: "📋", lines: ["GESTORA DE", "PROYECTOS"], ring: { x: 40, y: 540, w: 760, h: 330 } },
+  { cut: 6.5, emoji: "📊", lines: ["FINANZAS"], ring: { x: 740, y: 730, w: 330, h: 220 } },
+  { cut: 8.433, emoji: "🛋️", lines: ["INTERIORISTA"], ring: { x: 100, y: 470, w: 830, h: 280 } },
+  { cut: 9.4, emoji: "📐", lines: ["ARQUITECTA"], ring: { x: 700, y: 490, w: 340, h: 420 } },
 ];
 const CIERRE = 10.45;
 
@@ -98,7 +98,7 @@ const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 300, tex
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
-const FRASE_B2_OUT = s(3.87) - 10; // sale justo cuando aparece la primera imagen de IA (corte a los 3,87 s)
+const FRASE_B2_OUT = s(3.6) - 10; // sale justo cuando aparece la primera imagen de IA (corte a los 3,6 s)
 
 const Frase: React.FC<{ lines: React.ReactNode[]; size: number; top: number; a: number; out: number }> = ({ lines, size, top, a, out }) => {
   const f = useCurrentFrame();

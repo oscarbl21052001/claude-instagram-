@@ -40,9 +40,9 @@ const useFonts = () => {
 };
 
 const useTextoFont = () => {
-  const [handle] = useState(() => delayRender("Cargando Poppins Medium"));
+  const [handle] = useState(() => delayRender("Cargando Poppins Light"));
   useEffect(() => {
-    loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-Medium.ttf"), weight: "500" }).then(() => continueRender(handle));
+    loadFont({ family: "Poppins", url: staticFile("fonts/Poppins-Light.ttf"), weight: "300" }).then(() => continueRender(handle));
   }, [handle]);
 };
 
@@ -94,7 +94,7 @@ const Seleccion: React.FC<{ left: number; top: number; w: number; h: number; sta
 };
 
 // Intro "Lo que soy / Como los clientes me ven": serif blanca con contorno negro, centrada.
-const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 500, textAlign: "center", color: "#fff", WebkitTextStroke: "6px #000", paintOrder: "stroke fill", letterSpacing: "-0.01em", lineHeight: 1.12, textShadow: "0 4px 18px rgba(0,0,0,.3)" };
+const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 300, textAlign: "center", color: "#fff", WebkitTextStroke: "3px rgba(0,0,0,.85)", paintOrder: "stroke fill", letterSpacing: "0.01em", lineHeight: 1.18, textShadow: "0 2px 14px rgba(0,0,0,.35)" };
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
@@ -171,7 +171,7 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean; minima
     return (
       <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
         <span style={{ fontFamily: "Noto Color Emoji", fontSize: 50, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
-        <span style={{ ...TEXTO, fontSize: 46, WebkitTextStroke: "6px #000" }}>{nombre}</span>
+        <span style={{ ...TEXTO, fontSize: 46, WebkitTextStroke: "3px rgba(0,0,0,.85)" }}>{nombre}</span>
       </div>
     );
   }

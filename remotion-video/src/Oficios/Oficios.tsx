@@ -94,7 +94,7 @@ const Seleccion: React.FC<{ left: number; top: number; w: number; h: number; sta
 };
 
 // Intro "Lo que soy / Como los clientes me ven": serif blanca con contorno negro, centrada.
-const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 300, textAlign: "center", color: "#fff", WebkitTextStroke: "3px rgba(0,0,0,.85)", paintOrder: "stroke fill", letterSpacing: "0.01em", lineHeight: 1.18, textShadow: "0 2px 14px rgba(0,0,0,.35)" };
+const TEXTO: React.CSSProperties = { fontFamily: "Poppins", fontWeight: 300, textAlign: "center", color: "#fff", WebkitTextStroke: "2.5px rgba(0,0,0,.85)", paintOrder: "stroke fill", letterSpacing: "0.01em", lineHeight: 1.18, textShadow: "0 2px 14px rgba(0,0,0,.35)" };
 const FRASE_A = s(0.15);
 const FRASE_A_OUT = s(1.85);
 const FRASE_B = s(2.0);
@@ -118,8 +118,8 @@ const Frase: React.FC<{ lines: React.ReactNode[]; size: number; top: number; a: 
 const IntroLucia: React.FC = () => {
   return (
     <AbsoluteFill>
-      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={76} top={400} a={FRASE_A} out={FRASE_A_OUT} />
-      <Frase lines={["Como los clientes", "me ven"]} size={70} top={370} a={FRASE_B} out={FRASE_B2_OUT} />
+      <Frase lines={["Lo que soy:", "corredora", "inmobiliaria"]} size={54} top={440} a={FRASE_A} out={FRASE_A_OUT} />
+      <Frase lines={["Como los clientes", "me ven"]} size={50} top={440} a={FRASE_B} out={FRASE_B2_OUT} />
     </AbsoluteFill>
   );
 };
@@ -170,8 +170,8 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean; minima
     const q = easeOut(clamp01((f - start) / 14));
     return (
       <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
-        <span style={{ fontFamily: "Noto Color Emoji", fontSize: 50, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
-        <span style={{ ...TEXTO, fontSize: 46, WebkitTextStroke: "3px rgba(0,0,0,.85)" }}>{nombre}</span>
+        <span style={{ fontFamily: "Noto Color Emoji", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
+        <span style={{ ...TEXTO, fontSize: 40, WebkitTextStroke: "2.5px rgba(0,0,0,.85)" }}>{nombre}</span>
       </div>
     );
   }
@@ -218,7 +218,7 @@ const FotoLucia: React.FC = () => {
   return (
     <AbsoluteFill>
       <Img src={staticFile("oficios/lucia_final.jpg")} style={{ width: 1080, height: 1920, objectFit: "cover", objectPosition: "50% 0%", transform: `scale(${1 + f * 0.0008})`, transformOrigin: "50% 40%" }} />
-      <Frase lines={[<>Soy <span style={{ color: GOLD }}>Lucía Rodríguez,</span></>, "y para nuestros", "clientes..."]} size={76} top={400} a={6} out={9999} />
+      <Frase lines={[<>Soy <span style={{ color: GOLD }}>Lucía Rodríguez,</span></>, "y para nuestros", "clientes..."]} size={54} top={440} a={6} out={9999} />
     </AbsoluteFill>
   );
 };
@@ -226,7 +226,7 @@ const FotoLucia: React.FC = () => {
 const ClipCta: React.FC = () => (
   <AbsoluteFill>
     <OffthreadVideo src={staticFile("oficios/1024_corte.mp4")} muted />
-    <Frase lines={["Somos todo eso", <>y <span style={{ color: GOLD }}>MÁS</span></>]} size={84} top={380} a={6} out={9999} />
+    <Frase lines={["Somos todo eso", <>y <span style={{ color: GOLD }}>MÁS</span></>]} size={60} top={440} a={6} out={9999} />
   </AbsoluteFill>
 );
 

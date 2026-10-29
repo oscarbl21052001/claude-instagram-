@@ -26,9 +26,9 @@ const s = (sec: number) => Math.round(sec * OFICIOS_FPS);
 const OFICIOS = [
   { cut: 3.87, emoji: "⚖️", lines: ["ABOGADA"], ring: { x: 40, y: 200, w: 760, h: 440 } },
   { cut: 5.33, emoji: "📋", lines: ["GESTORA DE", "PROYECTOS"], ring: { x: 40, y: 540, w: 760, h: 330 } },
-  { cut: 6.7, emoji: "📊", lines: ["FINANZAS"], ring: { x: 740, y: 730, w: 330, h: 220 } },
-  { cut: 8.3, emoji: "🛋️", lines: ["INTERIORISTA"], ring: { x: 100, y: 470, w: 830, h: 280 } },
-  { cut: 9.83, emoji: "📐", lines: ["ARQUITECTA"], ring: { x: 700, y: 490, w: 340, h: 420 } },
+  { cut: 6.77, emoji: "📊", lines: ["FINANZAS"], ring: { x: 740, y: 730, w: 330, h: 220 } },
+  { cut: 8.23, emoji: "🛋️", lines: ["INTERIORISTA"], ring: { x: 100, y: 470, w: 830, h: 280 } },
+  { cut: 9.7, emoji: "📐", lines: ["ARQUITECTA"], ring: { x: 700, y: 490, w: 340, h: 420 } },
 ];
 const CIERRE = 10.45;
 
@@ -270,12 +270,12 @@ export const Oficios: React.FC<{ completo: boolean; flash?: boolean; cierre?: bo
     <AbsoluteFill style={{ background: "#000" }}>
       <AbsoluteFill style={{ transform: `scale(${zoom})` }}>
         <Sequence durationInFrames={VIDEO_FRAMES}>
-          <OffthreadVideo src={staticFile("oficios/oficios_1080.mp4")} />
+          <OffthreadVideo src={staticFile("oficios/oficios_1080_beat.mp4")} muted />
         </Sequence>
         {cierre && (
           <Sequence from={VIDEO_FRAMES}>
             <Freeze frame={VIDEO_FRAMES - 2}>
-              <OffthreadVideo src={staticFile("oficios/oficios_1080.mp4")} startFrom={VIDEO_FRAMES - 2} muted />
+              <OffthreadVideo src={staticFile("oficios/oficios_1080_beat.mp4")} startFrom={VIDEO_FRAMES - 2} muted />
             </Freeze>
           </Sequence>
         )}

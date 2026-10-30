@@ -169,10 +169,14 @@ const Etiqueta: React.FC<{ i: number; completo: boolean; cierre: boolean; minima
     const nombre = of.lines.join(" ").toLowerCase().replace(/^./, (c) => c.toUpperCase());
     const q = easeOut(clamp01((f - start) / 14));
     return (
-      <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
-        <span style={{ fontFamily: "Noto Color Emoji", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.35))" }}>{of.emoji}</span>
-        <span style={{ ...TEXTO, fontSize: 40, WebkitTextStroke: "2.5px rgba(0,0,0,.85)" }}>{nombre}</span>
-      </div>
+      <>
+        {/* velo oscuro suave detrás del nombre para que se lea sobre fondos claros */}
+        <div style={{ position: "absolute", left: 0, top: 230, width: 1080, height: 320, opacity: (1 - out) * q, background: "radial-gradient(ellipse 52% 50% at 50% 50%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.32) 45%, rgba(0,0,0,0) 100%)" }} />
+        <div style={{ position: "absolute", left: 0, top: 340, width: 1080, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: (1 - out) * q, transform: `translateY(${(1 - q) * 14 - out * 14}px)`, filter: `blur(${(1 - q) * 4 + out * 4}px)` }}>
+          <span style={{ fontFamily: "Noto Color Emoji", fontSize: 38, lineHeight: 1, filter: "drop-shadow(0 2px 6px rgba(0,0,0,.5))" }}>{of.emoji}</span>
+          <span style={{ ...TEXTO, fontSize: 40, WebkitTextStroke: "2.5px rgba(0,0,0,.9)", textShadow: "0 2px 4px rgba(0,0,0,.6), 0 3px 18px rgba(0,0,0,.6)" }}>{nombre}</span>
+        </div>
+      </>
     );
   }
   return (
